@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AI Pen</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0b0c10;
+  color:white;
+  text-align:center;
+}
+
+.chat {
+  height:70vh;
+  overflow:auto;
+  padding:10px;
+}
+
+.msg {
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
+
+.user {
+  background:#007aff;
+  text-align:right;
+}
+
+.ai {
+  background:#222;
+  text-align:left;
+}
+
+button {
+  padding:15px;
+  font-size:20px;
+  margin:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🖊️ AI Pen</h2>
+<p id="status">Tap to speak</p>
+
+<div id="chat" class="chat"></div>
+
+<button id="mic">🎙️</button>
+
+<script>
+let recognition;
+let history = [];
+
+const chat = document.getElementById("chat");
+const status = document.getElementById("status");
+const mic = document.getElementById("mic");
+
+function addMessage(text, user=false){
+  let div = document.createElement("div");
+  div.className = "msg " + (user ? "user" : "ai");
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function speak(text){
+  speechSynthesis.cancel();
+  let s = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(s);
+}
+
+function setup(){
+  if(recognition) return;
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    alert("Use Chrome");
+    return;
+  }
+
+  recognition = new SR();
+  recognition.lang = "en-GB";
+
+  recognition.onresult = async (e)=>{
+    let text = e.results[0][0].transcript;
+
+    addMessage(text, true);
+    history.push({role:"user", content:text});
+
+    await askAI(text);
+  };
+
+  recognition.onend = ()=>{
+    status.innerText = "Tap to speak";
+  };
+}
+
+async function askAI(q){
+  status.innerText = "Thinking...";
+  addMessage("...", false);
+
+  try {
+    let res = await fetch("https://fortunate-enraged-lines--mathischui.replit.app/ask",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        notes: JSON.stringify(history),
+        question: q
+      })
+    });
+
+    let data = await res.json();
+    let ans = data.choices?.[0]?.message?.content || "No answer";
+
+    chat.lastChild.innerText = ans;
+    history.push({role:"assistant", content:ans});
+
+    speak(ans);
+    status.innerText = "Tap to speak";
+
+  } catch {
+    chat.lastChild.innerText = "Error";
+  }
+}
+
+mic.onclick = ()=>{
+  setup();
+  recognition.start();
+  status.innerText = "Listening...";
+};
+</script>
+
+</body>
+</html>
