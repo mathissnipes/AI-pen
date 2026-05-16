@@ -3,78 +3,146 @@
 <head>
 <meta charset="utf-8">
 <title>AI Pen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
   margin:0;
-  font-family:Arial;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
   background:#0b0c10;
   color:white;
+}
+
+.app {
+  max-width:420px;
+  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:16px;
+}
+
+.header {
   text-align:center;
 }
 
+.status {
+  font-size:12px;
+  color:#aaa;
+  margin-bottom:10px;
+}
+
 .chat {
-  height:70vh;
-  overflow:auto;
-  padding:10px;
+  flex:1;
+  overflow-y:auto;
+  padding:10px 0;
 }
 
 .msg {
-  margin:10px;
-  padding:10px;
-  border-radius:10px;
+  max-width:70%;
+  padding:12px;
+  border-radius:18px;
+  margin-bottom:10px;
+  font-size:14px;
+  line-height:1.4;
 }
 
 .user {
   background:#007aff;
-  text-align:right;
+  margin-left:auto;
 }
 
 .ai {
-  background:#222;
-  text-align:left;
+  background:#1c1c1e;
 }
 
-button {
-  padding:15px;
-  font-size:20px;
-  margin:10px;
+.micWrap {
+  display:flex;
+  justify-content:center;
+  padding:10px;
+}
+
+.mic {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  border:none;
+  font-size:28px;
+  background:#007aff;
+  color:white;
+}
+
+.mic.active {
+  background:red;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🖊️ AI Pen</h2>
-<p id="status">Tap to speak</p>
+<div class="app">
+
+<div class="header">
+  <h2>🖊️ AI Pen</h2>
+  <div id="status" class="status">Tap and speak</div>
+</div>
 
 <div id="chat" class="chat"></div>
 
-<button id="mic">🎙️</button>
+<div class="micWrap">
+  <button id="mic" class="mic">🎙️</button>
+</div>
+
+</div>
 
 <script>
 let recognition;
 let history = [];
+let isListening = false;
 
-const chat = document.getElementById("chat");
-const status = document.getElementById("status");
 const mic = document.getElementById("mic");
+const status = document.getElementById("status");
+const chat = document.getElementById("chat");
 
+/* Add message */
 function addMessage(text, user=false){
   let div = document.createElement("div");
   div.className = "msg " + (user ? "user" : "ai");
   div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
+  return div;
 }
 
+/* Speak */
 function speak(text){
   speechSynthesis.cancel();
   let s = new SpeechSynthesisUtterance(text);
+  s.rate = 0.95;
   speechSynthesis.speak(s);
 }
 
-function setup(){
+/* Smarter follow-up */
+function getFollowUp(question){
+  const q = question.toLowerCase();
+
+  if(q.includes("what") || q.includes("explain")){
+    return "Want a simpler version?";
+  }
+
+  if(q.includes("how")){
+    return "Want step-by-step help?";
+  }
+
+  if(q.includes("why")){
+    return "Want an example?";
+  }
+
+  return "";
+}
+
+/* Setup mic once */
+function setupMic(){
   if(recognition) return;
 
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -86,6 +154,11 @@ function setup(){
   recognition = new SR();
   recognition.lang = "en-GB";
 
+  recognition.onstart = ()=>{
+    status.innerText = "Listening...";
+    mic.classList.add("active");
+  };
+
   recognition.onresult = async (e)=>{
     let text = e.results[0][0].transcript;
 
@@ -96,43 +169,61 @@ function setup(){
   };
 
   recognition.onend = ()=>{
-    status.innerText = "Tap to speak";
+    isListening = false;
+    mic.classList.remove("active");
+    status.innerText = "Tap and speak";
   };
 }
 
-async function askAI(q){
-  status.innerText = "Thinking...";
-  addMessage("...", false);
+/* Start mic */
+function startListening(){
+  setupMic();
+
+  if(isListening) return;
 
   try {
+    recognition.start();
+    isListening = true;
+  } catch(e){}
+}
+
+/* AI */
+async function askAI(question){
+  status.innerText = "Thinking...";
+  let el = addMessage("...", false);
+
+  try{
     let res = await fetch("https://fortunate-enraged-lines--mathischui.replit.app/ask",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         notes: JSON.stringify(history),
-        question: q
+        question: question
       })
     });
 
     let data = await res.json();
     let ans = data.choices?.[0]?.message?.content || "No answer";
 
-    chat.lastChild.innerText = ans;
+    // 🔥 shorten answer
+    ans = ans.split(".").slice(0,2).join(".") + ".";
+
+    // 🔥 better follow-up
+    let follow = getFollowUp(question);
+    if(follow) ans += "\n\n👉 " + follow;
+
+    el.innerText = ans;
     history.push({role:"assistant", content:ans});
 
     speak(ans);
-    status.innerText = "Tap to speak";
+    status.innerText = "Tap and speak";
 
   } catch {
-    chat.lastChild.innerText = "Error";
+    el.innerText = "Error";
   }
 }
 
-mic.onclick = ()=>{
-  setup();
-  recognition.start();
-  status.innerText = "Listening...";
-};
+mic.onclick = startListening;
 </script>
 
 </body>
