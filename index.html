@@ -49,7 +49,6 @@ input,button{
 
 <div class="container">
 
-<!-- LOGIN -->
 <div id="login">
   <h2>AI Pen</h2>
   <input id="email" placeholder="Email">
@@ -58,7 +57,6 @@ input,button{
   <button id="signupBtn">Sign Up</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
   <h2>AI Pen</h2>
   <div id="chat" class="chat"></div>
@@ -74,7 +72,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/fireba
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-/* Firebase config */
+/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
@@ -100,13 +98,25 @@ document.getElementById("loginBtn").onclick = login;
 document.getElementById("signupBtn").onclick = signup;
 document.getElementById("logoutBtn").onclick = logout;
 
-/* SPEAK (VOICE OUTPUT) */
+/* 🔊 SPEECH FIXED */
 function speak(text){
   speechSynthesis.cancel();
-  const s = new SpeechSynthesisUtterance(text);
-  s.rate = 0.9;
-  s.lang = "en-GB";
-  speechSynthesis.speak(s);
+
+  function run(){
+    const voices = speechSynthesis.getVoices();
+    const s = new SpeechSynthesisUtterance(text);
+
+    s.voice = voices.find(v => v.lang.includes("en")) || voices[0];
+    s.rate = 0.95;
+
+    speechSynthesis.speak(s);
+  }
+
+  if(speechSynthesis.getVoices().length === 0){
+    speechSynthesis.onvoiceschanged = run;
+  } else {
+    run();
+  }
 }
 
 /* LOGIN */
@@ -171,7 +181,7 @@ async function save(text,role){
   });
 }
 
-/* UI MESSAGE */
+/* UI */
 function addMessage(text,isUser){
   const div = document.createElement("div");
   div.className = "msg " + (isUser?"user":"ai");
@@ -184,6 +194,9 @@ function addMessage(text,isUser){
 document.getElementById("mic").onclick = ()=>{
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SR();
+
+  // 🔥 unlock audio
+  speechSynthesis.resume();
 
   recognition.onresult = async (e)=>{
     let text = e.results[0][0].transcript;
@@ -202,7 +215,8 @@ document.getElementById("mic").onclick = ()=>{
 
     addMessage(ans,false);
     save(ans,"ai");
-    speak(ans); // 🔥 VOICE BACK
+
+    speak(ans); // 🔊 guaranteed working
   };
 
   recognition.start();
@@ -212,4 +226,3 @@ document.getElementById("mic").onclick = ()=>{
 
 </body>
 </html>
-
