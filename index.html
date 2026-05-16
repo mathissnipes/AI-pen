@@ -74,7 +74,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/fireba
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-/* 🔥 YOUR FIREBASE CONFIG (already correct) */
+/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
@@ -95,10 +95,19 @@ const loginDiv = document.getElementById("login");
 const appDiv = document.getElementById("app");
 const chat = document.getElementById("chat");
 
-/* BUTTONS (IMPORTANT FIX) */
-document.getElementById("loginBtn").addEventListener("click", login);
-document.getElementById("signupBtn").addEventListener("click", signup);
-document.getElementById("logoutBtn").addEventListener("click", logout);
+/* BUTTONS */
+document.getElementById("loginBtn").onclick = login;
+document.getElementById("signupBtn").onclick = signup;
+document.getElementById("logoutBtn").onclick = logout;
+
+/* SPEAK (VOICE OUTPUT) */
+function speak(text){
+  speechSynthesis.cancel();
+  const s = new SpeechSynthesisUtterance(text);
+  s.rate = 0.9;
+  s.lang = "en-GB";
+  speechSynthesis.speak(s);
+}
 
 /* LOGIN */
 async function login(){
@@ -172,7 +181,7 @@ function addMessage(text,isUser){
 }
 
 /* MIC */
-document.getElementById("mic").addEventListener("click", ()=>{
+document.getElementById("mic").onclick = ()=>{
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SR();
 
@@ -193,12 +202,14 @@ document.getElementById("mic").addEventListener("click", ()=>{
 
     addMessage(ans,false);
     save(ans,"ai");
+    speak(ans); // 🔥 VOICE BACK
   };
 
   recognition.start();
-});
+};
 
 </script>
 
 </body>
 </html>
+
