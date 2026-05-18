@@ -6,15 +6,15 @@
 <title>AI Pen</title>
 
 <style>
-body {
+body{
   margin:0;
-  font-family:Arial;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   background:#0f172a;
   color:white;
 }
 
-/* LOGIN */
-#auth {
+/* AUTH */
+#auth{
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -22,17 +22,17 @@ body {
   height:100vh;
 }
 
-input {
+input{
   padding:12px;
-  margin:8px;
+  margin:6px;
   border-radius:8px;
   border:none;
-  width:250px;
+  width:260px;
 }
 
-button {
+button{
   padding:12px;
-  margin:5px;
+  margin:6px;
   border:none;
   border-radius:8px;
   background:#2563eb;
@@ -40,97 +40,127 @@ button {
   cursor:pointer;
 }
 
+.switch{
+  color:#38bdf8;
+  cursor:pointer;
+}
+
 /* APP */
-#app {
+#app{
   display:none;
   height:100vh;
 }
 
-#sidebar {
-  width:250px;
+/* Sidebar */
+#sidebar{
+  width:260px;
   background:#020617;
   height:100%;
-  overflow:auto;
   float:left;
+  padding:10px;
 }
 
-#chatArea {
-  margin-left:250px;
+.chatItem{
+  padding:10px;
+  background:#1e293b;
+  margin:5px 0;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* Main */
+#main{
+  margin-left:260px;
   height:100%;
   display:flex;
   flex-direction:column;
 }
 
-#messages {
+#top{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #1e293b;
+}
+
+#messages{
   flex:1;
   overflow:auto;
   padding:10px;
 }
 
-.msg {
-  margin:10px;
-  padding:10px;
-  border-radius:10px;
+.msg{
   max-width:70%;
+  padding:10px;
+  margin:6px;
+  border-radius:10px;
 }
 
-.user {
+.user{
   background:#2563eb;
   margin-left:auto;
 }
 
-.ai {
+.ai{
   background:#1e293b;
 }
 
-#inputBar {
+#inputBar{
   display:flex;
-}
-
-#inputBar input {
-  flex:1;
-}
-
-.chatItem {
   padding:10px;
-  border-bottom:1px solid #1e293b;
-  cursor:pointer;
+}
+
+#inputBar input{
+  flex:1;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- AUTH -->
 <div id="auth">
-  <h2>AI Pen</h2>
+  <h2 id="authTitle">Login</h2>
+
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn">Login</button>
-  <button id="signupBtn">Sign Up</button>
+  <input id="username" placeholder="Username" style="display:none;">
+
+  <button id="authBtn">Login</button>
+  <div id="switchText" class="switch">No account? Sign up</div>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <div id="sidebar">
-    <button id="newChatBtn">+ New Chat</button>
-    <div id="chatList"></div>
-  </div>
 
-  <div id="chatArea">
-    <div id="messages"></div>
-    <div id="inputBar">
-      <input id="msgInput" placeholder="Type a message...">
-      <button id="sendBtn">Send</button>
-    </div>
-  </div>
+<div id="sidebar">
+  <button id="newChatBtn">+ New Chat</button>
+  <div id="chatList"></div>
+</div>
+
+<div id="main">
+
+<div id="top">
+  <div id="profile"></div>
+</div>
+
+<div id="messages"></div>
+
+<div id="inputBar">
+  <input id="msgInput" placeholder="Type a message...">
+  <button id="sendBtn">Send</button>
+</div>
+
+</div>
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
+/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
@@ -141,74 +171,62 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-let currentUser = null;
-let currentChat = [];
+let user = null;
+let isSignup = false;
+let currentChatId = null;
+
+/* SWITCH LOGIN/SIGNUP */
+switchText.onclick = ()=>{
+  isSignup = !isSignup;
+
+  authTitle.innerText = isSignup ? "Sign Up" : "Login";
+  authBtn.innerText = isSignup ? "Create Account" : "Login";
+  username.style.display = isSignup ? "block" : "none";
+
+  switchText.innerText = isSignup
+    ? "Already have account? Login"
+    : "No account? Sign up";
+};
 
 /* AUTH */
-loginBtn.onclick = async ()=>{
-  await signInWithEmailAndPassword(auth, email.value, password.value);
+authBtn.onclick = async ()=>{
+  try{
+    if(isSignup){
+      const res = await createUserWithEmailAndPassword(auth,email.value,password.value);
+
+      await setDoc(doc(db,"users",res.user.uid),{
+        username: username.value
+      });
+
+    }else{
+      await signInWithEmailAndPassword(auth,email.value,password.value);
+    }
+  }catch(e){
+    alert(e.message);
+  }
 };
 
-signupBtn.onclick = async ()=>{
-  await createUserWithEmailAndPassword(auth, email.value, password.value);
-};
-
-onAuthStateChanged(auth, user=>{
-  if(user){
-    currentUser = user;
+/* AUTO LOGIN */
+onAuthStateChanged(auth, async u=>{
+  if(u){
+    user = u;
     auth.style.display="none";
     app.style.display="block";
+
+    profile.innerText = u.email;
+
     loadChats();
   }
 });
 
-/* CHAT UI */
-sendBtn.onclick = sendMessage;
-
-msgInput.addEventListener("keypress", e=>{
-  if(e.key==="Enter") sendMessage();
-});
-
-function addMessage(text, type){
-  let div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-/* SIMPLE AI */
-function fakeAI(text){
-  return "AI: " + text;
-}
-
-/* SEND */
-async function sendMessage(){
-  let text = msgInput.value;
-  if(!text) return;
-
-  addMessage(text,"user");
-  currentChat.push({role:"user",text});
-
-  msgInput.value="";
-
-  let reply = fakeAI(text);
-
-  addMessage(reply,"ai");
-  currentChat.push({role:"ai",text:reply});
-}
-
-/* SAVE CHAT */
+/* CREATE CHAT */
 newChatBtn.onclick = async ()=>{
-  if(currentChat.length===0) return;
-
-  await addDoc(collection(db,"chats"),{
-    uid: currentUser.uid,
-    messages: currentChat,
-    created: Date.now()
+  const ref = await addDoc(collection(db,"chats"),{
+    uid:user.uid,
+    created:Date.now()
   });
 
-  currentChat = [];
+  currentChatId = ref.id;
   messages.innerHTML="";
   loadChats();
 };
@@ -216,24 +234,71 @@ newChatBtn.onclick = async ()=>{
 /* LOAD CHATS */
 async function loadChats(){
   chatList.innerHTML="";
-  const q = query(collection(db,"chats"), where("uid","==",currentUser.uid));
+
+  const q = query(collection(db,"chats"), where("uid","==",user.uid));
   const snap = await getDocs(q);
 
-  snap.forEach(doc=>{
-    let item = document.createElement("div");
-    item.className="chatItem";
-    item.innerText="Chat";
+  snap.forEach(docSnap=>{
+    let div = document.createElement("div");
+    div.className="chatItem";
+    div.innerText="Chat";
 
-    item.onclick = ()=>{
-      messages.innerHTML="";
-      doc.data().messages.forEach(m=>{
-        addMessage(m.text, m.role==="user"?"user":"ai");
-      });
+    div.onclick = ()=>{
+      currentChatId = docSnap.id;
+      loadMessages();
     };
 
-    chatList.appendChild(item);
+    chatList.appendChild(div);
   });
 }
+
+/* LOAD MESSAGES */
+async function loadMessages(){
+  messages.innerHTML="";
+
+  const snap = await getDocs(collection(db,"chats",currentChatId,"messages"));
+
+  snap.forEach(d=>{
+    const m = d.data();
+    addMessage(m.text, m.role);
+  });
+}
+
+/* SEND MESSAGE */
+sendBtn.onclick = sendMessage;
+
+async function sendMessage(){
+  let text = msgInput.value;
+  if(!text || !currentChatId) return;
+
+  addMessage(text,"user");
+
+  await addDoc(collection(db,"chats",currentChatId,"messages"),{
+    text,
+    role:"user"
+  });
+
+  msgInput.value="";
+
+  let reply = "AI: " + text;
+
+  addMessage(reply,"ai");
+
+  await addDoc(collection(db,"chats",currentChatId,"messages"),{
+    text:reply,
+    role:"ai"
+  });
+}
+
+/* UI */
+function addMessage(text,type){
+  let div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
 </script>
 
 </body>
