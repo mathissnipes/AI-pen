@@ -11,10 +11,9 @@ body {
   font-family:Arial;
   background:#0f172a;
   color:white;
-  text-align:center;
 }
 
-#auth, #app {
+.container {
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -42,15 +41,14 @@ button {
   cursor:pointer;
 }
 
-#messages {
-  max-height:300px;
-  overflow:auto;
+#chat {
   width:90%;
+  max-width:700px;
 }
 
 .msg {
   padding:10px;
-  margin:5px;
+  margin:5px 0;
   border-radius:10px;
 }
 
@@ -61,9 +59,9 @@ button {
 
 <body>
 
-<!-- LOGIN -->
-<div id="auth">
-  <h2>AI Pen Login</h2>
+<!-- AUTH -->
+<div id="auth" class="container">
+  <h2>AI Pen</h2>
 
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
@@ -73,12 +71,12 @@ button {
 </div>
 
 <!-- APP -->
-<div id="app">
+<div id="app" class="container">
   <button onclick="logout()">Logout</button>
 
-  <div id="messages"></div>
+  <div id="chat"></div>
 
-  <input id="msgInput" placeholder="Ask something...">
+  <input id="msg" placeholder="Ask something...">
   <button onclick="send()">Send</button>
 </div>
 
@@ -87,10 +85,10 @@ button {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-/* ===== PUT YOUR KEY HERE ===== */
-const API_KEY = "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";
+/* ===== YOUR API KEY ===== */
+const API_KEY = "PASTE_YOUR_OPENROUTER_KEY";
 
-/* ===== FIREBASE ===== */
+/* ===== FIREBASE CONFIG ===== */
 firebase.initializeApp({
   apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain:"ai-pen-c85a0.firebaseapp.com",
@@ -99,46 +97,49 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 
-/* ===== SIGNUP ===== */
+/* ===== AUTH ===== */
 function signup(){
-  auth.createUserWithEmailAndPassword(email.value, password.value)
+  auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(()=>alert("Account created"))
   .catch(e=>alert(e.code));
 }
 
-/* ===== LOGIN ===== */
 function login(){
-  auth.signInWithEmailAndPassword(email.value, password.value)
+  auth.signInWithEmailAndPassword(email.value,password.value)
   .catch(e=>alert(e.code));
 }
 
-/* ===== LOGOUT ===== */
 function logout(){
   auth.signOut();
 }
 
-/* ===== STATE ===== */
 auth.onAuthStateChanged(user=>{
   if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="flex";
-  }else{
-    document.getElementById("auth").style.display="flex";
-    document.getElementById("app").style.display="none";
+    auth.style.display="none";
+    app.style.display="flex";
+  } else {
+    auth.style.display="flex";
+    app.style.display="none";
   }
 });
 
-/* ===== SEND ===== */
-function send(){
-  const text = msgInput.value;
+/* ===== CHAT ===== */
+function add(text,type){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.innerText=text;
+  chat.appendChild(d);
+}
+
+async function send(){
+  const text=msg.value;
   if(!text) return;
 
   add(text,"user");
-  msgInput.value="";
+  msg.value="";
 
-  askAI(text).then(reply=>{
-    add(reply,"ai");
-  });
+  const reply=await askAI(text);
+  add(reply,"ai");
 }
 
 /* ===== AI ===== */
@@ -148,18 +149,22 @@ async function askAI(message){
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "Authorization":"Bearer " + API_KEY
+        "Authorization":"Bearer "+API_KEY,
+        "HTTP-Referer":"https://mathissnipes.github.io",
+        "X-Title":"AI Pen"
       },
-      body: JSON.stringify({
-        model:"mistralai/mistral-7b-instruct",
-        messages:[{role:"user",content:message}]
+      body:JSON.stringify({
+        model:"mistralai/mistral-7b-instruct:free",
+        messages:[
+          {role:"user",content:message}
+        ]
       })
     });
 
     const data = await res.json();
 
     if(!data.choices){
-      return "AI error";
+      return "ERROR: " + JSON.stringify(data);
     }
 
     return data.choices[0].message.content;
@@ -167,14 +172,6 @@ async function askAI(message){
   }catch(e){
     return "Connection error";
   }
-}
-
-/* ===== UI ===== */
-function add(text,type){
-  const d = document.createElement("div");
-  d.className = "msg " + type;
-  d.innerText = text;
-  messages.appendChild(d);
 }
 </script>
 
