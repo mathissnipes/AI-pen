@@ -13,7 +13,6 @@ body{
   color:white;
 }
 
-/* AUTH */
 #auth{
   display:flex;
   flex-direction:column;
@@ -40,46 +39,15 @@ button{
   cursor:pointer;
 }
 
-.switch{
-  color:#38bdf8;
-  cursor:pointer;
-}
-
-/* APP */
 #app{
   display:none;
-  height:100vh;
-}
-
-#messages{
-  height:80%;
-  overflow:auto;
-  padding:10px;
-}
-
-.msg{
-  margin:8px;
-  padding:10px;
-  border-radius:10px;
-  max-width:70%;
-}
-
-.user{ background:#2563eb; margin-left:auto; }
-.ai{ background:#1e293b; }
-
-#inputBar{
-  display:flex;
-}
-
-#inputBar input{
-  flex:1;
+  padding:20px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
 <div id="auth">
   <h2 id="title">Login</h2>
 
@@ -88,98 +56,80 @@ button{
   <input id="username" placeholder="Username" style="display:none;">
 
   <button id="mainBtn">Login</button>
-  <div id="switchBtn" class="switch">No account? Sign up</div>
+  <button id="toggleBtn">Switch Mode</button>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <div id="messages"></div>
-
-  <div id="inputBar">
-    <input id="msgInput" placeholder="Type...">
-    <button id="sendBtn">Send</button>
-  </div>
+  <h2>Logged in 🎉</h2>
 </div>
 
-<script type="module">
+<!-- Firebase (NON MODULE VERSION) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+<script>
+console.log("Script loaded ✅");
 
 /* Firebase */
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
   projectId: "ai-pen-c85a0"
-};
+});
 
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-/* MODE */
 let signupMode = false;
 
-const authDiv = document.getElementById("auth");
-const appDiv = document.getElementById("app");
+/* Buttons */
+const mainBtn = document.getElementById("mainBtn");
+const toggleBtn = document.getElementById("toggleBtn");
 
-/* SWITCH */
-switchBtn.onclick = ()=>{
+/* Switch mode */
+toggleBtn.onclick = ()=>{
   signupMode = !signupMode;
 
-  title.innerText = signupMode ? "Sign Up" : "Login";
+  document.getElementById("title").innerText = signupMode ? "Sign Up" : "Login";
+  document.getElementById("username").style.display = signupMode ? "block" : "none";
   mainBtn.innerText = signupMode ? "Create Account" : "Login";
-  username.style.display = signupMode ? "block" : "none";
-
-  switchBtn.innerText = signupMode
-    ? "Already have account? Login"
-    : "No account? Sign up";
 };
 
-/* AUTH ACTION */
+/* Main action */
 mainBtn.onclick = async ()=>{
+  console.log("Button clicked 🔥");
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value;
+
   try{
     if(signupMode){
-      const res = await createUserWithEmailAndPassword(auth,email.value,password.value);
+      const res = await auth.createUserWithEmailAndPassword(email,password);
 
-      await setDoc(doc(db,"users",res.user.uid),{
-        username: username.value
+      await db.collection("users").doc(res.user.uid).set({
+        username: username
       });
 
+      alert("Account created!");
     }else{
-      await signInWithEmailAndPassword(auth,email.value,password.value);
+      await auth.signInWithEmailAndPassword(email,password);
+      alert("Logged in!");
     }
   }catch(e){
+    console.error(e);
     alert(e.message);
   }
 };
 
-/* AUTO LOGIN */
-onAuthStateChanged(auth, user=>{
+/* Auto login */
+auth.onAuthStateChanged(user=>{
   if(user){
-    authDiv.style.display="none";
-    appDiv.style.display="block";
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="block";
   }
 });
-
-/* CHAT */
-sendBtn.onclick = ()=>{
-  if(!msgInput.value) return;
-
-  addMsg(msgInput.value,"user");
-  addMsg("AI: "+msgInput.value,"ai");
-
-  msgInput.value="";
-};
-
-function addMsg(text,type){
-  let d = document.createElement("div");
-  d.className="msg "+type;
-  d.innerText=text;
-  messages.appendChild(d);
-}
-
 </script>
 
 </body>
