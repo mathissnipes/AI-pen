@@ -35,6 +35,8 @@ button{
   margin:6px;
   border:none;
   border-radius:8px;
+  background:#2563eb;
+  color:white;
   cursor:pointer;
 }
 
@@ -44,13 +46,12 @@ button{
   height:100vh;
 }
 
-/* BIG LOGOUT BUTTON */
+/* LOGOUT */
 #logoutBtn{
   position:fixed;
   top:10px;
   right:10px;
   background:red;
-  color:white;
   font-weight:bold;
   z-index:9999;
 }
@@ -95,7 +96,7 @@ button{
   <input id="username" placeholder="Username" style="display:none;">
 
   <button id="mainBtn">Login</button>
-  <button id="switchBtn">Switch Mode</button>
+  <button id="switchBtn">No account? Sign up</button>
 </div>
 
 <!-- APP -->
@@ -119,8 +120,6 @@ button{
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-
-/* Firebase */
 firebase.initializeApp({
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
@@ -131,13 +130,21 @@ const auth = firebase.auth();
 
 let signupMode = false;
 
-/* SWITCH */
+/* SWITCH LOGIN / SIGNUP */
 switchBtn.onclick = ()=>{
   signupMode = !signupMode;
 
-  title.innerText = signupMode ? "Sign Up" : "Login";
-  mainBtn.innerText = signupMode ? "Create Account" : "Login";
-  username.style.display = signupMode ? "block" : "none";
+  if(signupMode){
+    title.innerText = "Sign Up";
+    mainBtn.innerText = "Create Account";
+    username.style.display = "block";
+    switchBtn.innerText = "Already have account? Login";
+  }else{
+    title.innerText = "Login";
+    mainBtn.innerText = "Login";
+    username.style.display = "none";
+    switchBtn.innerText = "No account? Sign up";
+  }
 };
 
 /* LOGIN / SIGNUP */
@@ -164,7 +171,7 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-/* LOGOUT (GUARANTEED) */
+/* LOGOUT */
 logoutBtn.onclick = ()=>{
   auth.signOut();
 };
@@ -206,7 +213,6 @@ recognition.onresult = (event)=>{
   const speech = new SpeechSynthesisUtterance(reply);
   window.speechSynthesis.speak(speech);
 };
-
 </script>
 
 </body>
