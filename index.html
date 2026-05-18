@@ -2,220 +2,159 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Pen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family:sans-serif;
-  background:#0f172a;
-  color:white;
-}
-
-/* AUTH */
-#auth{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-
-input{
-  padding:12px;
-  margin:6px;
-  border-radius:8px;
-  border:none;
-  width:260px;
-}
-
-button{
-  padding:12px;
-  margin:6px;
-  border:none;
-  border-radius:8px;
-  background:#2563eb;
-  color:white;
-  cursor:pointer;
-}
-
-/* APP */
-#app{
-  display:none;
-  height:100vh;
-}
-
-/* LOGOUT */
-#logoutBtn{
-  position:fixed;
-  top:10px;
-  right:10px;
-  background:red;
-  font-weight:bold;
-  z-index:9999;
-}
-
-/* CHAT */
-#messages{
-  height:70%;
-  overflow:auto;
-  padding:10px;
-}
-
-.msg{
-  padding:10px;
-  margin:5px;
-  border-radius:10px;
-  max-width:70%;
-}
-
-.user{ background:#2563eb; margin-left:auto; }
-.ai{ background:#1e293b; }
-
-/* INPUT */
-#inputBar{
-  display:flex;
-  padding:10px;
-}
-
-#inputBar input{
-  flex:1;
-}
+body{margin:0;font-family:sans-serif;background:#0f172a;color:white;}
+#auth{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
+input{padding:12px;margin:6px;border-radius:8px;border:none;width:260px;}
+button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer;}
+#app{display:none;}
+#logoutBtn{position:fixed;top:10px;right:10px;background:red;}
+.msg{margin:5px;padding:10px;border-radius:10px;max-width:70%;}
+.user{background:#2563eb;margin-left:auto;}
+.ai{background:#1e293b;}
 </style>
+
 </head>
 
 <body>
 
-<!-- AUTH -->
 <div id="auth">
   <h2 id="title">Login</h2>
-
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <input id="username" placeholder="Username" style="display:none;">
-
   <button id="mainBtn">Login</button>
   <button id="switchBtn">No account? Sign up</button>
 </div>
 
-<!-- APP -->
 <div id="app">
-
 <button id="logoutBtn">LOGOUT</button>
 
 <div id="messages"></div>
 
-<div id="inputBar">
-  <input id="msgInput" placeholder="Type message...">
-  <button id="sendBtn">Send</button>
-</div>
-
+<input id="msgInput" placeholder="Type or speak...">
+<button id="sendBtn">Send</button>
 <button id="micBtn">🎙️ Speak</button>
 
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
+
 firebase.initializeApp({
-  apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
-  authDomain: "ai-pen-c85a0.firebaseapp.com",
-  projectId: "ai-pen-c85a0"
+  apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
+  authDomain:"ai-pen-c85a0.firebaseapp.com",
+  projectId:"ai-pen-c85a0"
 });
 
 const auth = firebase.auth();
-let signupMode = false;
+let signupMode=false;
 
-/* SWITCH LOGIN / SIGNUP */
-document.getElementById("switchBtn").onclick = ()=>{
-  signupMode = !signupMode;
-
-  if(signupMode){
-    document.getElementById("title").innerText = "Sign Up";
-    document.getElementById("mainBtn").innerText = "Create Account";
-    document.getElementById("username").style.display = "block";
-    document.getElementById("switchBtn").innerText = "Already have account? Login";
-  }else{
-    document.getElementById("title").innerText = "Login";
-    document.getElementById("mainBtn").innerText = "Login";
-    document.getElementById("username").style.display = "none";
-    document.getElementById("switchBtn").innerText = "No account? Sign up";
-  }
+switchBtn.onclick=()=>{
+  signupMode=!signupMode;
+  title.innerText=signupMode?"Sign Up":"Login";
+  mainBtn.innerText=signupMode?"Create Account":"Login";
+  username.style.display=signupMode?"block":"none";
+  switchBtn.innerText=signupMode?"Already have account? Login":"No account? Sign up";
 };
 
-/* LOGIN / SIGNUP */
-document.getElementById("mainBtn").onclick = async ()=>{
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
+mainBtn.onclick=async()=>{
   try{
     if(signupMode){
-      await auth.createUserWithEmailAndPassword(email,password);
+      await auth.createUserWithEmailAndPassword(email.value,password.value);
     }else{
-      await auth.signInWithEmailAndPassword(email,password);
+      await auth.signInWithEmailAndPassword(email.value,password.value);
     }
   }catch(e){
     alert(e.message);
   }
 };
 
-/* AUTH STATE */
 auth.onAuthStateChanged(user=>{
   if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
+    auth.style.display="none";
+    app.style.display="block";
   }else{
-    document.getElementById("auth").style.display="flex";
-    document.getElementById("app").style.display="none";
+    auth.style.display="flex";
+    app.style.display="none";
   }
 });
 
-/* LOGOUT */
-document.getElementById("logoutBtn").onclick = ()=>{
-  auth.signOut();
-};
+logoutBtn.onclick=()=>auth.signOut();
 
 /* CHAT */
-document.getElementById("sendBtn").onclick = ()=>{
-  const input = document.getElementById("msgInput");
-  if(!input.value) return;
+sendBtn.onclick=sendMessage;
 
-  addMsg(input.value,"user");
-  addMsg("AI: " + input.value,"ai");
+async function sendMessage(){
+  const text=msgInput.value;
+  if(!text) return;
 
-  input.value="";
-};
+  addMsg(text,"user");
+  msgInput.value="";
 
+  const reply=await askAI(text);
+  addMsg(reply,"ai");
+}
+
+/* DEBUG AI */
+async function askAI(message){
+  try{
+    console.log("Sending:",message);
+
+    const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer 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"
+      },
+      body:JSON.stringify({
+        model:"mistralai/mistral-7b-instruct",
+        messages:[{role:"user",content:message}]
+      })
+    });
+
+    const data=await res.json();
+
+    console.log("AI Response:",data);
+
+    if(!data.choices){
+      return "⚠️ AI ERROR: "+JSON.stringify(data);
+    }
+
+    return data.choices[0].message.content;
+
+  }catch(e){
+    console.error(e);
+    return "❌ ERROR: "+e.message;
+  }
+}
+
+/* UI */
 function addMsg(text,type){
-  const d = document.createElement("div");
+  const d=document.createElement("div");
   d.className="msg "+type;
   d.innerText=text;
-  document.getElementById("messages").appendChild(d);
+  messages.appendChild(d);
 }
 
 /* SPEECH */
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+const recognition=new SpeechRecognition();
 
-document.getElementById("micBtn").onclick = ()=>{
-  recognition.start();
-};
+micBtn.onclick=()=>recognition.start();
 
-recognition.onresult = (event)=>{
-  const text = event.results[0][0].transcript;
-
+recognition.onresult=async(e)=>{
+  const text=e.results[0][0].transcript;
   addMsg(text,"user");
-
-  const reply = "AI: " + text;
-
+  const reply=await askAI(text);
   addMsg(reply,"ai");
-
-  const speech = new SpeechSynthesisUtterance(reply);
-  window.speechSynthesis.speak(speech);
 };
+
 </script>
 
 </body>
