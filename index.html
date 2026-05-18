@@ -2,50 +2,62 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI Pen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Pen</title>
 
 <style>
 body{margin:0;font-family:sans-serif;background:#0f172a;color:white;}
 #auth{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
 input{padding:12px;margin:6px;border-radius:8px;border:none;width:260px;}
 button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer;}
-#app{display:none;}
-#logoutBtn{position:fixed;top:10px;right:10px;background:red;}
-.msg{margin:5px;padding:10px;border-radius:10px;max-width:70%;}
+#app{display:none;height:100vh;}
+#logoutBtn{position:fixed;top:10px;right:10px;background:red;font-weight:bold;z-index:9999;}
+#messages{height:70%;overflow:auto;padding:10px;}
+.msg{padding:10px;margin:5px;border-radius:10px;max-width:70%;}
 .user{background:#2563eb;margin-left:auto;}
 .ai{background:#1e293b;}
+#inputBar{display:flex;padding:10px;}
+#inputBar input{flex:1;}
 </style>
-
 </head>
 
 <body>
 
+<!-- AUTH -->
 <div id="auth">
   <h2 id="title">Login</h2>
+
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <input id="username" placeholder="Username" style="display:none;">
+
   <button id="mainBtn">Login</button>
   <button id="switchBtn">No account? Sign up</button>
 </div>
 
+<!-- APP -->
 <div id="app">
-<button id="logoutBtn">LOGOUT</button>
+  <button id="logoutBtn">LOGOUT</button>
 
-<div id="messages"></div>
+  <div id="messages"></div>
 
-<input id="msgInput" placeholder="Type or speak...">
-<button id="sendBtn">Send</button>
-<button id="micBtn">🎙️ Speak</button>
+  <div id="inputBar">
+    <input id="msgInput" placeholder="Type or speak...">
+    <button id="sendBtn">Send</button>
+  </div>
 
+  <button id="micBtn">🎙️ Speak</button>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
+/* ===== PUT YOUR KEY HERE ===== */
+const OPENROUTER_API_KEY = "PASTE_YOUR_KEY_HERE";
 
+/* ===== FIREBASE ===== */
 firebase.initializeApp({
   apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain:"ai-pen-c85a0.firebaseapp.com",
@@ -53,17 +65,26 @@ firebase.initializeApp({
 });
 
 const auth = firebase.auth();
-let signupMode=false;
+let signupMode = false;
 
-switchBtn.onclick=()=>{
-  signupMode=!signupMode;
-  title.innerText=signupMode?"Sign Up":"Login";
-  mainBtn.innerText=signupMode?"Create Account":"Login";
-  username.style.display=signupMode?"block":"none";
-  switchBtn.innerText=signupMode?"Already have account? Login":"No account? Sign up";
+/* ===== SWITCH LOGIN / SIGNUP ===== */
+switchBtn.onclick = ()=>{
+  signupMode = !signupMode;
+  if(signupMode){
+    title.innerText = "Sign Up";
+    mainBtn.innerText = "Create Account";
+    username.style.display = "block";
+    switchBtn.innerText = "Already have account? Login";
+  }else{
+    title.innerText = "Login";
+    mainBtn.innerText = "Login";
+    username.style.display = "none";
+    switchBtn.innerText = "No account? Sign up";
+  }
 };
 
-mainBtn.onclick=async()=>{
+/* ===== LOGIN / SIGNUP ===== */
+mainBtn.onclick = async ()=>{
   try{
     if(signupMode){
       await auth.createUserWithEmailAndPassword(email.value,password.value);
@@ -75,86 +96,100 @@ mainBtn.onclick=async()=>{
   }
 };
 
+/* ===== AUTH STATE ===== */
 auth.onAuthStateChanged(user=>{
   if(user){
-    auth.style.display="none";
-    app.style.display="block";
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="block";
   }else{
-    auth.style.display="flex";
-    app.style.display="none";
+    document.getElementById("auth").style.display="flex";
+    document.getElementById("app").style.display="none";
   }
 });
 
-logoutBtn.onclick=()=>auth.signOut();
+/* ===== LOGOUT ===== */
+logoutBtn.onclick = ()=>auth.signOut();
 
-/* CHAT */
-sendBtn.onclick=sendMessage;
+/* ===== SEND MESSAGE ===== */
+sendBtn.onclick = sendMessage;
 
 async function sendMessage(){
-  const text=msgInput.value;
+  const text = msgInput.value.trim();
   if(!text) return;
 
   addMsg(text,"user");
   msgInput.value="";
 
-  const reply=await askAI(text);
+  const reply = await askAI(text);
+
   addMsg(reply,"ai");
+  speak(reply);
 }
 
-/* DEBUG AI */
+/* ===== FREE AI (OPENROUTER) ===== */
 async function askAI(message){
   try{
-    console.log("Sending:",message);
-
-    const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions",{
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "Authorization":"Bearer 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"
+        "Authorization":"Bearer " + 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,
+        "HTTP-Referer":"https://mathissnipes.github.io",
+        "X-Title":"AI Pen"
       },
-      body:JSON.stringify({
+      body: JSON.stringify({
         model:"mistralai/mistral-7b-instruct",
-        messages:[{role:"user",content:message}]
+        messages:[
+          {role:"system",content:"You are a helpful AI assistant."},
+          {role:"user",content:message}
+        ]
       })
     });
 
-    const data=await res.json();
-
-    console.log("AI Response:",data);
+    const data = await res.json();
 
     if(!data.choices){
-      return "⚠️ AI ERROR: "+JSON.stringify(data);
+      return "⚠️ AI error: " + JSON.stringify(data);
     }
 
     return data.choices[0].message.content;
 
   }catch(e){
-    console.error(e);
-    return "❌ ERROR: "+e.message;
+    return "❌ Connection error: " + e.message;
   }
 }
 
-/* UI */
+/* ===== UI ===== */
 function addMsg(text,type){
-  const d=document.createElement("div");
+  const d = document.createElement("div");
   d.className="msg "+type;
   d.innerText=text;
   messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
 }
 
-/* SPEECH */
-const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-const recognition=new SpeechRecognition();
+/* ===== SPEECH INPUT ===== */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
 
-micBtn.onclick=()=>recognition.start();
+micBtn.onclick = ()=>recognition.start();
 
-recognition.onresult=async(e)=>{
-  const text=e.results[0][0].transcript;
+recognition.onresult = async (event)=>{
+  const text = event.results[0][0].transcript;
   addMsg(text,"user");
-  const reply=await askAI(text);
+
+  const reply = await askAI(text);
   addMsg(reply,"ai");
+  speak(reply);
 };
 
+/* ===== SPEECH OUTPUT ===== */
+function speak(text){
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.rate = 1;
+  speech.pitch = 1;
+  window.speechSynthesis.speak(speech);
+}
 </script>
 
 </body>
