@@ -46,7 +46,7 @@ button{
   height:100vh;
 }
 
-/* BIG LOGOUT */
+/* LOGOUT */
 #logoutBtn{
   position:fixed;
   top:10px;
@@ -127,10 +127,9 @@ firebase.initializeApp({
 });
 
 const auth = firebase.auth();
-
 let signupMode = false;
 
-/* SWITCH LOGIN / SIGNUP (FIXED TEXT) */
+/* SWITCH LOGIN / SIGNUP */
 document.getElementById("switchBtn").onclick = ()=>{
   signupMode = !signupMode;
 
