@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  font-family:sans-serif;
   background:#0f172a;
   color:white;
 }
@@ -51,63 +51,24 @@ button{
   height:100vh;
 }
 
-/* Sidebar */
-#sidebar{
-  width:260px;
-  background:#020617;
-  height:100%;
-  float:left;
-  padding:10px;
-}
-
-.chatItem{
-  padding:10px;
-  background:#1e293b;
-  margin:5px 0;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* Main */
-#main{
-  margin-left:260px;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-
-#top{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  border-bottom:1px solid #1e293b;
-}
-
 #messages{
-  flex:1;
+  height:80%;
   overflow:auto;
   padding:10px;
 }
 
 .msg{
-  max-width:70%;
+  margin:8px;
   padding:10px;
-  margin:6px;
   border-radius:10px;
+  max-width:70%;
 }
 
-.user{
-  background:#2563eb;
-  margin-left:auto;
-}
-
-.ai{
-  background:#1e293b;
-}
+.user{ background:#2563eb; margin-left:auto; }
+.ai{ background:#1e293b; }
 
 #inputBar{
   display:flex;
-  padding:10px;
 }
 
 #inputBar input{
@@ -120,45 +81,31 @@ button{
 
 <!-- AUTH -->
 <div id="auth">
-  <h2 id="authTitle">Login</h2>
+  <h2 id="title">Login</h2>
 
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <input id="username" placeholder="Username" style="display:none;">
 
-  <button id="authBtn">Login</button>
-  <div id="switchText" class="switch">No account? Sign up</div>
+  <button id="mainBtn">Login</button>
+  <div id="switchBtn" class="switch">No account? Sign up</div>
 </div>
 
 <!-- APP -->
 <div id="app">
+  <div id="messages"></div>
 
-<div id="sidebar">
-  <button id="newChatBtn">+ New Chat</button>
-  <div id="chatList"></div>
-</div>
-
-<div id="main">
-
-<div id="top">
-  <div id="profile"></div>
-</div>
-
-<div id="messages"></div>
-
-<div id="inputBar">
-  <input id="msgInput" placeholder="Type a message...">
-  <button id="sendBtn">Send</button>
-</div>
-
-</div>
+  <div id="inputBar">
+    <input id="msgInput" placeholder="Type...">
+    <button id="sendBtn">Send</button>
+  </div>
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 /* Firebase */
 const firebaseConfig = {
@@ -167,31 +114,33 @@ const firebaseConfig = {
   projectId: "ai-pen-c85a0"
 };
 
-const app = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-let user = null;
-let isSignup = false;
-let currentChatId = null;
+/* MODE */
+let signupMode = false;
 
-/* SWITCH LOGIN/SIGNUP */
-switchText.onclick = ()=>{
-  isSignup = !isSignup;
+const authDiv = document.getElementById("auth");
+const appDiv = document.getElementById("app");
 
-  authTitle.innerText = isSignup ? "Sign Up" : "Login";
-  authBtn.innerText = isSignup ? "Create Account" : "Login";
-  username.style.display = isSignup ? "block" : "none";
+/* SWITCH */
+switchBtn.onclick = ()=>{
+  signupMode = !signupMode;
 
-  switchText.innerText = isSignup
+  title.innerText = signupMode ? "Sign Up" : "Login";
+  mainBtn.innerText = signupMode ? "Create Account" : "Login";
+  username.style.display = signupMode ? "block" : "none";
+
+  switchBtn.innerText = signupMode
     ? "Already have account? Login"
     : "No account? Sign up";
 };
 
-/* AUTH */
-authBtn.onclick = async ()=>{
+/* AUTH ACTION */
+mainBtn.onclick = async ()=>{
   try{
-    if(isSignup){
+    if(signupMode){
       const res = await createUserWithEmailAndPassword(auth,email.value,password.value);
 
       await setDoc(doc(db,"users",res.user.uid),{
@@ -207,96 +156,28 @@ authBtn.onclick = async ()=>{
 };
 
 /* AUTO LOGIN */
-onAuthStateChanged(auth, async u=>{
-  if(u){
-    user = u;
-    auth.style.display="none";
-    app.style.display="block";
-
-    profile.innerText = u.email;
-
-    loadChats();
+onAuthStateChanged(auth, user=>{
+  if(user){
+    authDiv.style.display="none";
+    appDiv.style.display="block";
   }
 });
 
-/* CREATE CHAT */
-newChatBtn.onclick = async ()=>{
-  const ref = await addDoc(collection(db,"chats"),{
-    uid:user.uid,
-    created:Date.now()
-  });
+/* CHAT */
+sendBtn.onclick = ()=>{
+  if(!msgInput.value) return;
 
-  currentChatId = ref.id;
-  messages.innerHTML="";
-  loadChats();
-};
-
-/* LOAD CHATS */
-async function loadChats(){
-  chatList.innerHTML="";
-
-  const q = query(collection(db,"chats"), where("uid","==",user.uid));
-  const snap = await getDocs(q);
-
-  snap.forEach(docSnap=>{
-    let div = document.createElement("div");
-    div.className="chatItem";
-    div.innerText="Chat";
-
-    div.onclick = ()=>{
-      currentChatId = docSnap.id;
-      loadMessages();
-    };
-
-    chatList.appendChild(div);
-  });
-}
-
-/* LOAD MESSAGES */
-async function loadMessages(){
-  messages.innerHTML="";
-
-  const snap = await getDocs(collection(db,"chats",currentChatId,"messages"));
-
-  snap.forEach(d=>{
-    const m = d.data();
-    addMessage(m.text, m.role);
-  });
-}
-
-/* SEND MESSAGE */
-sendBtn.onclick = sendMessage;
-
-async function sendMessage(){
-  let text = msgInput.value;
-  if(!text || !currentChatId) return;
-
-  addMessage(text,"user");
-
-  await addDoc(collection(db,"chats",currentChatId,"messages"),{
-    text,
-    role:"user"
-  });
+  addMsg(msgInput.value,"user");
+  addMsg("AI: "+msgInput.value,"ai");
 
   msgInput.value="";
+};
 
-  let reply = "AI: " + text;
-
-  addMessage(reply,"ai");
-
-  await addDoc(collection(db,"chats",currentChatId,"messages"),{
-    text:reply,
-    role:"ai"
-  });
-}
-
-/* UI */
-function addMessage(text,type){
-  let div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+function addMsg(text,type){
+  let d = document.createElement("div");
+  d.className="msg "+type;
+  d.innerText=text;
+  messages.appendChild(d);
 }
 
 </script>
