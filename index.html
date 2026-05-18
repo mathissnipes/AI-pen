@@ -1,100 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Pen</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
+body {
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+  font-family:Arial;
+  background:#0f172a;
   color:white;
 }
 
-/* Layout */
-.container{
-  max-width:420px;
-  margin:auto;
-  height:100vh;
+/* LOGIN */
+#auth {
   display:flex;
   flex-direction:column;
-  padding:15px;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
 }
 
-/* Header */
-.title{
-  text-align:center;
-  font-size:24px;
-  font-weight:700;
-  margin-bottom:10px;
-}
-
-/* Chat */
-.chat{
-  flex:1;
-  overflow-y:auto;
-  padding:10px 0;
-}
-
-.msg{
-  max-width:75%;
+input {
   padding:12px;
-  border-radius:18px;
-  margin-bottom:10px;
-  font-size:14px;
-  line-height:1.4;
+  margin:8px;
+  border-radius:8px;
+  border:none;
+  width:250px;
 }
 
-.user{
-  background:#00c6ff;
+button {
+  padding:12px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+/* APP */
+#app {
+  display:none;
+  height:100vh;
+}
+
+#sidebar {
+  width:250px;
+  background:#020617;
+  height:100%;
+  overflow:auto;
+  float:left;
+}
+
+#chatArea {
+  margin-left:250px;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+#messages {
+  flex:1;
+  overflow:auto;
+  padding:10px;
+}
+
+.msg {
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+  max-width:70%;
+}
+
+.user {
+  background:#2563eb;
   margin-left:auto;
 }
 
-.ai{
-  background:rgba(255,255,255,0.2);
+.ai {
+  background:#1e293b;
 }
 
-/* Inputs */
-input{
-  width:90%;
+#inputBar {
+  display:flex;
+}
+
+#inputBar input {
+  flex:1;
+}
+
+.chatItem {
   padding:10px;
-  margin:5px;
-  border-radius:8px;
-  border:none;
-}
-
-button{
-  width:90%;
-  padding:12px;
-  margin:5px;
-  border-radius:10px;
-  border:none;
-  background:#00c6ff;
-  color:white;
-  font-size:16px;
-}
-
-/* Mic */
-.mic{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  font-size:26px;
-  margin:auto;
-  display:block;
+  border-bottom:1px solid #1e293b;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
 <!-- LOGIN -->
-<div id="login">
-  <div class="title">AI Pen</div>
+<div id="auth">
+  <h2>AI Pen</h2>
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <button id="loginBtn">Login</button>
@@ -102,183 +111,129 @@ button{
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none;">
-  <div class="title">AI Pen</div>
-  <div id="chat" class="chat"></div>
-  <button id="mic" class="mic">🎙️</button>
-  <button id="logoutBtn">Logout</button>
-</div>
+<div id="app">
+  <div id="sidebar">
+    <button id="newChatBtn">+ New Chat</button>
+    <div id="chatList"></div>
+  </div>
 
+  <div id="chatArea">
+    <div id="messages"></div>
+    <div id="inputBar">
+      <input id="msgInput" placeholder="Type a message...">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain: "ai-pen-c85a0.firebaseapp.com",
-  projectId: "ai-pen-c85a0",
-  storageBucket: "ai-pen-c85a0.firebasestorage.app",
-  messagingSenderId: "997852271146",
-  appId: "1:997852271146:web:f9b42d91dce0ead0d86953"
+  projectId: "ai-pen-c85a0"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-let user = null;
+let currentUser = null;
+let currentChat = [];
 
-/* UI */
-const loginDiv = document.getElementById("login");
-const appDiv = document.getElementById("app");
-const chat = document.getElementById("chat");
+/* AUTH */
+loginBtn.onclick = async ()=>{
+  await signInWithEmailAndPassword(auth, email.value, password.value);
+};
 
-/* Buttons */
-document.getElementById("loginBtn").onclick = login;
-document.getElementById("signupBtn").onclick = signup;
-document.getElementById("logoutBtn").onclick = logout;
+signupBtn.onclick = async ()=>{
+  await createUserWithEmailAndPassword(auth, email.value, password.value);
+};
 
-/* 🔥 AUTO LOGIN */
-onAuthStateChanged(auth, (u)=>{
-  if(u){
-    user = u;
-    startApp();
+onAuthStateChanged(auth, user=>{
+  if(user){
+    currentUser = user;
+    auth.style.display="none";
+    app.style.display="block";
+    loadChats();
   }
 });
 
-/* 🔊 VOICE */
-function speak(text){
-  speechSynthesis.cancel();
+/* CHAT UI */
+sendBtn.onclick = sendMessage;
 
-  function run(){
-    const voices = speechSynthesis.getVoices();
-    const s = new SpeechSynthesisUtterance(text);
+msgInput.addEventListener("keypress", e=>{
+  if(e.key==="Enter") sendMessage();
+});
 
-    s.voice = voices.find(v=>v.lang.includes("en")) || voices[0];
-    s.rate = 0.95;
-
-    speechSynthesis.speak(s);
-  }
-
-  if(speechSynthesis.getVoices().length===0){
-    speechSynthesis.onvoiceschanged = run;
-  }else{
-    run();
-  }
+function addMessage(text, type){
+  let div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
 }
 
-/* LOGIN */
-async function login(){
-  try{
-    const email = emailVal();
-    const pass = passVal();
-
-    const res = await signInWithEmailAndPassword(auth,email,pass);
-    user = res.user;
-    startApp();
-
-  }catch(e){
-    alert(e.message);
-  }
+/* SIMPLE AI */
+function fakeAI(text){
+  return "AI: " + text;
 }
 
-/* SIGNUP */
-async function signup(){
-  try{
-    const email = emailVal();
-    const pass = passVal();
+/* SEND */
+async function sendMessage(){
+  let text = msgInput.value;
+  if(!text) return;
 
-    const res = await createUserWithEmailAndPassword(auth,email,pass);
-    user = res.user;
-    startApp();
+  addMessage(text,"user");
+  currentChat.push({role:"user",text});
 
-  }catch(e){
-    alert(e.message);
-  }
+  msgInput.value="";
+
+  let reply = fakeAI(text);
+
+  addMessage(reply,"ai");
+  currentChat.push({role:"ai",text:reply});
 }
 
-/* LOGOUT */
-async function logout(){
-  await signOut(auth);
-  location.reload();
-}
+/* SAVE CHAT */
+newChatBtn.onclick = async ()=>{
+  if(currentChat.length===0) return;
 
-/* START APP */
-async function startApp(){
-  loginDiv.style.display="none";
-  appDiv.style.display="block";
-  loadMessages();
-}
-
-/* LOAD */
-async function loadMessages(){
-  chat.innerHTML = "";
-
-  const snap = await getDocs(collection(db,"users",user.uid,"chat"));
-
-  snap.forEach(doc=>{
-    const d = doc.data();
-    addMessage(d.text, d.role==="user");
+  await addDoc(collection(db,"chats"),{
+    uid: currentUser.uid,
+    messages: currentChat,
+    created: Date.now()
   });
-}
 
-/* SAVE */
-async function save(text,role){
-  await addDoc(collection(db,"users",user.uid,"chat"),{text,role});
-}
-
-/* UI */
-function addMessage(text,isUser){
-  const div=document.createElement("div");
-  div.className="msg "+(isUser?"user":"ai");
-  div.innerText=text;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-}
-
-/* Helpers */
-function emailVal(){ return document.getElementById("email").value }
-function passVal(){ return document.getElementById("password").value }
-
-/* MIC */
-document.getElementById("mic").onclick = ()=>{
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SR();
-
-  speechSynthesis.resume();
-
-  recognition.onresult = async (e)=>{
-    let text = e.results[0][0].transcript;
-
-    addMessage(text,true);
-    save(text,"user");
-
-    let res = await fetch("https://fortunate-enraged-lines--mathischui.replit.app/ask",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({question:text})
-    });
-
-    let data = await res.json();
-    let ans = data.choices?.[0]?.message?.content || "No answer";
-
-    if(ans.includes(".")){
-      ans = ans.split(".")[0] + ".";
-    }
-
-    addMessage(ans,false);
-    save(ans,"ai");
-    speak(ans);
-  };
-
-  recognition.start();
+  currentChat = [];
+  messages.innerHTML="";
+  loadChats();
 };
 
+/* LOAD CHATS */
+async function loadChats(){
+  chatList.innerHTML="";
+  const q = query(collection(db,"chats"), where("uid","==",currentUser.uid));
+  const snap = await getDocs(q);
+
+  snap.forEach(doc=>{
+    let item = document.createElement("div");
+    item.className="chatItem";
+    item.innerText="Chat";
+
+    item.onclick = ()=>{
+      messages.innerHTML="";
+      doc.data().messages.forEach(m=>{
+        addMessage(m.text, m.role==="user"?"user":"ai");
+      });
+    };
+
+    chatList.appendChild(item);
+  });
+}
 </script>
 
 </body>
