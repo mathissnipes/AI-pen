@@ -51,65 +51,46 @@ button{
   height:100vh;
 }
 
-/* Sidebar */
-#sidebar{
-  width:260px;
-  background:#020617;
-  height:100%;
-  float:left;
-  padding:10px;
-}
-
-.chatItem{
-  padding:10px;
-  background:#1e293b;
-  margin:5px 0;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* Main */
-#main{
-  margin-left:260px;
-  height:100%;
+#topbar{
   display:flex;
-  flex-direction:column;
-}
-
-#top{
+  justify-content:space-between;
   padding:10px;
-  border-bottom:1px solid #1e293b;
+  background:#020617;
 }
 
+/* SETTINGS MENU */
+#settingsMenu{
+  position:absolute;
+  top:50px;
+  right:10px;
+  background:#1e293b;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+}
+
+/* CHAT */
 #messages{
-  flex:1;
+  height:70%;
   overflow:auto;
   padding:10px;
 }
 
 .msg{
-  max-width:70%;
+  margin:8px;
   padding:10px;
-  margin:6px;
   border-radius:10px;
+  max-width:70%;
 }
 
-.user{
-  background:#2563eb;
-  margin-left:auto;
-}
+.user{ background:#2563eb; margin-left:auto; }
+.ai{ background:#1e293b; }
 
-.ai{
-  background:#1e293b;
-}
-
-#inputBar{
+#controls{
   display:flex;
+  justify-content:center;
+  gap:10px;
   padding:10px;
-}
-
-#inputBar input{
-  flex:1;
 }
 </style>
 </head>
@@ -131,25 +112,21 @@ button{
 <!-- APP -->
 <div id="app">
 
-<div id="sidebar">
-  <button id="newChatBtn">+ New Chat</button>
-  <div id="chatList"></div>
+<div id="topbar">
+  <span>AI Pen</span>
+  <button id="settingsBtn">⚙️</button>
 </div>
 
-<div id="main">
-
-<div id="top">
-  <span id="userDisplay"></span>
+<div id="settingsMenu">
+  <button id="logoutBtn">Logout</button>
 </div>
 
 <div id="messages"></div>
 
-<div id="inputBar">
-  <input id="msgInput" placeholder="Type message...">
-  <button id="sendBtn">Send</button>
+<div id="controls">
+  <button id="micBtn">🎙️ Speak</button>
 </div>
 
-</div>
 </div>
 
 <!-- Firebase -->
@@ -170,10 +147,8 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let signupMode = false;
-let currentUser = null;
-let currentChatId = null;
 
-/* SWITCH */
+/* SWITCH LOGIN/SIGNUP */
 switchBtn.onclick = ()=>{
   signupMode = !signupMode;
 
@@ -188,20 +163,16 @@ switchBtn.onclick = ()=>{
 
 /* LOGIN / SIGNUP */
 mainBtn.onclick = async ()=>{
-  const emailVal = email.value;
-  const passVal = password.value;
-  const userVal = username.value;
-
   try{
     if(signupMode){
-      const res = await auth.createUserWithEmailAndPassword(emailVal,passVal);
+      const res = await auth.createUserWithEmailAndPassword(email.value,password.value);
 
       await db.collection("users").doc(res.user.uid).set({
-        username:userVal
+        username: username.value
       });
 
     }else{
-      await auth.signInWithEmailAndPassword(emailVal,passVal);
+      await auth.signInWithEmailAndPassword(email.value,password.value);
     }
   }catch(e){
     alert(e.message);
@@ -209,107 +180,68 @@ mainBtn.onclick = async ()=>{
 };
 
 /* AUTO LOGIN */
-auth.onAuthStateChanged(async user=>{
+auth.onAuthStateChanged(user=>{
   if(user){
-    currentUser = user;
-
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
-
-    userDisplay.innerText = user.email;
-
-    loadChats();
+    auth.style.display="none";
+    app.style.display="block";
+  }else{
+    auth.style.display="flex";
+    app.style.display="none";
   }
 });
 
-/* NEW CHAT */
-newChatBtn.onclick = async ()=>{
-  const ref = await db.collection("chats").add({
-    uid: currentUser.uid,
-    created: Date.now()
-  });
-
-  currentChatId = ref.id;
-  messages.innerHTML="";
-  loadChats();
+/* SETTINGS */
+settingsBtn.onclick = ()=>{
+  settingsMenu.style.display =
+    settingsMenu.style.display === "block" ? "none" : "block";
 };
 
-/* LOAD CHATS */
-async function loadChats(){
-  chatList.innerHTML="";
+/* LOGOUT */
+logoutBtn.onclick = async ()=>{
+  await auth.signOut();
+};
 
-  const snap = await db.collection("chats")
-    .where("uid","==",currentUser.uid)
-    .get();
-
-  snap.forEach(doc=>{
-    const div = document.createElement("div");
-    div.className="chatItem";
-    div.innerText="Chat";
-
-    div.onclick = ()=>{
-      currentChatId = doc.id;
-      loadMessages();
-    };
-
-    chatList.appendChild(div);
-  });
-}
-
-/* LOAD MESSAGES */
-async function loadMessages(){
-  messages.innerHTML="";
-
-  const snap = await db.collection("chats")
-    .doc(currentChatId)
-    .collection("messages")
-    .get();
-
-  snap.forEach(d=>{
-    const m = d.data();
-    addMessage(m.text, m.role);
-  });
-}
-
-/* SEND */
-sendBtn.onclick = sendMessage;
-
-async function sendMessage(){
-  const text = msgInput.value;
-  if(!text || !currentChatId) return;
-
-  addMessage(text,"user");
-
-  await db.collection("chats")
-    .doc(currentChatId)
-    .collection("messages")
-    .add({
-      text,
-      role:"user"
-    });
-
-  msgInput.value="";
-
-  const reply = "AI: " + text;
-
-  addMessage(reply,"ai");
-
-  await db.collection("chats")
-    .doc(currentChatId)
-    .collection("messages")
-    .add({
-      text:reply,
-      role:"ai"
-    });
-}
-
-/* UI */
+/* CHAT UI */
 function addMessage(text,type){
   const div = document.createElement("div");
   div.className="msg "+type;
   div.innerText=text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+}
+
+/* SPEECH */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+recognition.lang = "en-GB";
+
+/* MIC BUTTON */
+micBtn.onclick = ()=>{
+  recognition.start();
+  micBtn.innerText = "Listening...";
+};
+
+/* RESULT */
+recognition.onresult = (event)=>{
+  const text = event.results[0][0].transcript;
+
+  micBtn.innerText = "🎙️ Speak";
+
+  addMessage(text,"user");
+
+  const reply = "AI: " + text;
+
+  addMessage(reply,"ai");
+
+  speak(reply);
+};
+
+/* TEXT TO SPEECH */
+function speak(text){
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-GB";
+  window.speechSynthesis.speak(speech);
 }
 
 </script>
