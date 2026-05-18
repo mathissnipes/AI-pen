@@ -6,40 +6,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:sans-serif;background:#0f172a;color:white;}
-#auth{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
-#app{display:none;padding:20px;}
-input{padding:12px;margin:6px;border-radius:8px;border:none;width:250px;}
-button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer;}
-#messages{margin-top:20px;}
-.msg{margin:5px;padding:10px;border-radius:10px;}
-.user{background:#2563eb;}
-.ai{background:#1e293b;}
-</style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
 
+#auth, #app {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+#app { display:none; }
+
+input {
+  padding:12px;
+  margin:6px;
+  border-radius:8px;
+  border:none;
+  width:260px;
+}
+
+button {
+  padding:12px;
+  margin:6px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+#messages {
+  max-height:300px;
+  overflow:auto;
+  width:90%;
+}
+
+.msg {
+  padding:10px;
+  margin:5px;
+  border-radius:10px;
+}
+
+.user { background:#2563eb; }
+.ai { background:#1e293b; }
+</style>
 </head>
 
 <body>
 
-<!-- AUTH -->
+<!-- LOGIN -->
 <div id="auth">
-  <h2>Login / Sign Up</h2>
+  <h2>AI Pen Login</h2>
 
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
 
-  <button id="signupBtn">Sign Up</button>
-  <button id="loginBtn">Login</button>
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <button id="logoutBtn">Logout</button>
+  <button onclick="logout()">Logout</button>
 
   <div id="messages"></div>
 
   <input id="msgInput" placeholder="Ask something...">
-  <button id="sendBtn">Send</button>
+  <button onclick="send()">Send</button>
 </div>
 
 <!-- Firebase -->
@@ -48,7 +88,7 @@ button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;
 
 <script>
 /* ===== PUT YOUR KEY HERE ===== */
-const API_KEY = "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";
+const API_KEY = "PASTE_OPENROUTER_KEY";
 
 /* ===== FIREBASE ===== */
 firebase.initializeApp({
@@ -59,54 +99,46 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 
-/* ===== SIGN UP ===== */
-signupBtn.onclick = async ()=>{
-  try{
-    await auth.createUserWithEmailAndPassword(email.value,password.value);
-    alert("Account created!");
-  }catch(e){
-    alert(e.code);
-  }
-};
+/* ===== SIGNUP ===== */
+function signup(){
+  auth.createUserWithEmailAndPassword(email.value, password.value)
+  .then(()=>alert("Account created"))
+  .catch(e=>alert(e.code));
+}
 
 /* ===== LOGIN ===== */
-loginBtn.onclick = async ()=>{
-  try{
-    await auth.signInWithEmailAndPassword(email.value,password.value);
-  }catch(e){
-    alert(e.code);
-  }
-};
-
-/* ===== AUTH STATE ===== */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    authDiv(false);
-  }else{
-    authDiv(true);
-  }
-});
-
-function authDiv(show){
-  document.getElementById("auth").style.display = show ? "flex" : "none";
-  document.getElementById("app").style.display = show ? "none" : "block";
+function login(){
+  auth.signInWithEmailAndPassword(email.value, password.value)
+  .catch(e=>alert(e.code));
 }
 
 /* ===== LOGOUT ===== */
-logoutBtn.onclick = ()=>auth.signOut();
+function logout(){
+  auth.signOut();
+}
+
+/* ===== STATE ===== */
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="flex";
+  }else{
+    document.getElementById("auth").style.display="flex";
+    document.getElementById("app").style.display="none";
+  }
+});
 
 /* ===== SEND ===== */
-sendBtn.onclick = sendMessage;
-
-async function sendMessage(){
+function send(){
   const text = msgInput.value;
   if(!text) return;
 
-  addMsg(text,"user");
+  add(text,"user");
   msgInput.value="";
 
-  const reply = await askAI(text);
-  addMsg(reply,"ai");
+  askAI(text).then(reply=>{
+    add(reply,"ai");
+  });
 }
 
 /* ===== AI ===== */
@@ -127,18 +159,18 @@ async function askAI(message){
     const data = await res.json();
 
     if(!data.choices){
-      return "AI error: " + JSON.stringify(data);
+      return "AI error";
     }
 
     return data.choices[0].message.content;
 
   }catch(e){
-    return "Error: " + e.message;
+    return "Connection error";
   }
 }
 
 /* ===== UI ===== */
-function addMsg(text,type){
+function add(text,type){
   const d = document.createElement("div");
   d.className = "msg " + type;
   d.innerText = text;
