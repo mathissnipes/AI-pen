@@ -2,52 +2,53 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Pen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{margin:0;font-family:sans-serif;background:#0f172a;color:white;}
 #auth{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
-input{padding:12px;margin:6px;border-radius:8px;border:none;width:260px;}
+#app{display:none;padding:20px;}
+input{padding:12px;margin:6px;border-radius:8px;border:none;width:250px;}
 button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer;}
-#app{display:none;height:100vh;}
-#logoutBtn{position:fixed;top:10px;right:10px;background:red;}
-.msg{margin:5px;padding:10px;border-radius:10px;max-width:70%;}
-.user{background:#2563eb;margin-left:auto;}
+#messages{margin-top:20px;}
+.msg{margin:5px;padding:10px;border-radius:10px;}
+.user{background:#2563eb;}
 .ai{background:#1e293b;}
-#messages{height:70%;overflow:auto;padding:10px;}
-#inputBar{display:flex;padding:10px;}
-#inputBar input{flex:1;}
 </style>
+
 </head>
 
 <body>
 
+<!-- AUTH -->
 <div id="auth">
-  <h2 id="title">Login</h2>
+  <h2>Login / Sign Up</h2>
+
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn">Login</button>
+
   <button id="signupBtn">Sign Up</button>
+  <button id="loginBtn">Login</button>
 </div>
 
+<!-- APP -->
 <div id="app">
-  <button id="logoutBtn">LOGOUT</button>
+  <button id="logoutBtn">Logout</button>
 
   <div id="messages"></div>
 
-  <div id="inputBar">
-    <input id="msgInput" placeholder="Type message...">
-    <button id="sendBtn">Send</button>
-  </div>
+  <input id="msgInput" placeholder="Ask something...">
+  <button id="sendBtn">Send</button>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-/* ====== PUT YOUR KEY HERE ====== */
-const API_KEY = "PASTE_YOUR_OPENROUTER_KEY";
+/* ===== PUT YOUR KEY HERE ===== */
+const API_KEY = "PASTE_OPENROUTER_KEY";
 
 /* ===== FIREBASE ===== */
 firebase.initializeApp({
@@ -58,22 +59,22 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 
-/* ===== LOGIN ===== */
-loginBtn.onclick = async ()=>{
-  try{
-    await auth.signInWithEmailAndPassword(email.value,password.value);
-  }catch(e){
-    alert("Login failed: " + e.message);
-  }
-};
-
-/* ===== SIGNUP ===== */
+/* ===== SIGN UP ===== */
 signupBtn.onclick = async ()=>{
   try{
     await auth.createUserWithEmailAndPassword(email.value,password.value);
     alert("Account created!");
   }catch(e){
-    alert("Signup failed: " + e.message);
+    alert(e.code);
+  }
+};
+
+/* ===== LOGIN ===== */
+loginBtn.onclick = async ()=>{
+  try{
+    await auth.signInWithEmailAndPassword(email.value,password.value);
+  }catch(e){
+    alert(e.code);
   }
 };
 
@@ -86,16 +87,18 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-function authDiv(showAuth){
-  document.getElementById("auth").style.display = showAuth ? "flex" : "none";
-  document.getElementById("app").style.display = showAuth ? "none" : "block";
+function authDiv(show){
+  document.getElementById("auth").style.display = show ? "flex" : "none";
+  document.getElementById("app").style.display = show ? "none" : "block";
 }
 
 /* ===== LOGOUT ===== */
 logoutBtn.onclick = ()=>auth.signOut();
 
 /* ===== SEND ===== */
-sendBtn.onclick = async ()=>{
+sendBtn.onclick = sendMessage;
+
+async function sendMessage(){
   const text = msgInput.value;
   if(!text) return;
 
@@ -104,7 +107,7 @@ sendBtn.onclick = async ()=>{
 
   const reply = await askAI(text);
   addMsg(reply,"ai");
-};
+}
 
 /* ===== AI ===== */
 async function askAI(message){
@@ -113,7 +116,7 @@ async function askAI(message){
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "Authorization":"Bearer " + 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
+        "Authorization":"Bearer " + API_KEY
       },
       body: JSON.stringify({
         model:"mistralai/mistral-7b-instruct",
@@ -137,7 +140,7 @@ async function askAI(message){
 /* ===== UI ===== */
 function addMsg(text,type){
   const d = document.createElement("div");
-  d.className="msg " + type;
+  d.className = "msg " + type;
   d.innerText = text;
   messages.appendChild(d);
 }
