@@ -46,7 +46,7 @@ button{
   height:100vh;
 }
 
-/* LOGOUT */
+/* BIG LOGOUT */
 #logoutBtn{
   position:fixed;
   top:10px;
@@ -130,30 +130,33 @@ const auth = firebase.auth();
 
 let signupMode = false;
 
-/* SWITCH LOGIN / SIGNUP */
-switchBtn.onclick = ()=>{
+/* SWITCH LOGIN / SIGNUP (FIXED TEXT) */
+document.getElementById("switchBtn").onclick = ()=>{
   signupMode = !signupMode;
 
   if(signupMode){
-    title.innerText = "Sign Up";
-    mainBtn.innerText = "Create Account";
-    username.style.display = "block";
-    switchBtn.innerText = "Already have account? Login";
+    document.getElementById("title").innerText = "Sign Up";
+    document.getElementById("mainBtn").innerText = "Create Account";
+    document.getElementById("username").style.display = "block";
+    document.getElementById("switchBtn").innerText = "Already have account? Login";
   }else{
-    title.innerText = "Login";
-    mainBtn.innerText = "Login";
-    username.style.display = "none";
-    switchBtn.innerText = "No account? Sign up";
+    document.getElementById("title").innerText = "Login";
+    document.getElementById("mainBtn").innerText = "Login";
+    document.getElementById("username").style.display = "none";
+    document.getElementById("switchBtn").innerText = "No account? Sign up";
   }
 };
 
 /* LOGIN / SIGNUP */
-mainBtn.onclick = async ()=>{
+document.getElementById("mainBtn").onclick = async ()=>{
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
   try{
     if(signupMode){
-      await auth.createUserWithEmailAndPassword(email.value,password.value);
+      await auth.createUserWithEmailAndPassword(email,password);
     }else{
-      await auth.signInWithEmailAndPassword(email.value,password.value);
+      await auth.signInWithEmailAndPassword(email,password);
     }
   }catch(e){
     alert(e.message);
@@ -163,41 +166,42 @@ mainBtn.onclick = async ()=>{
 /* AUTH STATE */
 auth.onAuthStateChanged(user=>{
   if(user){
-    auth.style.display="none";
-    app.style.display="block";
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="block";
   }else{
-    auth.style.display="flex";
-    app.style.display="none";
+    document.getElementById("auth").style.display="flex";
+    document.getElementById("app").style.display="none";
   }
 });
 
 /* LOGOUT */
-logoutBtn.onclick = ()=>{
+document.getElementById("logoutBtn").onclick = ()=>{
   auth.signOut();
 };
 
 /* CHAT */
-sendBtn.onclick = ()=>{
-  if(!msgInput.value) return;
+document.getElementById("sendBtn").onclick = ()=>{
+  const input = document.getElementById("msgInput");
+  if(!input.value) return;
 
-  addMsg(msgInput.value,"user");
-  addMsg("AI: "+msgInput.value,"ai");
+  addMsg(input.value,"user");
+  addMsg("AI: " + input.value,"ai");
 
-  msgInput.value="";
+  input.value="";
 };
 
 function addMsg(text,type){
-  let d = document.createElement("div");
+  const d = document.createElement("div");
   d.className="msg "+type;
   d.innerText=text;
-  messages.appendChild(d);
+  document.getElementById("messages").appendChild(d);
 }
 
 /* SPEECH */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 
-micBtn.onclick = ()=>{
+document.getElementById("micBtn").onclick = ()=>{
   recognition.start();
 };
 
