@@ -13,6 +13,7 @@ body{
   color:white;
 }
 
+/* AUTH */
 #auth{
   display:flex;
   flex-direction:column;
@@ -39,15 +40,83 @@ button{
   cursor:pointer;
 }
 
+.switch{
+  color:#38bdf8;
+  cursor:pointer;
+}
+
+/* APP */
 #app{
   display:none;
-  padding:20px;
+  height:100vh;
+}
+
+/* Sidebar */
+#sidebar{
+  width:260px;
+  background:#020617;
+  height:100%;
+  float:left;
+  padding:10px;
+}
+
+.chatItem{
+  padding:10px;
+  background:#1e293b;
+  margin:5px 0;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* Main */
+#main{
+  margin-left:260px;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+#top{
+  padding:10px;
+  border-bottom:1px solid #1e293b;
+}
+
+#messages{
+  flex:1;
+  overflow:auto;
+  padding:10px;
+}
+
+.msg{
+  max-width:70%;
+  padding:10px;
+  margin:6px;
+  border-radius:10px;
+}
+
+.user{
+  background:#2563eb;
+  margin-left:auto;
+}
+
+.ai{
+  background:#1e293b;
+}
+
+#inputBar{
+  display:flex;
+  padding:10px;
+}
+
+#inputBar input{
+  flex:1;
 }
 </style>
 </head>
 
 <body>
 
+<!-- AUTH -->
 <div id="auth">
   <h2 id="title">Login</h2>
 
@@ -56,20 +125,39 @@ button{
   <input id="username" placeholder="Username" style="display:none;">
 
   <button id="mainBtn">Login</button>
-  <button id="toggleBtn">Switch Mode</button>
+  <div id="switchBtn" class="switch">No account? Sign up</div>
 </div>
 
+<!-- APP -->
 <div id="app">
-  <h2>Logged in 🎉</h2>
+
+<div id="sidebar">
+  <button id="newChatBtn">+ New Chat</button>
+  <div id="chatList"></div>
 </div>
 
-<!-- Firebase (NON MODULE VERSION) -->
+<div id="main">
+
+<div id="top">
+  <span id="userDisplay"></span>
+</div>
+
+<div id="messages"></div>
+
+<div id="inputBar">
+  <input id="msgInput" placeholder="Type message...">
+  <button id="sendBtn">Send</button>
+</div>
+
+</div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-console.log("Script loaded ✅");
 
 /* Firebase */
 firebase.initializeApp({
@@ -82,54 +170,148 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let signupMode = false;
+let currentUser = null;
+let currentChatId = null;
 
-/* Buttons */
-const mainBtn = document.getElementById("mainBtn");
-const toggleBtn = document.getElementById("toggleBtn");
-
-/* Switch mode */
-toggleBtn.onclick = ()=>{
+/* SWITCH */
+switchBtn.onclick = ()=>{
   signupMode = !signupMode;
 
-  document.getElementById("title").innerText = signupMode ? "Sign Up" : "Login";
-  document.getElementById("username").style.display = signupMode ? "block" : "none";
+  title.innerText = signupMode ? "Sign Up" : "Login";
   mainBtn.innerText = signupMode ? "Create Account" : "Login";
+  username.style.display = signupMode ? "block" : "none";
+
+  switchBtn.innerText = signupMode
+    ? "Already have account? Login"
+    : "No account? Sign up";
 };
 
-/* Main action */
+/* LOGIN / SIGNUP */
 mainBtn.onclick = async ()=>{
-  console.log("Button clicked 🔥");
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const username = document.getElementById("username").value;
+  const emailVal = email.value;
+  const passVal = password.value;
+  const userVal = username.value;
 
   try{
     if(signupMode){
-      const res = await auth.createUserWithEmailAndPassword(email,password);
+      const res = await auth.createUserWithEmailAndPassword(emailVal,passVal);
 
       await db.collection("users").doc(res.user.uid).set({
-        username: username
+        username:userVal
       });
 
-      alert("Account created!");
     }else{
-      await auth.signInWithEmailAndPassword(email,password);
-      alert("Logged in!");
+      await auth.signInWithEmailAndPassword(emailVal,passVal);
     }
   }catch(e){
-    console.error(e);
     alert(e.message);
   }
 };
 
-/* Auto login */
-auth.onAuthStateChanged(user=>{
+/* AUTO LOGIN */
+auth.onAuthStateChanged(async user=>{
   if(user){
+    currentUser = user;
+
     document.getElementById("auth").style.display="none";
     document.getElementById("app").style.display="block";
+
+    userDisplay.innerText = user.email;
+
+    loadChats();
   }
 });
+
+/* NEW CHAT */
+newChatBtn.onclick = async ()=>{
+  const ref = await db.collection("chats").add({
+    uid: currentUser.uid,
+    created: Date.now()
+  });
+
+  currentChatId = ref.id;
+  messages.innerHTML="";
+  loadChats();
+};
+
+/* LOAD CHATS */
+async function loadChats(){
+  chatList.innerHTML="";
+
+  const snap = await db.collection("chats")
+    .where("uid","==",currentUser.uid)
+    .get();
+
+  snap.forEach(doc=>{
+    const div = document.createElement("div");
+    div.className="chatItem";
+    div.innerText="Chat";
+
+    div.onclick = ()=>{
+      currentChatId = doc.id;
+      loadMessages();
+    };
+
+    chatList.appendChild(div);
+  });
+}
+
+/* LOAD MESSAGES */
+async function loadMessages(){
+  messages.innerHTML="";
+
+  const snap = await db.collection("chats")
+    .doc(currentChatId)
+    .collection("messages")
+    .get();
+
+  snap.forEach(d=>{
+    const m = d.data();
+    addMessage(m.text, m.role);
+  });
+}
+
+/* SEND */
+sendBtn.onclick = sendMessage;
+
+async function sendMessage(){
+  const text = msgInput.value;
+  if(!text || !currentChatId) return;
+
+  addMessage(text,"user");
+
+  await db.collection("chats")
+    .doc(currentChatId)
+    .collection("messages")
+    .add({
+      text,
+      role:"user"
+    });
+
+  msgInput.value="";
+
+  const reply = "AI: " + text;
+
+  addMessage(reply,"ai");
+
+  await db.collection("chats")
+    .doc(currentChatId)
+    .collection("messages")
+    .add({
+      text:reply,
+      role:"ai"
+    });
+}
+
+/* UI */
+function addMessage(text,type){
+  const div = document.createElement("div");
+  div.className="msg "+type;
+  div.innerText=text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
 </script>
 
 </body>
