@@ -11,11 +11,11 @@ body{margin:0;font-family:sans-serif;background:#0f172a;color:white;}
 input{padding:12px;margin:6px;border-radius:8px;border:none;width:260px;}
 button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer;}
 #app{display:none;height:100vh;}
-#logoutBtn{position:fixed;top:10px;right:10px;background:red;font-weight:bold;z-index:9999;}
-#messages{height:70%;overflow:auto;padding:10px;}
-.msg{padding:10px;margin:5px;border-radius:10px;max-width:70%;}
+#logoutBtn{position:fixed;top:10px;right:10px;background:red;}
+.msg{margin:5px;padding:10px;border-radius:10px;max-width:70%;}
 .user{background:#2563eb;margin-left:auto;}
 .ai{background:#1e293b;}
+#messages{height:70%;overflow:auto;padding:10px;}
 #inputBar{display:flex;padding:10px;}
 #inputBar input{flex:1;}
 </style>
@@ -23,39 +23,31 @@ button{padding:12px;margin:6px;border:none;border-radius:8px;background:#2563eb;
 
 <body>
 
-<!-- AUTH -->
 <div id="auth">
   <h2 id="title">Login</h2>
-
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-  <input id="username" placeholder="Username" style="display:none;">
-
-  <button id="mainBtn">Login</button>
-  <button id="switchBtn">No account? Sign up</button>
+  <button id="loginBtn">Login</button>
+  <button id="signupBtn">Sign Up</button>
 </div>
 
-<!-- APP -->
 <div id="app">
   <button id="logoutBtn">LOGOUT</button>
 
   <div id="messages"></div>
 
   <div id="inputBar">
-    <input id="msgInput" placeholder="Type or speak...">
+    <input id="msgInput" placeholder="Type message...">
     <button id="sendBtn">Send</button>
   </div>
-
-  <button id="micBtn">🎙️ Speak</button>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-/* ===== PUT YOUR KEY HERE ===== */
-const OPENROUTER_API_KEY = "PASTE_YOUR_KEY_HERE";
+/* ====== PUT YOUR KEY HERE ====== */
+const API_KEY = "PASTE_YOUR_OPENROUTER_KEY";
 
 /* ===== FIREBASE ===== */
 firebase.initializeApp({
@@ -65,130 +57,89 @@ firebase.initializeApp({
 });
 
 const auth = firebase.auth();
-let signupMode = false;
 
-/* ===== SWITCH LOGIN / SIGNUP ===== */
-switchBtn.onclick = ()=>{
-  signupMode = !signupMode;
-  if(signupMode){
-    title.innerText = "Sign Up";
-    mainBtn.innerText = "Create Account";
-    username.style.display = "block";
-    switchBtn.innerText = "Already have account? Login";
-  }else{
-    title.innerText = "Login";
-    mainBtn.innerText = "Login";
-    username.style.display = "none";
-    switchBtn.innerText = "No account? Sign up";
+/* ===== LOGIN ===== */
+loginBtn.onclick = async ()=>{
+  try{
+    await auth.signInWithEmailAndPassword(email.value,password.value);
+  }catch(e){
+    alert("Login failed: " + e.message);
   }
 };
 
-/* ===== LOGIN / SIGNUP ===== */
-mainBtn.onclick = async ()=>{
+/* ===== SIGNUP ===== */
+signupBtn.onclick = async ()=>{
   try{
-    if(signupMode){
-      await auth.createUserWithEmailAndPassword(email.value,password.value);
-    }else{
-      await auth.signInWithEmailAndPassword(email.value,password.value);
-    }
+    await auth.createUserWithEmailAndPassword(email.value,password.value);
+    alert("Account created!");
   }catch(e){
-    alert(e.message);
+    alert("Signup failed: " + e.message);
   }
 };
 
 /* ===== AUTH STATE ===== */
 auth.onAuthStateChanged(user=>{
   if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
+    authDiv(false);
   }else{
-    document.getElementById("auth").style.display="flex";
-    document.getElementById("app").style.display="none";
+    authDiv(true);
   }
 });
+
+function authDiv(showAuth){
+  document.getElementById("auth").style.display = showAuth ? "flex" : "none";
+  document.getElementById("app").style.display = showAuth ? "none" : "block";
+}
 
 /* ===== LOGOUT ===== */
 logoutBtn.onclick = ()=>auth.signOut();
 
-/* ===== SEND MESSAGE ===== */
-sendBtn.onclick = sendMessage;
-
-async function sendMessage(){
-  const text = msgInput.value.trim();
+/* ===== SEND ===== */
+sendBtn.onclick = async ()=>{
+  const text = msgInput.value;
   if(!text) return;
 
   addMsg(text,"user");
   msgInput.value="";
 
   const reply = await askAI(text);
-
   addMsg(reply,"ai");
-  speak(reply);
-}
+};
 
-/* ===== FREE AI (OPENROUTER) ===== */
+/* ===== AI ===== */
 async function askAI(message){
   try{
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions",{
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "Authorization":"Bearer " + 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,
-        "HTTP-Referer":"https://mathissnipes.github.io",
-        "X-Title":"AI Pen"
+        "Authorization":"Bearer " + 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
       },
       body: JSON.stringify({
         model:"mistralai/mistral-7b-instruct",
-        messages:[
-          {role:"system",content:"You are a helpful AI assistant."},
-          {role:"user",content:message}
-        ]
+        messages:[{role:"user",content:message}]
       })
     });
 
     const data = await res.json();
 
     if(!data.choices){
-      return "⚠️ AI error: " + JSON.stringify(data);
+      return "AI error: " + JSON.stringify(data);
     }
 
     return data.choices[0].message.content;
 
   }catch(e){
-    return "❌ Connection error: " + e.message;
+    return "Error: " + e.message;
   }
 }
 
 /* ===== UI ===== */
 function addMsg(text,type){
   const d = document.createElement("div");
-  d.className="msg "+type;
-  d.innerText=text;
+  d.className="msg " + type;
+  d.innerText = text;
   messages.appendChild(d);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-/* ===== SPEECH INPUT ===== */
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
-
-micBtn.onclick = ()=>recognition.start();
-
-recognition.onresult = async (event)=>{
-  const text = event.results[0][0].transcript;
-  addMsg(text,"user");
-
-  const reply = await askAI(text);
-  addMsg(reply,"ai");
-  speak(reply);
-};
-
-/* ===== SPEECH OUTPUT ===== */
-function speak(text){
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.rate = 1;
-  speech.pitch = 1;
-  window.speechSynthesis.speak(speech);
 }
 </script>
 
