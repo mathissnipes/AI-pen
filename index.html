@@ -35,8 +35,6 @@ button{
   margin:6px;
   border:none;
   border-radius:8px;
-  background:#2563eb;
-  color:white;
   cursor:pointer;
 }
 
@@ -46,43 +44,29 @@ button{
   height:100vh;
 }
 
-/* SIDEBAR */
-#sidebar{
-  width:250px;
-  background:#020617;
-  height:100%;
-  float:left;
-  padding:10px;
-}
-
-/* MAIN */
-#main{
-  margin-left:250px;
-  display:flex;
-  flex-direction:column;
-  height:100%;
-}
-
-/* TOP BAR */
-#topbar{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  border-bottom:1px solid #1e293b;
+/* BIG LOGOUT BUTTON */
+#logoutBtn{
+  position:fixed;
+  top:10px;
+  right:10px;
+  background:red;
+  color:white;
+  font-weight:bold;
+  z-index:9999;
 }
 
 /* CHAT */
 #messages{
-  flex:1;
+  height:70%;
   overflow:auto;
   padding:10px;
 }
 
 .msg{
-  max-width:70%;
   padding:10px;
-  margin:6px;
+  margin:5px;
   border-radius:10px;
+  max-width:70%;
 }
 
 .user{ background:#2563eb; margin-left:auto; }
@@ -96,13 +80,6 @@ button{
 
 #inputBar input{
   flex:1;
-}
-
-/* VOICE */
-#voiceBar{
-  display:flex;
-  justify-content:center;
-  padding:10px;
 }
 </style>
 </head>
@@ -124,16 +101,7 @@ button{
 <!-- APP -->
 <div id="app">
 
-<div id="sidebar">
-  <button id="newChatBtn">+ New Chat</button>
-</div>
-
-<div id="main">
-
-<div id="topbar">
-  <span id="userDisplay"></span>
-  <button onclick="logout()">Logout</button>
-</div>
+<button id="logoutBtn">LOGOUT</button>
 
 <div id="messages"></div>
 
@@ -142,17 +110,13 @@ button{
   <button id="sendBtn">Send</button>
 </div>
 
-<div id="voiceBar">
-  <button id="micBtn">🎙️ Speak</button>
-</div>
+<button id="micBtn">🎙️ Speak</button>
 
-</div>
 </div>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
@@ -176,7 +140,7 @@ switchBtn.onclick = ()=>{
   username.style.display = signupMode ? "block" : "none";
 };
 
-/* AUTH */
+/* LOGIN / SIGNUP */
 mainBtn.onclick = async ()=>{
   try{
     if(signupMode){
@@ -189,22 +153,21 @@ mainBtn.onclick = async ()=>{
   }
 };
 
-/* AUTO LOGIN */
+/* AUTH STATE */
 auth.onAuthStateChanged(user=>{
   if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
-    userDisplay.innerText = user.email;
+    auth.style.display="none";
+    app.style.display="block";
   }else{
-    document.getElementById("auth").style.display="flex";
-    document.getElementById("app").style.display="none";
+    auth.style.display="flex";
+    app.style.display="none";
   }
 });
 
-/* LOGOUT */
-function logout(){
+/* LOGOUT (GUARANTEED) */
+logoutBtn.onclick = ()=>{
   auth.signOut();
-}
+};
 
 /* CHAT */
 sendBtn.onclick = ()=>{
@@ -226,17 +189,13 @@ function addMsg(text,type){
 /* SPEECH */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
-recognition.lang = "en-GB";
 
 micBtn.onclick = ()=>{
   recognition.start();
-  micBtn.innerText = "Listening...";
 };
 
 recognition.onresult = (event)=>{
   const text = event.results[0][0].transcript;
-
-  micBtn.innerText = "🎙️ Speak";
 
   addMsg(text,"user");
 
@@ -244,16 +203,9 @@ recognition.onresult = (event)=>{
 
   addMsg(reply,"ai");
 
-  speak(reply);
-};
-
-function speak(text){
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "en-GB";
-  speech.rate = 1;
-  speech.pitch = 1;
+  const speech = new SpeechSynthesisUtterance(reply);
   window.speechSynthesis.speak(speech);
-}
+};
 
 </script>
 
