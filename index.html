@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+body{
   margin:0;
   font-family:Arial;
   background:#0f172a;
   color:white;
 }
 
-.container {
+.center{
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -21,9 +21,9 @@ body {
   height:100vh;
 }
 
-#app { display:none; }
+#app{ display:none; width:100%; }
 
-input {
+input{
   padding:12px;
   margin:6px;
   border-radius:8px;
@@ -31,8 +31,8 @@ input {
   width:260px;
 }
 
-button {
-  padding:12px;
+button{
+  padding:10px;
   margin:6px;
   border:none;
   border-radius:8px;
@@ -41,26 +41,32 @@ button {
   cursor:pointer;
 }
 
-#chat {
+#chat{
   width:90%;
   max-width:700px;
 }
 
-.msg {
+.msg{
   padding:10px;
   margin:5px 0;
   border-radius:10px;
 }
 
-.user { background:#2563eb; }
-.ai { background:#1e293b; }
+.user{ background:#2563eb; }
+.ai{ background:#1e293b; }
+
+.topbar{
+  display:flex;
+  justify-content:flex-end;
+  padding:10px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
-<div id="auth" class="container">
+<!-- LOGIN -->
+<div id="auth" class="center">
   <h2>AI Pen</h2>
 
   <input id="email" placeholder="Email">
@@ -71,24 +77,25 @@ button {
 </div>
 
 <!-- APP -->
-<div id="app" class="container">
-  <button onclick="logout()">Logout</button>
+<div id="app">
+  <div class="topbar">
+    <button onclick="logout()">Logout</button>
+  </div>
 
-  <div id="chat"></div>
+  <div class="center">
+    <div id="chat"></div>
 
-  <input id="msg" placeholder="Ask something...">
-  <button onclick="send()">Send</button>
+    <input id="msg" placeholder="Ask something...">
+    <button onclick="send()">Send</button>
+  </div>
 </div>
 
-<!-- Firebase -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-/* ===== YOUR API KEY ===== */
-const API_KEY = "PASTE_YOUR_OPENROUTER_KEY";
-
-/* ===== FIREBASE CONFIG ===== */
+/* 🔥 FIREBASE CONFIG */
 firebase.initializeApp({
   apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
   authDomain:"ai-pen-c85a0.firebaseapp.com",
@@ -97,40 +104,42 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 
-/* ===== AUTH ===== */
+/* 🔐 AUTH FUNCTIONS */
 function signup(){
   auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(()=>alert("Account created"))
-  .catch(e=>alert(e.code));
+  .catch(e=>alert(e.message));
 }
 
 function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
-  .catch(e=>alert(e.code));
+  .catch(e=>alert(e.message));
 }
 
 function logout(){
   auth.signOut();
 }
 
+/* 🔄 AUTH STATE */
 auth.onAuthStateChanged(user=>{
   if(user){
-    auth.style.display="none";
-    app.style.display="flex";
-  } else {
-    auth.style.display="flex";
-    app.style.display="none";
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="block";
+  }else{
+    document.getElementById("auth").style.display="flex";
+    document.getElementById("app").style.display="none";
   }
 });
 
-/* ===== CHAT ===== */
+/* 💬 CHAT UI */
 function add(text,type){
-  const d=document.createElement("div");
-  d.className="msg "+type;
-  d.innerText=text;
-  chat.appendChild(d);
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.innerText=text;
+  chat.appendChild(div);
 }
 
+/* 🚀 SEND MESSAGE */
 async function send(){
   const text=msg.value;
   if(!text) return;
@@ -138,27 +147,19 @@ async function send(){
   add(text,"user");
   msg.value="";
 
-  const reply=await askAI(text);
+  const reply = await askAI(text);
   add(reply,"ai");
 }
 
-/* ===== AI ===== */
+/* 🤖 CALL BACKEND */
 async function askAI(message){
   try{
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions",{
+    const res = await fetch("https://ai-pen-alpha.vercel.app/api/chat", {
       method:"POST",
       headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer "+API_KEY,
-        "HTTP-Referer":"https://mathissnipes.github.io",
-        "X-Title":"AI Pen"
+        "Content-Type":"application/json"
       },
-      body:JSON.stringify({
-        model:"mistralai/mistral-7b-instruct:free",
-        messages:[
-          {role:"user",content:message}
-        ]
-      })
+      body: JSON.stringify({ message })
     });
 
     const data = await res.json();
