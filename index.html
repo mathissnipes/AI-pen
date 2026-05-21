@@ -1,64 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AI Pen</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg,#020617,#0f172a);
+  color: white;
 }
 
-.center{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
+/* LOGIN */
+#loginPage {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#app{ display:none; width:100%; }
-
-input{
-  padding:12px;
-  margin:6px;
-  border-radius:8px;
-  border:none;
-  width:260px;
+.login-box {
+  background: #0f172a;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
 }
 
-button{
-  padding:10px;
-  margin:6px;
-  border:none;
-  border-radius:8px;
-  background:#2563eb;
-  color:white;
-  cursor:pointer;
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
 }
 
-#chat{
-  width:90%;
-  max-width:700px;
+button {
+  padding: 10px;
+  width: 100%;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
 }
 
-.msg{
-  padding:10px;
-  margin:5px 0;
-  border-radius:10px;
+/* APP */
+#app {
+  display: none;
+  height: 100vh;
 }
 
-.user{ background:#2563eb; }
-.ai{ background:#1e293b; }
+.sidebar {
+  width: 220px;
+  background: #020617;
+  padding: 20px;
+}
 
-.topbar{
-  display:flex;
-  justify-content:flex-end;
-  padding:10px;
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+}
+
+.chat {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 60%;
+}
+
+.user {
+  background: #3b82f6;
+  margin-left: auto;
+}
+
+.ai {
+  background: #1e293b;
+}
+
+.input-box {
+  display: flex;
+  padding: 20px;
+  gap: 10px;
+}
+
+.input-box input {
+  flex: 1;
+}
+
+.logout {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 </style>
 </head>
@@ -66,112 +113,110 @@ button{
 <body>
 
 <!-- LOGIN -->
-<div id="auth" class="center">
-  <h2>AI Pen</h2>
-
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-
-  <button onclick="signup()">Sign Up</button>
-  <button onclick="login()">Login</button>
+<div id="loginPage">
+  <div class="login-box">
+    <h2>AI Pen</h2>
+    <input id="email" placeholder="Email"/>
+    <input id="password" type="password" placeholder="Password"/>
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Sign Up</button>
+  </div>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <div class="topbar">
-    <button onclick="logout()">Logout</button>
-  </div>
+  <button class="logout" onclick="logout()">Logout</button>
 
-  <div class="center">
-    <div id="chat"></div>
+  <div class="container">
+    <div class="sidebar">
+      <h3>AI Pen</h3>
+      <button onclick="clearChat()">+ New Chat</button>
+    </div>
 
-    <input id="msg" placeholder="Ask something...">
-    <button onclick="send()">Send</button>
+    <div class="main">
+      <div class="chat" id="chat"></div>
+
+      <div class="input-box">
+        <input id="input" placeholder="Ask something..."/>
+        <button onclick="send()">Send</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
 <script>
-/* 🔥 FIREBASE CONFIG */
-firebase.initializeApp({
-  apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
-  authDomain:"ai-pen-c85a0.firebaseapp.com",
-  projectId:"ai-pen-c85a0"
-});
+// SIMPLE LOGIN (local storage for now)
+function login() {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-const auth = firebase.auth();
-
-/* 🔐 AUTH FUNCTIONS */
-function signup(){
-  auth.createUserWithEmailAndPassword(email.value,password.value)
-  .then(()=>alert("Account created"))
-  .catch(e=>alert(e.message));
-}
-
-function login(){
-  auth.signInWithEmailAndPassword(email.value,password.value)
-  .catch(e=>alert(e.message));
-}
-
-function logout(){
-  auth.signOut();
-}
-
-/* 🔄 AUTH STATE */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
-  }else{
-    document.getElementById("auth").style.display="flex";
-    document.getElementById("app").style.display="none";
+  if (email && pass) {
+    localStorage.setItem("user", email);
+    showApp();
   }
-});
+}
 
-/* 💬 CHAT UI */
-function add(text,type){
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.innerText=text;
+function signup() {
+  alert("Signup simulated 👍");
+  login();
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+function showApp() {
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("app").style.display = "block";
+}
+
+// AUTO LOGIN
+if (localStorage.getItem("user")) {
+  showApp();
+}
+
+// CHAT
+function addMessage(type, text) {
+  const chat = document.getElementById("chat");
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.innerText = text;
   chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-/* 🚀 SEND MESSAGE */
-async function send(){
-  const text=msg.value;
-  if(!text) return;
-
-  add(text,"user");
-  msg.value="";
-
-  const reply = await askAI(text);
-  add(reply,"ai");
+function clearChat() {
+  document.getElementById("chat").innerHTML = "";
 }
 
-/* 🤖 CALL BACKEND */
-async function askAI(message){
-  try{
-    const res = await fetch("https://ai-pen-alpha.vercel.app/api/chat", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
+async function send() {
+  const input = document.getElementById("input");
+  const message = input.value;
+  if (!message) return;
+
+  addMessage("user", message);
+  input.value = "";
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ message })
     });
 
     const data = await res.json();
 
-    if(!data.choices){
-      return "ERROR: " + JSON.stringify(data);
+    if (data.reply) {
+      addMessage("ai", data.reply);
+    } else {
+      addMessage("ai", "Error: " + data.error);
     }
 
-    return data.choices[0].message.content;
-
-  }catch(e){
-    return "Connection error";
+  } catch (err) {
+    addMessage("ai", "Connection error");
   }
 }
 </script>
