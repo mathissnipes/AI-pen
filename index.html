@@ -1,45 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <title>AI Pen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+
+/* ================= GLOBAL ================= */
+
+* {
   margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#020617,#0f172a);
-  color: white;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* LOGIN */
-#loginPage {
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0b1220, #020617);
+  color: white;
   height: 100vh;
+  overflow: hidden;
+}
+
+/* ================= LOGIN ================= */
+
+.auth-container {
   display: flex;
+  height: 100vh;
   justify-content: center;
   align-items: center;
 }
 
-.login-box {
-  background: #0f172a;
-  padding: 30px;
-  border-radius: 12px;
-  width: 300px;
+.auth-box {
+  background: rgba(20,25,45,0.9);
+  padding: 40px;
+  border-radius: 15px;
+  width: 320px;
   text-align: center;
 }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: none;
+.auth-box h2 {
+  margin-bottom: 20px;
 }
 
-button {
-  padding: 10px;
+.auth-box input {
   width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #1e293b;
+  color: white;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
   background: #3b82f6;
   border: none;
   border-radius: 8px;
@@ -47,40 +65,84 @@ button {
   cursor: pointer;
 }
 
-/* APP */
-#app {
+/* ================= APP ================= */
+
+.app {
   display: none;
   height: 100vh;
 }
 
+/* SIDEBAR */
+
 .sidebar {
-  width: 220px;
-  background: #020617;
+  width: 260px;
+  background: rgba(10,15,30,0.95);
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
+
+.sidebar h1 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.new-chat {
+  padding: 12px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.chat-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* MAIN */
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* HEADER */
+
+.header {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
   justify-content: space-between;
 }
 
-.container {
-  display: flex;
-  height: 100%;
-}
+/* CHAT AREA */
 
-.chat {
-  padding: 20px;
+.chat-area {
+  flex: 1;
   overflow-y: auto;
+  padding: 40px;
 }
 
 .message {
-  margin: 10px 0;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 60%;
+  margin-bottom: 15px;
+  padding: 14px;
+  border-radius: 12px;
+  max-width: 70%;
 }
 
 .user {
@@ -92,111 +154,206 @@ button {
   background: #1e293b;
 }
 
-.input-box {
+/* INPUT */
+
+.input-container {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
   display: flex;
-  padding: 20px;
+  justify-content: center;
+}
+
+.input-box {
+  width: 700px;
+  display: flex;
   gap: 10px;
 }
 
 .input-box input {
   flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+}
+
+.input-box button {
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+}
+
+/* RIGHT PANEL */
+
+.right-panel {
+  width: 260px;
+  background: rgba(10,15,30,0.95);
+  padding: 20px;
+}
+
+.right-panel h3 {
+  margin-bottom: 10px;
+}
+
+.tool {
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
 }
 
 .logout {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  cursor: pointer;
+  color: #3b82f6;
 }
+
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="loginPage">
-  <div class="login-box">
+<div class="auth-container" id="auth">
+  <div class="auth-box">
     <h2>AI Pen</h2>
-    <input id="email" placeholder="Email"/>
-    <input id="password" type="password" placeholder="Password"/>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
     <button onclick="signup()">Sign Up</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app">
-  <button class="logout" onclick="logout()">Logout</button>
+<div class="app" id="app">
 
-  <div class="container">
+  <div style="display:flex;height:100%">
+
+    <!-- SIDEBAR -->
     <div class="sidebar">
-      <h3>AI Pen</h3>
-      <button onclick="clearChat()">+ New Chat</button>
+      <h1>AI Pen</h1>
+      <button class="new-chat" onclick="newChat()">+ New Chat</button>
+
+      <div class="chat-list" id="chatList"></div>
+
+      <div class="logout" onclick="logout()">Logout</div>
     </div>
 
+    <!-- MAIN -->
     <div class="main">
-      <div class="chat" id="chat"></div>
 
-      <div class="input-box">
-        <input id="input" placeholder="Ask something..."/>
-        <button onclick="send()">Send</button>
+      <div class="header">
+        <div>New Chat</div>
+        <div>GPT-3.5 Turbo</div>
       </div>
+
+      <div class="chat-area" id="chat"></div>
+
+      <div class="input-container">
+        <div class="input-box">
+          <input id="input" placeholder="Ask something...">
+          <button onclick="send()">Send</button>
+        </div>
+      </div>
+
     </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <h3>Tools</h3>
+      <div class="tool">Grammar</div>
+      <div class="tool">Summarize</div>
+      <div class="tool">Translate</div>
+
+      <h3 style="margin-top:20px;">History</h3>
+      <div id="history"></div>
+    </div>
+
   </div>
+
 </div>
 
 <script>
-// SIMPLE LOGIN (local storage for now)
-function login() {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
 
-  if (email && pass) {
-    localStorage.setItem("user", email);
-    showApp();
-  }
+/* ================= AUTH ================= */
+
+function login() {
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("app").style.display = "flex";
 }
 
 function signup() {
-  alert("Signup simulated 👍");
-  login();
+  alert("Signed up (demo)");
 }
 
 function logout() {
-  localStorage.removeItem("user");
   location.reload();
 }
 
-function showApp() {
-  document.getElementById("loginPage").style.display = "none";
-  document.getElementById("app").style.display = "block";
+/* ================= CHAT ================= */
+
+let chats = [];
+
+function newChat() {
+  chats.push([]);
+  renderChatList();
 }
 
-// AUTO LOGIN
-if (localStorage.getItem("user")) {
-  showApp();
+function renderChatList() {
+  const list = document.getElementById("chatList");
+  list.innerHTML = "";
+
+  chats.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "chat-item";
+    div.innerText = "Chat " + (i + 1);
+    div.onclick = () => loadChat(i);
+    list.appendChild(div);
+  });
 }
 
-// CHAT
-function addMessage(type, text) {
+let currentChat = [];
+
+function loadChat(i) {
+  currentChat = chats[i];
+  renderChat();
+}
+
+function renderChat() {
   const chat = document.getElementById("chat");
+  chat.innerHTML = "";
+
+  currentChat.forEach(m => {
+    addMessage(m.text, m.type);
+  });
+}
+
+function addMessage(text, type) {
+  const chat = document.getElementById("chat");
+
   const div = document.createElement("div");
   div.className = "message " + type;
   div.innerText = text;
+
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function clearChat() {
-  document.getElementById("chat").innerHTML = "";
-}
+/* ================= SEND ================= */
 
 async function send() {
   const input = document.getElementById("input");
-  const message = input.value;
-  if (!message) return;
+  const msg = input.value;
 
-  addMessage("user", message);
+  if (!msg) return;
+
   input.value = "";
+
+  addMessage(msg, "user");
 
   try {
     const res = await fetch("/api/chat", {
@@ -204,21 +361,18 @@ async function send() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message: msg })
     });
 
     const data = await res.json();
 
-    if (data.reply) {
-      addMessage("ai", data.reply);
-    } else {
-      addMessage("ai", "Error: " + data.error);
-    }
+    addMessage(data.reply || "No response", "ai");
 
   } catch (err) {
-    addMessage("ai", "Connection error");
+    addMessage("Connection error", "ai");
   }
 }
+
 </script>
 
 </body>
