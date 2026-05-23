@@ -138,6 +138,7 @@
       border-radius: 9px;
       cursor: pointer;
       transition: background 0.12s;
+      position: relative;
     }
     .user-row:hover { background: var(--card); }
     .avatar {
@@ -155,6 +156,32 @@
     .user-info { flex: 1; min-width: 0; }
     .user-name  { font-size: 13px; font-weight: 600; }
     .user-email { font-size: 11px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Sign out menu */
+    .signout-menu {
+      display: none;
+      position: absolute;
+      bottom: 52px;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 100;
+    }
+    .signout-menu.open { display: block; }
+    .signout-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #f87171;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .signout-item:hover { background: var(--card-hover); }
 
     /* ── MAIN ── */
     .main {
@@ -212,7 +239,6 @@
       gap: 18px;
     }
 
-    /* Welcome */
     .welcome {
       display: flex;
       flex-direction: column;
@@ -261,7 +287,6 @@
       color: var(--accent);
     }
 
-    /* Messages */
     .msg { display: flex; flex-direction: column; gap: 4px; animation: fadeUp 0.22s ease; }
     .msg.user { align-items: flex-end; }
     .msg.ai   { align-items: flex-start; }
@@ -447,7 +472,6 @@
       transition: background 0.12s, color 0.12s;
     }
     .tool-item:hover { background: var(--card); color: var(--text); }
-    .tool-label { font-size: 10.5px; font-weight: 700; color: var(--text-2); width: 20px; text-align: center; flex-shrink: 0; }
 
     .hist-row {
       display: flex;
@@ -483,14 +507,37 @@
       width: 100%;
       margin-top: 4px;
       transition: background 0.12s;
+      font-family: inherit;
     }
     .clear-btn:hover { background: rgba(239,68,68,0.14); }
+
+    /* Auth loading overlay */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .auth-spin {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 1100px) { .right-panel { display: none; } }
     @media (max-width: 700px)  { .sidebar     { display: none; } }
   </style>
 </head>
 <body>
+
+<!-- Auth loading overlay (hidden once auth resolves) -->
+<div id="auth-overlay"><div class="auth-spin"></div></div>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
@@ -538,20 +585,26 @@
     <button class="upgrade-btn">Upgrade Now</button>
   </div>
 
-  <div class="user-row">
-    <div class="avatar">U</div>
+  <div class="user-row" onclick="toggleSignOut()">
+    <div class="avatar" id="user-avatar">U</div>
     <div class="user-info">
-      <div class="user-name">User</div>
-      <div class="user-email">user@example.com</div>
+      <div class="user-name" id="user-name">User</div>
+      <div class="user-email" id="user-email">user@example.com</div>
     </div>
     <svg width="14" height="14" fill="none" stroke="#8899b4" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="signout-menu" id="signout-menu">
+      <div class="signout-item" onclick="signOut(event)">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </div>
+    </div>
   </div>
 </aside>
 
 <!-- ══ MAIN ══ -->
 <main class="main">
   <header class="chat-header">
-    <div class="header-title" id="chat-title-wrap">
+    <div class="header-title">
       <span id="chat-title">New Chat</span>
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
@@ -559,7 +612,7 @@
       <div class="hdr-btn">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </div>
-      <div class="avatar" style="width:34px;height:34px;font-size:13px;cursor:pointer;">U</div>
+      <div class="avatar" style="width:34px;height:34px;font-size:13px;cursor:pointer;" id="header-avatar">U</div>
     </div>
   </header>
 
@@ -575,40 +628,20 @@
         <p class="sub">Your intelligent writing assistant.</p>
         <div class="feature-grid">
           <div class="fcard" onclick="prefill('Write an essay about the future of AI.')">
-            <div class="fcard-text">
-              <div class="ft">Write an essay</div>
-              <div class="fd">Write an essay about the future of AI.</div>
-            </div>
-            <div class="fcard-icon">
-              <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </div>
+            <div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div>
+            <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
           </div>
           <div class="fcard" onclick="prefill('Summarize this document in a few key points.')">
-            <div class="fcard-text">
-              <div class="ft">Summarize</div>
-              <div class="fd">Summarize this document in a few key points.</div>
-            </div>
-            <div class="fcard-icon">
-              <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
+            <div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div>
+            <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           </div>
           <div class="fcard" onclick="prefill('Give me 10 ideas for a YouTube channel.')">
-            <div class="fcard-text">
-              <div class="ft">Brainstorm ideas</div>
-              <div class="fd">Give me 10 ideas for a YouTube channel.</div>
-            </div>
-            <div class="fcard-icon">
-              <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-            </div>
+            <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
+            <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
           </div>
           <div class="fcard" onclick="prefill('Explain this code and suggest improvements.')">
-            <div class="fcard-text">
-              <div class="ft">Code help</div>
-              <div class="fd">Explain this code and suggest improvements.</div>
-            </div>
-            <div class="fcard-icon">
-              <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            </div>
+            <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
+            <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           </div>
         </div>
       </div>
@@ -631,7 +664,6 @@
 <!-- ══ RIGHT PANEL ══ -->
 <aside class="right-panel">
   <div class="panel-scroll">
-
     <div>
       <div class="sec-title">AI Model</div>
       <div class="model-select">
@@ -639,88 +671,97 @@
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
     </div>
-
     <div>
       <div class="sec-title">Tools</div>
-      <div class="tool-item">
-        <span class="tool-label" style="font-size:11px;font-weight:800;">Aa</span>
-        Grammar Check
-      </div>
-      <div class="tool-item">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Summarize
-      </div>
-      <div class="tool-item">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-        Translate
-      </div>
-      <div class="tool-item">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Explain Code
-      </div>
-      <div class="tool-item">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-        Generate Ideas
-      </div>
+      <div class="tool-item"><span style="font-size:11px;font-weight:800;width:18px;text-align:center;flex-shrink:0;color:var(--text-2)">Aa</span>Grammar Check</div>
+      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Summarize</div>
+      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Translate</div>
+      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Explain Code</div>
+      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Generate Ideas</div>
     </div>
-
     <div>
       <div class="sec-title">Chat History</div>
-      <div class="hist-row active">
-        <span class="hist-n">New Chat</span>
-        <span class="hist-t">10:30 PM</span>
-      </div>
-      <div class="hist-row">
-        <span class="hist-n">Essay about AI</span>
-        <span class="hist-t">Yesterday</span>
-      </div>
-      <div class="hist-row">
-        <span class="hist-n">YouTube Ideas</span>
-        <span class="hist-t">2 days ago</span>
-      </div>
-      <div class="hist-row">
-        <span class="hist-n">Code Explanation</span>
-        <span class="hist-t">3 days ago</span>
-      </div>
-      <div class="hist-row">
-        <span class="hist-n">Story Writing</span>
-        <span class="hist-t">5 days ago</span>
-      </div>
+      <div class="hist-row active"><span class="hist-n">New Chat</span><span class="hist-t">10:30 PM</span></div>
+      <div class="hist-row"><span class="hist-n">Essay about AI</span><span class="hist-t">Yesterday</span></div>
+      <div class="hist-row"><span class="hist-n">YouTube Ideas</span><span class="hist-t">2 days ago</span></div>
+      <div class="hist-row"><span class="hist-n">Code Explanation</span><span class="hist-t">3 days ago</span></div>
+      <div class="hist-row"><span class="hist-n">Story Writing</span><span class="hist-t">5 days ago</span></div>
       <button class="clear-btn">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Clear history
       </button>
     </div>
-
   </div>
 </aside>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
 <script>
+  // ── Firebase auth guard ──
+  firebase.initializeApp({
+    apiKey:            "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
+    authDomain:        "ai-pen-c85a0.firebaseapp.com",
+    projectId:         "ai-pen-c85a0",
+    storageBucket:     "ai-pen-c85a0.firebasestorage.app",
+    messagingSenderId: "997852271146",
+    appId:             "1:997852271146:web:f9b42d91dce0ead0d86953",
+    measurementId:     "G-L3KBGYBFWM"
+  });
+
+  const auth = firebase.auth();
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = '/login.html';
+      return;
+    }
+    // Populate user info
+    const initial = (user.displayName || user.email || user.phoneNumber || 'U')[0].toUpperCase();
+    document.getElementById('user-avatar').textContent  = initial;
+    document.getElementById('header-avatar').textContent = initial;
+    document.getElementById('user-name').textContent    = user.displayName || 'User';
+    document.getElementById('user-email').textContent   = user.email || user.phoneNumber || '';
+    // Show app
+    document.getElementById('auth-overlay').style.display = 'none';
+  });
+
+  function toggleSignOut() {
+    document.getElementById('signout-menu').classList.toggle('open');
+  }
+  function signOut(e) {
+    e.stopPropagation();
+    auth.signOut().then(() => window.location.href = '/login.html');
+  }
+  // Close menu on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.user-row')) {
+      document.getElementById('signout-menu').classList.remove('open');
+    }
+  });
+
+  // ── Chat ──
   let busy = false, msgCount = 0;
 
   function resize(el) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 160) + 'px';
   }
-
   function onKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   }
-
   function prefill(text) {
     const el = document.getElementById('msg-input');
     el.value = text; el.focus(); resize(el);
   }
-
   function scrollBottom() {
     const c = document.getElementById('msgs-scroll');
     c.scrollTop = c.scrollHeight;
   }
-
   function esc(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
@@ -728,23 +769,16 @@
   function addMsg(role, text) {
     const w = document.getElementById('welcome');
     if (w) w.remove();
-
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
     el.className = 'msg ' + role;
-
     const actions = role === 'ai' ? `<div class="msg-actions">
       <button class="mact" title="Copy" onclick="navigator.clipboard.writeText(this.closest('.msg').querySelector('.bubble').textContent)">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
-      <button class="mact" title="Like">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-      </button>
-      <button class="mact" title="Dislike">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
-      </button>
+      <button class="mact" title="Like"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button>
+      <button class="mact" title="Dislike"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg></button>
     </div>` : '';
-
     el.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-time">${getTime()}</div>${actions}`;
     wrap.appendChild(el);
     scrollBottom();
@@ -762,8 +796,8 @@
     return el;
   }
 
-  function buildWelcome() {
-    return `<div class="welcome" id="welcome">
+  function newChat() {
+    document.getElementById('msgs').innerHTML = `<div class="welcome" id="welcome">
       <svg class="welcome-icon" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
         <line x1="16" y1="8" x2="2" y2="22"/>
@@ -772,28 +806,12 @@
       <h1>Hello! I'm AI Pen</h1>
       <p class="sub">Your intelligent writing assistant.</p>
       <div class="feature-grid">
-        <div class="fcard" onclick="prefill('Write an essay about the future of AI.')">
-          <div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div>
-          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-        </div>
-        <div class="fcard" onclick="prefill('Summarize this document in a few key points.')">
-          <div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div>
-          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        </div>
-        <div class="fcard" onclick="prefill('Give me 10 ideas for a YouTube channel.')">
-          <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
-          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
-        </div>
-        <div class="fcard" onclick="prefill('Explain this code and suggest improvements.')">
-          <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
-          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        </div>
+        <div class="fcard" onclick="prefill('Write an essay about the future of AI.')"><div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div>
+        <div class="fcard" onclick="prefill('Summarize this document in a few key points.')"><div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div></div>
+        <div class="fcard" onclick="prefill('Give me 10 ideas for a YouTube channel.')"><div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div></div>
+        <div class="fcard" onclick="prefill('Explain this code and suggest improvements.')"><div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div>
       </div>
     </div>`;
-  }
-
-  function newChat() {
-    document.getElementById('msgs').innerHTML = buildWelcome();
     document.getElementById('chat-title').textContent = 'New Chat';
     document.getElementById('msg-input').value = '';
     msgCount = 0;
@@ -804,20 +822,16 @@
     const input = document.getElementById('msg-input');
     const message = input.value.trim();
     if (!message) return;
-
     busy = true;
     document.getElementById('send-btn').disabled = true;
     input.value = ''; input.style.height = 'auto';
-
     if (msgCount === 0) {
       document.getElementById('chat-title').textContent =
         message.length > 32 ? message.slice(0, 32) + '…' : message;
     }
-
     addMsg('user', message);
     const typer = addTyping();
     msgCount++;
-
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -832,7 +846,6 @@
       addMsg('ai', 'Something went wrong. Please try again.');
       console.error(err);
     }
-
     busy = false;
     document.getElementById('send-btn').disabled = false;
     input.focus();
