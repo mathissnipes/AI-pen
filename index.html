@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+content: <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -91,7 +91,7 @@
       transition: background 0.12s, color 0.12s;
     }
     .nav-item:hover  { background: var(--card); color: var(--text); }
-    .nav-item.active { color: var(--text); }
+    .nav-item.active { background: var(--card); color: var(--text); }
     .nav-item svg { flex-shrink: 0; }
 
     .spacer { flex: 1; }
@@ -157,7 +157,6 @@
     .user-name  { font-size: 13px; font-weight: 600; }
     .user-email { font-size: 11px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Sign out menu */
     .signout-menu {
       display: none;
       position: absolute;
@@ -210,7 +209,6 @@
       gap: 5px;
       font-size: 15px;
       font-weight: 600;
-      cursor: pointer;
     }
     .header-right { display: flex; align-items: center; gap: 10px; }
     .hdr-btn {
@@ -272,6 +270,7 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .fcard:hover { background: var(--card-hover); border-color: var(--accent); }
+    .fcard:active { transform: scale(0.98); }
     .fcard-text .ft  { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
     .fcard-text .fd  { font-size: 12px; color: var(--text-2); line-height: 1.45; }
     .fcard-icon {
@@ -445,6 +444,8 @@
 
     .sec-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
 
+    /* Model selector */
+    .model-wrap { position: relative; }
     .model-select {
       display: flex;
       align-items: center;
@@ -457,8 +458,34 @@
       font-size: 13.5px;
       font-weight: 500;
       transition: border-color 0.12s;
+      user-select: none;
     }
     .model-select:hover { border-color: var(--accent); }
+    .model-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .model-menu.open { display: block; }
+    .model-opt {
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .model-opt:hover { background: var(--card-hover); }
+    .model-opt.selected { color: var(--accent); }
+    .model-check { color: var(--accent); font-size: 11px; }
 
     .tool-item {
       display: flex;
@@ -472,6 +499,7 @@
       transition: background 0.12s, color 0.12s;
     }
     .tool-item:hover { background: var(--card); color: var(--text); }
+    .tool-item:active { background: var(--card-hover); }
 
     .hist-row {
       display: flex;
@@ -530,14 +558,33 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13px;
+      color: var(--text);
+      z-index: 500;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     @media (max-width: 1100px) { .right-panel { display: none; } }
     @media (max-width: 700px)  { .sidebar     { display: none; } }
   </style>
 </head>
 <body>
 
-<!-- Auth loading overlay (hidden once auth resolves) -->
 <div id="auth-overlay"><div class="auth-spin"></div></div>
+<div class="toast" id="toast"></div>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
@@ -557,19 +604,19 @@
     New Chat
   </button>
 
-  <div class="nav-item active">
+  <div class="nav-item active" data-nav="chats" onclick="setNav('chats')">
     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Chats
   </div>
-  <div class="nav-item">
+  <div class="nav-item" data-nav="templates" onclick="setNav('templates')">
     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
     Templates
   </div>
-  <div class="nav-item">
+  <div class="nav-item" data-nav="documents" onclick="setNav('documents')">
     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Documents
   </div>
-  <div class="nav-item">
+  <div class="nav-item" data-nav="settings" onclick="setNav('settings')">
     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
     Settings
   </div>
@@ -582,7 +629,7 @@
       Upgrade to Pro
     </div>
     <div class="upgrade-desc">Unlock more AI models, higher limits, and advanced features.</div>
-    <button class="upgrade-btn">Upgrade Now</button>
+    <button class="upgrade-btn" onclick="showToast('Pro plan coming soon!')">Upgrade Now</button>
   </div>
 
   <div class="user-row" onclick="toggleSignOut()">
@@ -606,11 +653,10 @@
   <header class="chat-header">
     <div class="header-title">
       <span id="chat-title">New Chat</span>
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
     <div class="header-right">
-      <div class="hdr-btn">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <div class="hdr-btn" onclick="newChat()" title="New Chat">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
       <div class="avatar" style="width:34px;height:34px;font-size:13px;cursor:pointer;" id="header-avatar">U</div>
     </div>
@@ -625,21 +671,21 @@
           <line x1="17.5" y1="15" x2="9" y2="15"/>
         </svg>
         <h1>Hello! I'm AI Pen</h1>
-        <p class="sub">Your intelligent writing assistant.</p>
+        <p class="sub">Your intelligent writing assistant. Click a card to get started.</p>
         <div class="feature-grid">
-          <div class="fcard" onclick="prefill('Write an essay about the future of AI.')">
+          <div class="fcard" onclick="quickSend('Write an essay about the future of AI.')">
             <div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
           </div>
-          <div class="fcard" onclick="prefill('Summarize this document in a few key points.')">
+          <div class="fcard" onclick="quickSend('Summarize the key points of the following text for me.')">
             <div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           </div>
-          <div class="fcard" onclick="prefill('Give me 10 ideas for a YouTube channel.')">
+          <div class="fcard" onclick="quickSend('Give me 10 creative ideas for a YouTube channel.')">
             <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
           </div>
-          <div class="fcard" onclick="prefill('Explain this code and suggest improvements.')">
+          <div class="fcard" onclick="quickSend('Explain this code and suggest improvements:\n\n')">
             <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           </div>
@@ -650,7 +696,7 @@
 
   <div class="input-zone">
     <div class="input-bar">
-      <button class="attach-btn" title="Attach file">
+      <button class="attach-btn" title="Attach file" onclick="showToast('File upload coming soon!')">
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
       </button>
       <textarea id="msg-input" rows="1" placeholder="Ask something..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
@@ -664,33 +710,51 @@
 <!-- ══ RIGHT PANEL ══ -->
 <aside class="right-panel">
   <div class="panel-scroll">
+
     <div>
       <div class="sec-title">AI Model</div>
-      <div class="model-select">
-        <span>GPT-3.5 Turbo</span>
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="model-wrap">
+        <div class="model-select" onclick="toggleModelMenu()">
+          <span id="model-name">GPT-3.5 Turbo</span>
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="model-menu" id="model-menu"></div>
       </div>
     </div>
+
     <div>
       <div class="sec-title">Tools</div>
-      <div class="tool-item"><span style="font-size:11px;font-weight:800;width:18px;text-align:center;flex-shrink:0;color:var(--text-2)">Aa</span>Grammar Check</div>
-      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Summarize</div>
-      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Translate</div>
-      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Explain Code</div>
-      <div class="tool-item"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Generate Ideas</div>
+      <div class="tool-item" onclick="toolPrompt('grammar')">
+        <span style="font-size:11px;font-weight:800;width:18px;text-align:center;flex-shrink:0;color:var(--text-2)">Aa</span>
+        Grammar Check
+      </div>
+      <div class="tool-item" onclick="toolPrompt('summarize')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Summarize
+      </div>
+      <div class="tool-item" onclick="toolPrompt('translate')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        Translate
+      </div>
+      <div class="tool-item" onclick="toolPrompt('code')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Explain Code
+      </div>
+      <div class="tool-item" onclick="toolPrompt('ideas')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+        Generate Ideas
+      </div>
     </div>
+
     <div>
       <div class="sec-title">Chat History</div>
-      <div class="hist-row active"><span class="hist-n">New Chat</span><span class="hist-t">10:30 PM</span></div>
-      <div class="hist-row"><span class="hist-n">Essay about AI</span><span class="hist-t">Yesterday</span></div>
-      <div class="hist-row"><span class="hist-n">YouTube Ideas</span><span class="hist-t">2 days ago</span></div>
-      <div class="hist-row"><span class="hist-n">Code Explanation</span><span class="hist-t">3 days ago</span></div>
-      <div class="hist-row"><span class="hist-n">Story Writing</span><span class="hist-t">5 days ago</span></div>
-      <button class="clear-btn">
+      <div id="history-list"></div>
+      <button class="clear-btn" onclick="clearHistory()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Clear history
       </button>
     </div>
+
   </div>
 </aside>
 
@@ -713,17 +777,12 @@
   const auth = firebase.auth();
 
   auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = '/login.html';
-      return;
-    }
-    // Populate user info
+    if (!user) { window.location.href = '/login.html'; return; }
     const initial = (user.displayName || user.email || user.phoneNumber || 'U')[0].toUpperCase();
-    document.getElementById('user-avatar').textContent  = initial;
+    document.getElementById('user-avatar').textContent   = initial;
     document.getElementById('header-avatar').textContent = initial;
-    document.getElementById('user-name').textContent    = user.displayName || 'User';
-    document.getElementById('user-email').textContent   = user.email || user.phoneNumber || '';
-    // Show app
+    document.getElementById('user-name').textContent     = user.displayName || 'User';
+    document.getElementById('user-email').textContent    = user.email || user.phoneNumber || '';
     document.getElementById('auth-overlay').style.display = 'none';
   });
 
@@ -734,16 +793,123 @@
     e.stopPropagation();
     auth.signOut().then(() => window.location.href = '/login.html');
   }
-  // Close menu on outside click
   document.addEventListener('click', e => {
-    if (!e.target.closest('.user-row')) {
+    if (!e.target.closest('.user-row'))
       document.getElementById('signout-menu').classList.remove('open');
-    }
+    if (!e.target.closest('.model-wrap'))
+      document.getElementById('model-menu').classList.remove('open');
   });
 
-  // ── Chat ──
-  let busy = false, msgCount = 0;
+  // ── Models ──
+  const MODELS = [
+    { id: 'gpt-3.5-turbo',   name: 'GPT-3.5 Turbo' },
+    { id: 'gpt-4',           name: 'GPT-4' },
+    { id: 'gpt-4o',          name: 'GPT-4o' },
+    { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet' },
+  ];
+  let currentModel = MODELS[0];
 
+  function buildModelMenu() {
+    const menu = document.getElementById('model-menu');
+    menu.innerHTML = MODELS.map(m => `
+      <div class="model-opt ${m.id === currentModel.id ? 'selected' : ''}" onclick="selectModel('${m.id}')">
+        ${m.name}
+        ${m.id === currentModel.id ? '<span class="model-check">✓</span>' : ''}
+      </div>`).join('');
+  }
+
+  function toggleModelMenu() {
+    buildModelMenu();
+    document.getElementById('model-menu').classList.toggle('open');
+  }
+
+  function selectModel(id) {
+    currentModel = MODELS.find(m => m.id === id) || MODELS[0];
+    document.getElementById('model-name').textContent = currentModel.name;
+    document.getElementById('model-menu').classList.remove('open');
+    showToast('Model: ' + currentModel.name);
+  }
+
+  // ── Tool prompts ──
+  const TOOL_PROMPTS = {
+    grammar:   'Please check and correct the grammar in the following text:\n\n',
+    summarize: 'Please summarize the following text in 3-5 key bullet points:\n\n',
+    translate: 'Please translate the following text to Spanish:\n\n',
+    code:      'Please explain this code and suggest improvements:\n\n',
+    ideas:     'Please generate 10 creative ideas for: ',
+  };
+
+  function toolPrompt(type) {
+    const prompt = TOOL_PROMPTS[type];
+    if (!prompt) return;
+    const el = document.getElementById('msg-input');
+    el.value = prompt;
+    el.focus();
+    el.setSelectionRange(prompt.length, prompt.length);
+    resize(el);
+  }
+
+  // ── Nav ──
+  function setNav(name) {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.nav === name);
+    });
+  }
+
+  // ── Toast ──
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── Chat state ──
+  let busy = false;
+  let chats = {};      // { id: { id, title, ts, messages: [{role, text, time}] } }
+  let chatOrder = [];  // ids newest-first
+  let currentChatId = null;
+
+  function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  function relTime(ts) {
+    const d = Date.now() - ts;
+    if (d < 86400000)  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (d < 172800000) return 'Yesterday';
+    return Math.floor(d / 86400000) + ' days ago';
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    if (chatOrder.length === 0) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:4px 10px;">No chats yet</div>';
+      return;
+    }
+    list.innerHTML = chatOrder.map(id => {
+      const c = chats[id];
+      return `<div class="hist-row ${id === currentChatId ? 'active' : ''}" onclick="loadChat('${id}')">
+        <span class="hist-n">${esc(c.title)}</span>
+        <span class="hist-t">${relTime(c.ts)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function loadChat(id) {
+    currentChatId = id;
+    const chat = chats[id];
+    const wrap = document.getElementById('msgs');
+    wrap.innerHTML = '';
+    chat.messages.forEach(m => renderMsgEl(m.role, m.text, m.time));
+    document.getElementById('chat-title').textContent = chat.title;
+    renderHistory();
+    scrollBottom();
+  }
+
+  // ── UI helpers ──
   function resize(el) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 160) + 'px';
@@ -751,43 +917,44 @@
   function onKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   }
-  function prefill(text) {
-    const el = document.getElementById('msg-input');
-    el.value = text; el.focus(); resize(el);
-  }
   function scrollBottom() {
     const c = document.getElementById('msgs-scroll');
     c.scrollTop = c.scrollHeight;
   }
   function esc(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  function addMsg(role, text) {
-    const w = document.getElementById('welcome');
-    if (w) w.remove();
+  function renderMsgEl(role, text, time) {
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
     el.className = 'msg ' + role;
     const actions = role === 'ai' ? `<div class="msg-actions">
-      <button class="mact" title="Copy" onclick="navigator.clipboard.writeText(this.closest('.msg').querySelector('.bubble').textContent)">
+      <button class="mact" title="Copy" onclick="copyMsg(this)">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
-      <button class="mact" title="Like"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button>
-      <button class="mact" title="Dislike"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg></button>
+      <button class="mact" title="Like" onclick="showToast('Liked!')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+      </button>
+      <button class="mact" title="Dislike" onclick="showToast('Noted!')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+      </button>
     </div>` : '';
-    el.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-time">${getTime()}</div>${actions}`;
+    el.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-time">${time}</div>${actions}`;
     wrap.appendChild(el);
     scrollBottom();
     return el;
   }
 
+  function copyMsg(btn) {
+    const text = btn.closest('.msg').querySelector('.bubble').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+  }
+
   function addTyping() {
-    const w = document.getElementById('welcome');
-    if (w) w.remove();
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
     el.className = 'msg ai'; el.id = 'typing-row';
@@ -796,61 +963,127 @@
     return el;
   }
 
+  // ── Chat actions ──
+  function quickSend(text) {
+    const el = document.getElementById('msg-input');
+    el.value = text;
+    resize(el);
+    send();
+  }
+
   function newChat() {
-    document.getElementById('msgs').innerHTML = `<div class="welcome" id="welcome">
+    currentChatId = null;
+    document.getElementById('msgs').innerHTML = buildWelcomeHTML();
+    document.getElementById('chat-title').textContent = 'New Chat';
+    document.getElementById('msg-input').value = '';
+    document.getElementById('msg-input').style.height = 'auto';
+    renderHistory();
+  }
+
+  function clearHistory() {
+    if (chatOrder.length === 0) { showToast('No history to clear'); return; }
+    chats = {};
+    chatOrder = [];
+    currentChatId = null;
+    document.getElementById('msgs').innerHTML = buildWelcomeHTML();
+    document.getElementById('chat-title').textContent = 'New Chat';
+    renderHistory();
+    showToast('History cleared');
+  }
+
+  function buildWelcomeHTML() {
+    return `<div class="welcome" id="welcome">
       <svg class="welcome-icon" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
         <line x1="16" y1="8" x2="2" y2="22"/>
         <line x1="17.5" y1="15" x2="9" y2="15"/>
       </svg>
       <h1>Hello! I'm AI Pen</h1>
-      <p class="sub">Your intelligent writing assistant.</p>
+      <p class="sub">Your intelligent writing assistant. Click a card to get started.</p>
       <div class="feature-grid">
-        <div class="fcard" onclick="prefill('Write an essay about the future of AI.')"><div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div>
-        <div class="fcard" onclick="prefill('Summarize this document in a few key points.')"><div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div></div>
-        <div class="fcard" onclick="prefill('Give me 10 ideas for a YouTube channel.')"><div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div></div>
-        <div class="fcard" onclick="prefill('Explain this code and suggest improvements.')"><div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div><div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div>
+        <div class="fcard" onclick="quickSend('Write an essay about the future of AI.')">
+          <div class="fcard-text"><div class="ft">Write an essay</div><div class="fd">Write an essay about the future of AI.</div></div>
+          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        </div>
+        <div class="fcard" onclick="quickSend('Summarize the key points of the following text for me.')">
+          <div class="fcard-text"><div class="ft">Summarize</div><div class="fd">Summarize this document in a few key points.</div></div>
+          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        </div>
+        <div class="fcard" onclick="quickSend('Give me 10 creative ideas for a YouTube channel.')">
+          <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
+          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
+        </div>
+        <div class="fcard" onclick="toolPrompt('code'); document.getElementById('msg-input').focus()">
+          <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
+          <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        </div>
       </div>
     </div>`;
-    document.getElementById('chat-title').textContent = 'New Chat';
-    document.getElementById('msg-input').value = '';
-    msgCount = 0;
   }
 
+  // ── Send ──
   async function send() {
     if (busy) return;
     const input = document.getElementById('msg-input');
     const message = input.value.trim();
     if (!message) return;
+
     busy = true;
     document.getElementById('send-btn').disabled = true;
     input.value = ''; input.style.height = 'auto';
-    if (msgCount === 0) {
-      document.getElementById('chat-title').textContent =
-        message.length > 32 ? message.slice(0, 32) + '…' : message;
+
+    const w = document.getElementById('welcome');
+    if (w) w.remove();
+
+    const time = getTime();
+
+    // Create or update chat record
+    if (!currentChatId) {
+      const id = genId();
+      const title = message.length > 36 ? message.slice(0, 36) + '…' : message;
+      chats[id] = { id, title, ts: Date.now(), messages: [] };
+      chatOrder.unshift(id);
+      currentChatId = id;
+      document.getElementById('chat-title').textContent = title;
     }
-    addMsg('user', message);
+
+    const chat = chats[currentChatId];
+    chat.messages.push({ role: 'user', text: message, time });
+    renderMsgEl('user', message, time);
     const typer = addTyping();
-    msgCount++;
+    renderHistory();
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message, model: currentModel.id })
       });
       const data = await res.json();
       typer.remove();
-      addMsg('ai', (data && data.reply) ? data.reply : 'Sorry, I could not get a response.');
+      const reply = (data && data.reply) ? data.reply : 'Sorry, I could not get a response.';
+      const replyTime = getTime();
+      chat.messages.push({ role: 'ai', text: reply, time: replyTime });
+      renderMsgEl('ai', reply, replyTime);
     } catch (err) {
       typer.remove();
-      addMsg('ai', 'Something went wrong. Please try again.');
+      const errMsg = 'Something went wrong. Please try again.';
+      chat.messages.push({ role: 'ai', text: errMsg, time: getTime() });
+      renderMsgEl('ai', errMsg, getTime());
       console.error(err);
     }
+
     busy = false;
     document.getElementById('send-btn').disabled = false;
     input.focus();
   }
+
+  // Init history
+  renderHistory();
 </script>
 </body>
 </html>
 
+file_path: /home/user/AI-pen/index.html
+
+File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.
