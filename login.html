@@ -8,133 +8,99 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #0c1222;
-      --card:        #141d2e;
-      --card-2:      #111827;
-      --border:      #1e2d45;
-      --accent:      #4361ee;
-      --accent-h:    #3451d1;
+      --bg:       #0c1222;
+      --card:     #141d2e;
+      --border:   #1e2d45;
+      --accent:   #4361ee;
+      --accent-h: #3451d1;
       --accent-glow: rgba(67,97,238,0.18);
-      --purple:      #7c3aed;
-      --text:        #ffffff;
-      --text-2:      #8899b4;
-      --text-3:      #4a5568;
-      --error:       #f87171;
-      --success:     #34d399;
+      --text:     #ffffff;
+      --text-2:   #8899b4;
+      --text-3:   #4a5568;
+      --error:    #f87171;
     }
 
     html, body {
-      min-height: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-
-    .page {
-      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      background:
-        radial-gradient(ellipse at 15% 50%, rgba(67,97,238,0.09) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 15%, rgba(124,58,237,0.09) 0%, transparent 55%),
-        var(--bg);
     }
 
     .card {
       width: 100%;
-      max-width: 420px;
-      background: var(--card-2);
+      max-width: 400px;
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 38px 34px;
+      border-radius: 20px;
+      padding: 36px 32px 32px;
+      margin: 20px;
     }
 
-    /* Logo */
     .logo-row {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 30px;
-    }
-    .logo-icon { color: var(--accent); }
-    .logo-text { font-size: 20px; font-weight: 700; }
-
-    .card-title {
-      font-size: 22px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-    .card-sub {
-      font-size: 13.5px;
-      color: var(--text-2);
-      text-align: center;
       margin-bottom: 28px;
     }
+    .logo-icon { color: var(--accent); }
+    .logo-text { font-size: 22px; font-weight: 800; }
 
-    /* Tabs */
     .tabs {
       display: flex;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 11px;
+      background: var(--bg);
+      border-radius: 10px;
       padding: 4px;
-      margin-bottom: 24px;
+      margin-bottom: 26px;
     }
     .tab {
       flex: 1;
-      padding: 8px;
       text-align: center;
-      font-size: 13.5px;
+      padding: 8px;
+      border-radius: 7px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--text-2);
       cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.15s;
-      user-select: none;
+      transition: background 0.15s, color 0.15s;
     }
-    .tab.active { background: var(--accent); color: #fff; }
-
-    /* Alert */
-    .alert {
-      font-size: 13px;
-      padding: 10px 13px;
-      border-radius: 9px;
-      margin-bottom: 16px;
-      display: none;
-      line-height: 1.5;
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
-    .alert.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25); color: var(--error); display: block; }
-    .alert.success { background: rgba(52,211,153,0.1);  border: 1px solid rgba(52,211,153,0.25);  color: var(--success); display: block; }
 
-    /* Form */
-    .form-group { margin-bottom: 16px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
     label {
       display: block;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-2);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 7px;
+      margin-bottom: 6px;
     }
+
+    input[type="text"],
     input[type="email"],
     input[type="password"],
-    input[type="tel"],
-    input[type="text"] {
+    input[type="tel"] {
       width: 100%;
-      background: var(--card);
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 11px 14px;
-      color: var(--text);
       font-size: 14px;
+      color: var(--text);
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      margin-bottom: 16px;
     }
     input:focus {
       border-color: var(--accent);
@@ -142,28 +108,6 @@
     }
     input::placeholder { color: var(--text-3); }
 
-    .phone-row { display: flex; gap: 8px; }
-    .cc-input  { width: 76px; flex-shrink: 0; }
-
-    /* OTP */
-    .otp-row {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 4px;
-    }
-    .otp-box {
-      width: 46px;
-      height: 52px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: 700;
-      padding: 0;
-      border-radius: 10px;
-      caret-color: var(--accent);
-    }
-
-    /* Buttons */
     .btn {
       width: 100%;
       padding: 12px;
@@ -171,164 +115,158 @@
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
-      font-family: inherit;
       cursor: pointer;
-      margin-top: 6px;
-      transition: background 0.15s, transform 0.1s, opacity 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      font-family: inherit;
+      transition: background 0.15s, opacity 0.15s;
     }
-    .btn:hover   { background: var(--accent-h); }
-    .btn:active  { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn:hover { background: var(--accent-h); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-2);
-      margin-top: 10px;
-    }
-    .btn-ghost:hover { background: var(--card); color: var(--text); }
-
-    /* Toggle */
     .toggle-row {
       text-align: center;
-      margin-top: 22px;
+      margin-top: 16px;
       font-size: 13px;
       color: var(--text-2);
     }
     .toggle-link {
       color: var(--accent);
-      font-weight: 600;
       cursor: pointer;
+      font-weight: 600;
     }
     .toggle-link:hover { text-decoration: underline; }
 
-    /* Back */
-    .back-btn {
+    .error-msg {
+      font-size: 13px;
+      color: var(--error);
+      margin-bottom: 14px;
+      min-height: 18px;
+    }
+
+    /* OTP boxes */
+    .otp-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+    .otp-box {
+      width: 46px;
+      height: 52px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      caret-color: transparent;
+      margin-bottom: 0;
+    }
+    .otp-box:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .back-link {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 12.5px;
+      gap: 6px;
       color: var(--text-2);
-      cursor: pointer;
-      margin-bottom: 18px;
-      background: none;
-      border: none;
-      font-family: inherit;
-      padding: 0;
-      transition: color 0.12s;
-    }
-    .back-btn:hover { color: var(--text); }
-
-    .step-hint {
       font-size: 13px;
-      color: var(--text-2);
-      text-align: center;
-      margin-bottom: 18px;
+      cursor: pointer;
+      margin-bottom: 20px;
     }
-    .step-hint strong { color: var(--text); }
+    .back-link:hover { color: var(--text); }
 
-    /* Spinner */
-    .spin {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+    /* Auth overlay */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .auth-spin {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin 0.65s linear infinite;
-      flex-shrink: 0;
+      animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .hidden { display: none !important; }
+    #recaptcha-container { margin-bottom: 16px; }
   </style>
 </head>
 <body>
-<div class="page">
-  <div class="card">
 
-    <div class="logo-row">
-      <svg class="logo-icon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-        <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
-        <line x1="16" y1="8" x2="2" y2="22"/>
-        <line x1="17.5" y1="15" x2="9" y2="15"/>
-      </svg>
-      <span class="logo-text">AI Pen</span>
+<div id="auth-overlay"><div class="auth-spin"></div></div>
+
+<div class="card" id="login-card" style="display:none">
+  <div class="logo-row">
+    <svg class="logo-icon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+      <line x1="16" y1="8" x2="2" y2="22"/>
+      <line x1="17.5" y1="15" x2="9" y2="15"/>
+    </svg>
+    <span class="logo-text">AI Pen</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-email" onclick="switchTab('email')">Email</div>
+    <div class="tab" id="tab-phone" onclick="switchTab('phone')">Phone</div>
+  </div>
+
+  <!-- EMAIL SECTION -->
+  <div class="section active" id="sec-email">
+    <div class="error-msg" id="email-error"></div>
+    <label>Email</label>
+    <input type="email" id="email-input" placeholder="you@example.com" />
+    <label>Password</label>
+    <input type="password" id="pass-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')emailAction()" />
+    <button class="btn" id="email-btn" onclick="emailAction()">Sign In</button>
+    <div class="toggle-row">
+      <span id="toggle-hint">Don't have an account?</span>
+      <span class="toggle-link" onclick="toggleMode()" id="toggle-link"> Sign Up</span>
+    </div>
+  </div>
+
+  <!-- PHONE SECTION -->
+  <div class="section" id="sec-phone">
+
+    <!-- Step 1: enter number -->
+    <div id="phone-step1">
+      <div class="error-msg" id="phone-error"></div>
+      <label>Phone Number</label>
+      <input type="tel" id="phone-input" placeholder="+1 555 000 0000" />
+      <div id="recaptcha-container"></div>
+      <button class="btn" id="send-code-btn" onclick="sendCode()">Send Code</button>
     </div>
 
-    <div class="card-title" id="card-title">Welcome back</div>
-    <div class="card-sub"   id="card-sub">Sign in to continue to AI Pen</div>
-
-    <div class="tabs">
-      <div class="tab active" id="tab-email" onclick="switchTab('email')">Email</div>
-      <div class="tab"        id="tab-phone" onclick="switchTab('phone')">Phone</div>
-    </div>
-
-    <div class="alert" id="alert"></div>
-
-    <!-- ── EMAIL ── -->
-    <div id="sec-email">
-      <div class="form-group">
-        <label>Email address</label>
-        <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+    <!-- Step 2: enter OTP -->
+    <div id="phone-step2" style="display:none">
+      <div class="back-link" onclick="backToStep1()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+      <div class="error-msg" id="otp-error"></div>
+      <label style="text-align:center;display:block;margin-bottom:12px">Enter the 6-digit code</label>
+      <div class="otp-row">
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" />
       </div>
-      <div class="form-group hidden" id="confirm-group">
-        <label>Confirm password</label>
-        <input type="password" id="confirm" placeholder="••••••••" autocomplete="new-password" />
-      </div>
-      <button class="btn" id="email-btn" onclick="handleEmail()">Sign in</button>
-      <div class="toggle-row">
-        <span id="toggle-text">Don't have an account?</span>
-        <span class="toggle-link" onclick="toggleMode()"> Sign up</span>
-      </div>
-    </div>
-
-    <!-- ── PHONE ── -->
-    <div id="sec-phone" class="hidden">
-
-      <!-- Step 1 -->
-      <div id="phone-s1">
-        <div class="form-group">
-          <label>Phone number</label>
-          <div class="phone-row">
-            <input class="cc-input" type="text" id="cc" value="+1" placeholder="+1" />
-            <input type="tel" id="phone" placeholder="555 000 0000" />
-          </div>
-        </div>
-        <div id="recaptcha-container"></div>
-        <button class="btn" id="send-btn" onclick="sendCode()" style="margin-top:12px;">Send verification code</button>
-      </div>
-
-      <!-- Step 2 -->
-      <div id="phone-s2" class="hidden">
-        <button class="back-btn" onclick="backToStep1()">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-          Change number
-        </button>
-        <div class="step-hint">Code sent to <strong id="phone-display"></strong></div>
-        <div class="form-group">
-          <label>6-digit code</label>
-          <div class="otp-row">
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" />
-          </div>
-        </div>
-        <button class="btn" id="verify-btn" onclick="verifyCode()">Verify &amp; sign in</button>
-        <button class="btn btn-ghost" onclick="resendCode()">Resend code</button>
-      </div>
-
+      <button class="btn" id="verify-btn" onclick="verifyCode()">Verify</button>
     </div>
 
   </div>
@@ -348,189 +286,171 @@
   });
 
   const auth = firebase.auth();
+  let signUpMode = false;
+  let confirmResult = null;
 
-  // Redirect if already logged in
-  auth.onAuthStateChanged(u => { if (u) window.location.href = '/'; });
+  // If already signed in, go to app
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      window.location.href = '/';
+      return;
+    }
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('login-card').style.display = 'block';
+  });
 
-  // ── State ──
-  let isSignUp = false;
-  let tab      = 'email';
-  let confirmationResult = null;
-  let recaptchaVerifier  = null;
-
-  // ── Alert ──
-  function showAlert(msg, type = 'error') {
-    const el = document.getElementById('alert');
-    el.textContent = msg;
-    el.className = 'alert ' + type;
-  }
-  function clearAlert() {
-    document.getElementById('alert').className = 'alert';
-  }
-
-  // ── Button loading state ──
-  function setLoading(id, on, label) {
-    const btn = document.getElementById(id);
-    btn.disabled = on;
-    btn.innerHTML = on
-      ? '<div class="spin"></div>Please wait…'
-      : label;
-  }
-
-  // ── Tab switch ──
-  function switchTab(t) {
-    tab = t;
-    clearAlert();
-    document.getElementById('tab-email').classList.toggle('active', t === 'email');
-    document.getElementById('tab-phone').classList.toggle('active', t === 'phone');
-    document.getElementById('sec-email').classList.toggle('hidden', t !== 'email');
-    document.getElementById('sec-phone').classList.toggle('hidden', t !== 'phone');
-    if (t === 'phone' && !recaptchaVerifier) initRecaptcha();
-  }
-
-  // ── Email: toggle sign in / sign up ──
-  function toggleMode() {
-    isSignUp = !isSignUp;
-    clearAlert();
-    document.getElementById('card-title').textContent  = isSignUp ? 'Create account'          : 'Welcome back';
-    document.getElementById('card-sub').textContent    = isSignUp ? 'Join AI Pen today'        : 'Sign in to continue to AI Pen';
-    document.getElementById('email-btn').textContent   = isSignUp ? 'Create account'           : 'Sign in';
-    document.getElementById('toggle-text').textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
-    document.querySelector('#sec-email .toggle-link').textContent = isSignUp ? ' Sign in' : ' Sign up';
-    document.getElementById('confirm-group').classList.toggle('hidden', !isSignUp);
-  }
-
-  // ── Email auth ──
-  async function handleEmail() {
-    clearAlert();
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirm  = document.getElementById('confirm').value;
-
-    if (!email || !password) return showAlert('Please fill in all fields.');
-    if (isSignUp && password !== confirm) return showAlert('Passwords do not match.');
-    if (password.length < 6) return showAlert('Password must be at least 6 characters.');
-
-    const label = isSignUp ? 'Create account' : 'Sign in';
-    setLoading('email-btn', true, label);
-
-    try {
-      if (isSignUp) {
-        await auth.createUserWithEmailAndPassword(email, password);
-      } else {
-        await auth.signInWithEmailAndPassword(email, password);
-      }
-      // onAuthStateChanged handles redirect
-    } catch (err) {
-      setLoading('email-btn', false, label);
-      showAlert(friendlyError(err.code));
+  function switchTab(tab) {
+    document.getElementById('tab-email').classList.toggle('active', tab === 'email');
+    document.getElementById('tab-phone').classList.toggle('active', tab === 'phone');
+    document.getElementById('sec-email').classList.toggle('active', tab === 'email');
+    document.getElementById('sec-phone').classList.toggle('active', tab === 'phone');
+    clearErrors();
+    if (tab === 'phone' && !window._recaptchaSetup) {
+      setupRecaptcha();
     }
   }
 
-  // ── Phone: reCAPTCHA ──
-  function initRecaptcha() {
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+  function toggleMode() {
+    signUpMode = !signUpMode;
+    document.getElementById('email-btn').textContent = signUpMode ? 'Create Account' : 'Sign In';
+    document.getElementById('toggle-hint').textContent = signUpMode ? 'Already have an account?' : "Don't have an account?";
+    document.getElementById('toggle-link').textContent = signUpMode ? ' Sign In' : ' Sign Up';
+    clearErrors();
+  }
+
+  function clearErrors() {
+    ['email-error','phone-error','otp-error'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  }
+
+  function friendlyError(code) {
+    const map = {
+      'auth/invalid-email':           'Please enter a valid email address.',
+      'auth/user-not-found':          'No account found with this email.',
+      'auth/wrong-password':          'Incorrect password. Try again.',
+      'auth/email-already-in-use':    'An account with this email already exists.',
+      'auth/weak-password':           'Password must be at least 6 characters.',
+      'auth/too-many-requests':       'Too many attempts. Please wait and try again.',
+      'auth/invalid-phone-number':    'Please enter a valid phone number (e.g. +1 555 000 0000).',
+      'auth/invalid-verification-code': 'Incorrect code. Please try again.',
+      'auth/code-expired':            'Code expired. Please request a new one.',
+      'auth/network-request-failed':  'Network error. Check your connection.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+
+  async function emailAction() {
+    const email = document.getElementById('email-input').value.trim();
+    const pass  = document.getElementById('pass-input').value;
+    const errEl = document.getElementById('email-error');
+    errEl.textContent = '';
+    if (!email || !pass) { errEl.textContent = 'Please fill in all fields.'; return; }
+    const btn = document.getElementById('email-btn');
+    btn.disabled = true;
+    btn.textContent = signUpMode ? 'Creating…' : 'Signing in…';
+    try {
+      if (signUpMode) {
+        await auth.createUserWithEmailAndPassword(email, pass);
+      } else {
+        await auth.signInWithEmailAndPassword(email, pass);
+      }
+      window.location.href = '/';
+    } catch (err) {
+      errEl.textContent = friendlyError(err.code);
+      btn.disabled = false;
+      btn.textContent = signUpMode ? 'Create Account' : 'Sign In';
+    }
+  }
+
+  function setupRecaptcha() {
+    window._recaptchaSetup = true;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       size: 'invisible',
       callback: () => {}
     });
-    recaptchaVerifier.render();
   }
 
-  // ── Phone: send code ──
   async function sendCode() {
-    clearAlert();
-    const cc     = document.getElementById('cc').value.trim();
-    const number = document.getElementById('phone').value.trim().replace(/\D/g, '');
-    if (!number) return showAlert('Please enter a phone number.');
-
-    const full = cc + number;
-    setLoading('send-btn', true, 'Send verification code');
-
+    const phone  = document.getElementById('phone-input').value.trim();
+    const errEl  = document.getElementById('phone-error');
+    errEl.textContent = '';
+    if (!phone) { errEl.textContent = 'Please enter your phone number.'; return; }
+    if (!window._recaptchaSetup) setupRecaptcha();
+    const btn = document.getElementById('send-code-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
     try {
-      confirmationResult = await auth.signInWithPhoneNumber(full, recaptchaVerifier);
-      document.getElementById('phone-display').textContent = full;
-      document.getElementById('phone-s1').classList.add('hidden');
-      document.getElementById('phone-s2').classList.remove('hidden');
-      clearAlert();
+      confirmResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier);
+      document.getElementById('phone-step1').style.display = 'none';
+      document.getElementById('phone-step2').style.display = 'block';
       document.querySelectorAll('.otp-box')[0].focus();
     } catch (err) {
-      setLoading('send-btn', false, 'Send verification code');
-      showAlert(friendlyError(err.code));
-      recaptchaVerifier.render();
+      errEl.textContent = friendlyError(err.code);
+      btn.disabled = false;
+      btn.textContent = 'Send Code';
+      // Reset recaptcha so it can be used again
+      window.recaptchaVerifier.render().then(id => window.grecaptcha && window.grecaptcha.reset(id));
     }
   }
 
-  // ── Phone: verify OTP ──
   async function verifyCode() {
-    clearAlert();
-    const code = Array.from(document.querySelectorAll('.otp-box')).map(i => i.value).join('');
-    if (code.length < 6) return showAlert('Please enter the full 6-digit code.');
-
-    setLoading('verify-btn', true, 'Verify &amp; sign in');
+    const boxes = document.querySelectorAll('.otp-box');
+    const code = Array.from(boxes).map(b => b.value).join('');
+    const errEl = document.getElementById('otp-error');
+    errEl.textContent = '';
+    if (code.length < 6) { errEl.textContent = 'Please enter the full 6-digit code.'; return; }
+    const btn = document.getElementById('verify-btn');
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
     try {
-      await confirmationResult.confirm(code);
+      await confirmResult.confirm(code);
+      window.location.href = '/';
     } catch (err) {
-      setLoading('verify-btn', false, 'Verify &amp; sign in');
-      showAlert(friendlyError(err.code));
+      errEl.textContent = friendlyError(err.code);
+      btn.disabled = false;
+      btn.textContent = 'Verify';
     }
   }
 
-  // ── Phone: resend ──
-  async function resendCode() {
-    clearAlert();
-    backToStep1();
-    if (recaptchaVerifier) { recaptchaVerifier.clear(); recaptchaVerifier = null; }
-    document.getElementById('recaptcha-container').innerHTML = '';
-    initRecaptcha();
-  }
-
-  // ── Back to step 1 ──
   function backToStep1() {
-    document.getElementById('phone-s1').classList.remove('hidden');
-    document.getElementById('phone-s2').classList.add('hidden');
-    document.querySelectorAll('.otp-box').forEach(i => i.value = '');
-    setLoading('send-btn', false, 'Send verification code');
+    document.getElementById('phone-step2').style.display = 'none';
+    document.getElementById('phone-step1').style.display = 'block';
+    document.getElementById('phone-error').textContent = '';
+    document.getElementById('otp-error').textContent = '';
+    document.getElementById('send-code-btn').disabled = false;
+    document.getElementById('send-code-btn').textContent = 'Send Code';
+    document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+    // Reset recaptcha
+    window._recaptchaSetup = false;
+    document.getElementById('recaptcha-container').innerHTML = '';
+    confirmResult = null;
   }
 
-  // ── OTP UX ──
-  document.querySelectorAll('.otp-box').forEach((box, i, all) => {
+  // OTP box UX: auto-advance, backspace, paste
+  document.querySelectorAll('.otp-box').forEach((box, i, boxes) => {
     box.addEventListener('input', () => {
-      box.value = box.value.replace(/\D/g, '').slice(-1);
-      if (box.value && i < all.length - 1) all[i + 1].focus();
+      const v = box.value.replace(/\D/g, '');
+      box.value = v.slice(-1);
+      if (v && i < boxes.length - 1) boxes[i + 1].focus();
+      if (Array.from(boxes).every(b => b.value)) verifyCode();
     });
     box.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !box.value && i > 0) all[i - 1].focus();
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        boxes[i - 1].focus();
+        boxes[i - 1].value = '';
+      }
     });
     box.addEventListener('paste', e => {
       e.preventDefault();
-      const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
-      all.forEach((b, j) => b.value = digits[j] || '');
-      all[Math.min(digits.length, 5)].focus();
+      const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+      boxes.forEach((b, j) => { b.value = digits[j] || ''; });
+      if (digits.length) boxes[Math.min(digits.length, boxes.length - 1)].focus();
+      if (digits.length === 6) verifyCode();
     });
   });
-
-  // ── Enter key ──
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    if (tab === 'email') handleEmail();
-  });
-
-  // ── Error messages ──
-  function friendlyError(code) {
-    return ({
-      'auth/user-not-found':             'No account found with this email.',
-      'auth/wrong-password':             'Incorrect password. Try again.',
-      'auth/invalid-credential':         'Incorrect email or password.',
-      'auth/email-already-in-use':       'An account with this email already exists.',
-      'auth/invalid-email':              'Please enter a valid email address.',
-      'auth/weak-password':              'Password must be at least 6 characters.',
-      'auth/too-many-requests':          'Too many attempts. Please try again later.',
-      'auth/invalid-phone-number':       'Invalid phone number. Include country code (e.g. +1).',
-      'auth/invalid-verification-code':  'Incorrect code. Check and try again.',
-      'auth/code-expired':               'Code expired. Please request a new one.',
-      'auth/network-request-failed':     'Network error. Check your connection.',
-    })[code] || 'Something went wrong. Please try again.';
-  }
 </script>
 </body>
 </html>
+
