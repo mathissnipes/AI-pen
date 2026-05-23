@@ -6,579 +6,136 @@
   <title>AI Pen</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:           #0c1222;
-      --sidebar:      #111827;
-      --panel:        #111827;
-      --card:         #141d2e;
-      --card-hover:   #1a2540;
-      --border:       #1e2d45;
-      --accent:       #4361ee;
-      --accent-h:     #3451d1;
-      --accent-glow:  rgba(67,97,238,0.18);
-      --purple:       #7c3aed;
-      --text:         #ffffff;
-      --text-2:       #8899b4;
-      --text-3:       #4a5568;
-      --sidebar-w:    240px;
-      --right-w:      272px;
+      --bg: #0c1222; --sidebar: #111827; --panel: #111827;
+      --card: #141d2e; --card-hover: #1a2540; --border: #1e2d45;
+      --accent: #4361ee; --accent-h: #3451d1; --accent-glow: rgba(67,97,238,0.18);
+      --purple: #7c3aed; --text: #ffffff; --text-2: #8899b4; --text-3: #4a5568;
+      --sidebar-w: 240px; --right-w: 272px;
     }
-
     html, body { height: 100%; overflow: hidden; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-    }
-
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      height: 100vh;
-      background: var(--sidebar);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      padding: 20px 14px 16px;
-    }
-
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 4px;
-      margin-bottom: 20px;
-    }
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); height: 100vh; background: var(--sidebar); display: flex; flex-direction: column; flex-shrink: 0; padding: 20px 14px 16px; }
+    .logo-row { display: flex; align-items: center; gap: 10px; padding: 0 4px; margin-bottom: 20px; }
     .logo-icon { color: var(--accent); flex-shrink: 0; }
     .logo-text { font-size: 17px; font-weight: 700; }
-
-    .new-chat-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 18px;
-      transition: background 0.15s;
-      width: 100%;
-    }
+    .new-chat-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 18px; transition: background 0.15s; width: 100%; }
     .new-chat-btn:hover { background: var(--accent-h); }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 9px 10px;
-      border-radius: 9px;
-      font-size: 14px;
-      color: var(--text-2);
-      cursor: pointer;
-      margin-bottom: 2px;
-      transition: background 0.12s, color 0.12s;
-    }
-    .nav-item:hover  { background: var(--card); color: var(--text); }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 9px; font-size: 14px; color: var(--text-2); cursor: pointer; margin-bottom: 2px; transition: background 0.12s, color 0.12s; }
+    .nav-item:hover { background: var(--card); color: var(--text); }
     .nav-item.active { background: var(--card); color: var(--text); }
     .nav-item svg { flex-shrink: 0; }
-
     .spacer { flex: 1; }
-
-    .upgrade-card {
-      background: linear-gradient(140deg, #1e1b4b 0%, #2d1b5e 100%);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .upgrade-title {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-    .upgrade-desc {
-      font-size: 12px;
-      color: #a5b4fc;
-      line-height: 1.55;
-      margin-bottom: 12px;
-    }
-    .upgrade-btn {
-      width: 100%;
-      padding: 9px;
-      background: var(--purple);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
+    .upgrade-card { background: linear-gradient(140deg, #1e1b4b 0%, #2d1b5e 100%); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .upgrade-title { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; margin-bottom: 7px; }
+    .upgrade-desc { font-size: 12px; color: #a5b4fc; line-height: 1.55; margin-bottom: 12px; }
+    .upgrade-btn { width: 100%; padding: 9px; background: var(--purple); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
     .upgrade-btn:hover { opacity: 0.88; }
-
-    .user-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 6px;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: background 0.12s;
-      position: relative;
-    }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 9px; cursor: pointer; transition: background 0.12s; position: relative; }
     .user-row:hover { background: var(--card); }
-    .avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--purple));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
     .user-info { flex: 1; min-width: 0; }
-    .user-name  { font-size: 13px; font-weight: 600; }
+    .user-name { font-size: 13px; font-weight: 600; }
     .user-email { font-size: 11px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .signout-menu {
-      display: none;
-      position: absolute;
-      bottom: 52px;
-      left: 0;
-      right: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      z-index: 100;
-    }
+    .signout-menu { display: none; position: absolute; bottom: 52px; left: 0; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; z-index: 100; }
     .signout-menu.open { display: block; }
-    .signout-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #f87171;
-      cursor: pointer;
-      transition: background 0.12s;
-    }
+    .signout-item { display: flex; align-items: center; gap: 9px; padding: 10px 14px; font-size: 13px; color: #f87171; cursor: pointer; transition: background 0.12s; }
     .signout-item:hover { background: var(--card-hover); }
 
-    /* ── MAIN ── */
-    .main {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      border-left: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-    }
-
-    .chat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 22px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 15px;
-      font-weight: 600;
-    }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .header-title { display: flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 600; }
     .header-right { display: flex; align-items: center; gap: 10px; }
-    .hdr-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-2);
-      transition: background 0.12s, color 0.12s;
-    }
+    .hdr-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-2); transition: background 0.12s, color 0.12s; }
     .hdr-btn:hover { background: var(--card-hover); color: var(--text); }
 
-    /* ── MESSAGES ── */
     .msgs-scroll { flex: 1; overflow-y: auto; padding-bottom: 110px; }
-    .msgs-inner {
-      max-width: 740px;
-      margin: 0 auto;
-      padding: 32px 28px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .welcome {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 36px 20px 12px;
-      gap: 10px;
-    }
+    .msgs-inner { max-width: 740px; margin: 0 auto; padding: 32px 28px 0; display: flex; flex-direction: column; gap: 18px; }
+    .welcome { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 36px 20px 12px; gap: 10px; }
     .welcome-icon { color: var(--accent); margin-bottom: 6px; }
     .welcome h1 { font-size: 26px; font-weight: 700; }
     .welcome .sub { font-size: 14.5px; color: var(--text-2); margin-bottom: 10px; }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-      max-width: 580px;
-    }
-    .fcard {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      text-align: left;
-      transition: background 0.15s, border-color 0.15s;
-    }
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 580px; }
+    .fcard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; text-align: left; transition: background 0.15s, border-color 0.15s; }
     .fcard:hover { background: var(--card-hover); border-color: var(--accent); }
     .fcard:active { transform: scale(0.98); }
-    .fcard-text .ft  { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
-    .fcard-text .fd  { font-size: 12px; color: var(--text-2); line-height: 1.45; }
-    .fcard-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: rgba(67,97,238,0.12);
-      border: 1px solid rgba(67,97,238,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: var(--accent);
-    }
+    .fcard-text .ft { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+    .fcard-text .fd { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+    .fcard-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(67,97,238,0.12); border: 1px solid rgba(67,97,238,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
 
     .msg { display: flex; flex-direction: column; gap: 4px; animation: fadeUp 0.22s ease; }
     .msg.user { align-items: flex-end; }
-    .msg.ai   { align-items: flex-start; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .bubble {
-      padding: 12px 16px;
-      font-size: 14px;
-      line-height: 1.65;
-      word-break: break-word;
-      white-space: pre-wrap;
-      max-width: 72%;
-    }
-    .msg.user .bubble {
-      background: var(--accent);
-      color: #fff;
-      border-radius: 18px 18px 4px 18px;
-    }
-    .msg.ai .bubble {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
-      color: var(--text);
-    }
-
+    .msg.ai { align-items: flex-start; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .bubble { padding: 12px 16px; font-size: 14px; line-height: 1.65; word-break: break-word; white-space: pre-wrap; max-width: 72%; }
+    .msg.user .bubble { background: var(--accent); color: #fff; border-radius: 18px 18px 4px 18px; }
+    .msg.ai .bubble { background: var(--card); border: 1px solid var(--border); border-radius: 18px 18px 18px 4px; color: var(--text); }
     .msg-time { font-size: 11px; color: var(--text-3); padding: 0 4px; }
-
     .msg-actions { display: flex; gap: 6px; padding: 2px 4px; }
-    .mact {
-      background: none;
-      border: none;
-      color: var(--text-3);
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      transition: color 0.12s, background 0.12s;
-    }
+    .mact { background: none; border: none; color: var(--text-3); cursor: pointer; padding: 4px; border-radius: 5px; display: flex; align-items: center; transition: color 0.12s, background 0.12s; }
     .mact:hover { color: var(--text-2); background: var(--card); }
-
-    .typing {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      padding: 12px 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
-      width: fit-content;
-    }
-    .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--text-2);
-      animation: bounce 1.3s infinite ease-in-out;
-    }
+    .typing { display: flex; gap: 4px; align-items: center; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 18px 18px 18px 4px; width: fit-content; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-2); animation: bounce 1.3s infinite ease-in-out; }
     .dot:nth-child(1) { animation-delay: 0s; }
     .dot:nth-child(2) { animation-delay: 0.18s; }
     .dot:nth-child(3) { animation-delay: 0.36s; }
-    @keyframes bounce {
-      0%,55%,100% { transform: translateY(0);    opacity: 0.4; }
-      28%          { transform: translateY(-5px); opacity: 1; }
-    }
+    @keyframes bounce { 0%,55%,100% { transform:translateY(0); opacity:0.4; } 28% { transform:translateY(-5px); opacity:1; } }
 
-    /* ── INPUT ── */
-    .input-zone {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 10px 22px 18px;
-      background: linear-gradient(to top, var(--bg) 68%, transparent);
-    }
-    .input-bar {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      padding: 8px 10px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .input-bar:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-    .attach-btn {
-      width: 32px; height: 32px;
-      background: none;
-      border: none;
-      color: var(--text-2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 7px;
-      flex-shrink: 0;
-      transition: color 0.12s, background 0.12s;
-    }
+    .input-zone { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 22px 18px; background: linear-gradient(to top, var(--bg) 68%, transparent); }
+    .input-bar { background: var(--card); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: flex-end; gap: 6px; padding: 8px 10px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .input-bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .attach-btn { width: 32px; height: 32px; background: none; border: none; color: var(--text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 7px; flex-shrink: 0; transition: color 0.12s, background 0.12s; }
     .attach-btn:hover { color: var(--text); background: var(--card-hover); }
-    #msg-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 14px;
-      font-family: inherit;
-      line-height: 1.5;
-      resize: none;
-      min-height: 24px;
-      max-height: 160px;
-      padding: 4px 0;
-    }
+    #msg-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-size: 14px; font-family: inherit; line-height: 1.5; resize: none; min-height: 24px; max-height: 160px; padding: 4px 0; }
     #msg-input::placeholder { color: var(--text-3); }
-    .send-btn {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: var(--accent);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .send-btn:hover   { background: var(--accent-h); }
-    .send-btn:active  { transform: scale(0.91); }
+    .send-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, transform 0.1s; }
+    .send-btn:hover { background: var(--accent-h); }
+    .send-btn:active { transform: scale(0.91); }
     .send-btn:disabled { background: var(--border); cursor: not-allowed; }
     .send-btn svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.5; }
 
-    /* ── RIGHT PANEL ── */
-    .right-panel {
-      width: var(--right-w);
-      min-width: var(--right-w);
-      height: 100vh;
-      background: var(--panel);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .panel-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-    }
-
+    .right-panel { width: var(--right-w); min-width: var(--right-w); height: 100vh; background: var(--panel); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+    .panel-scroll { flex: 1; overflow-y: auto; padding: 20px 14px; display: flex; flex-direction: column; gap: 22px; }
     .sec-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
-
-    /* Model selector */
     .model-wrap { position: relative; }
-    .model-select {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 13px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 13.5px;
-      font-weight: 500;
-      transition: border-color 0.12s;
-      user-select: none;
-    }
+    .model-select { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13.5px; font-weight: 500; transition: border-color 0.12s; user-select: none; }
     .model-select:hover { border-color: var(--accent); }
-    .model-menu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0; right: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      z-index: 50;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
+    .model-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
     .model-menu.open { display: block; }
-    .model-opt {
-      padding: 10px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .model-opt { padding: 10px 14px; font-size: 13px; cursor: pointer; transition: background 0.1s; display: flex; align-items: center; justify-content: space-between; }
     .model-opt:hover { background: var(--card-hover); }
     .model-opt.selected { color: var(--accent); }
-    .model-check { color: var(--accent); font-size: 11px; }
-
-    .tool-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      color: var(--text-2);
-      transition: background 0.12s, color 0.12s;
-    }
+    .tool-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-2); transition: background 0.12s, color 0.12s; }
     .tool-item:hover { background: var(--card); color: var(--text); }
     .tool-item:active { background: var(--card-hover); }
 
-    .hist-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      color: var(--text-2);
-      transition: background 0.12s, color 0.12s;
-      margin-bottom: 2px;
-    }
+    /* History */
+    .hist-section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .hist-list { flex: 1; overflow-y: auto; }
+    .hist-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-2); transition: background 0.12s, color 0.12s; margin-bottom: 2px; }
     .hist-row:hover { background: var(--card); color: var(--text); }
     .hist-row.active { background: var(--accent); color: #fff; }
     .hist-row.active .hist-t { color: rgba(255,255,255,0.65); }
-    .hist-n { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hist-n { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .hist-t { font-size: 11px; flex-shrink: 0; margin-left: 8px; color: var(--text-3); }
-
-    .clear-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 10px;
-      background: rgba(239,68,68,0.07);
-      border: 1px solid rgba(239,68,68,0.18);
-      border-radius: 8px;
-      color: #f87171;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 4px;
-      transition: background 0.12s;
-      font-family: inherit;
-    }
+    .hist-del { flex-shrink: 0; margin-left: 6px; background: none; border: none; color: transparent; cursor: pointer; padding: 2px 4px; border-radius: 4px; font-size: 12px; transition: color 0.1s, background 0.1s; }
+    .hist-row:hover .hist-del { color: var(--text-3); }
+    .hist-row:hover .hist-del:hover { color: #f87171; background: rgba(239,68,68,0.1); }
+    .clear-btn { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px; background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.18); border-radius: 8px; color: #f87171; font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 8px; transition: background 0.12s; font-family: inherit; }
     .clear-btn:hover { background: rgba(239,68,68,0.14); }
 
-    /* Auth loading overlay */
-    #auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-    .auth-spin {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    #auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .auth-spin { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 18px;
-      font-size: 13px;
-      color: var(--text);
-      z-index: 500;
-      opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
-      pointer-events: none;
-    }
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 13px; color: var(--text); z-index: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @media (max-width: 1100px) { .right-panel { display: none; } }
-    @media (max-width: 700px)  { .sidebar     { display: none; } }
+    @media (max-width: 700px) { .sidebar { display: none; } }
   </style>
 </head>
 <body>
@@ -586,13 +143,11 @@
 <div id="auth-overlay"><div class="auth-spin"></div></div>
 <div class="toast" id="toast"></div>
 
-<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="logo-row">
     <svg class="logo-icon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
       <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
-      <line x1="16" y1="8" x2="2" y2="22"/>
-      <line x1="17.5" y1="15" x2="9" y2="15"/>
+      <line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>
     </svg>
     <span class="logo-text">AI Pen</span>
   </div>
@@ -605,20 +160,16 @@
   </button>
 
   <div class="nav-item active" data-nav="chats" onclick="setNav('chats')">
-    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    Chats
+    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chats
   </div>
   <div class="nav-item" data-nav="templates" onclick="setNav('templates')">
-    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-    Templates
+    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Templates
   </div>
   <div class="nav-item" data-nav="documents" onclick="setNav('documents')">
-    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    Documents
+    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Documents
   </div>
   <div class="nav-item" data-nav="settings" onclick="setNav('settings')">
-    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
-    Settings
+    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Settings
   </div>
 
   <div class="spacer"></div>
@@ -648,12 +199,9 @@
   </div>
 </aside>
 
-<!-- ══ MAIN ══ -->
 <main class="main">
   <header class="chat-header">
-    <div class="header-title">
-      <span id="chat-title">New Chat</span>
-    </div>
+    <div class="header-title"><span id="chat-title">New Chat</span></div>
     <div class="header-right">
       <div class="hdr-btn" onclick="newChat()" title="New Chat">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -667,8 +215,7 @@
       <div class="welcome" id="welcome">
         <svg class="welcome-icon" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
           <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
-          <line x1="16" y1="8" x2="2" y2="22"/>
-          <line x1="17.5" y1="15" x2="9" y2="15"/>
+          <line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>
         </svg>
         <h1>Hello! I'm AI Pen</h1>
         <p class="sub">Your intelligent writing assistant. Click a card to get started.</p>
@@ -685,7 +232,7 @@
             <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
           </div>
-          <div class="fcard" onclick="quickSend('Explain this code and suggest improvements:\n\n')">
+          <div class="fcard" onclick="toolPrompt('code');document.getElementById('msg-input').focus()">
             <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
             <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           </div>
@@ -707,10 +254,8 @@
   </div>
 </main>
 
-<!-- ══ RIGHT PANEL ══ -->
 <aside class="right-panel">
   <div class="panel-scroll">
-
     <div>
       <div class="sec-title">AI Model</div>
       <div class="model-wrap">
@@ -724,46 +269,27 @@
 
     <div>
       <div class="sec-title">Tools</div>
-      <div class="tool-item" onclick="toolPrompt('grammar')">
-        <span style="font-size:11px;font-weight:800;width:18px;text-align:center;flex-shrink:0;color:var(--text-2)">Aa</span>
-        Grammar Check
-      </div>
-      <div class="tool-item" onclick="toolPrompt('summarize')">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Summarize
-      </div>
-      <div class="tool-item" onclick="toolPrompt('translate')">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-        Translate
-      </div>
-      <div class="tool-item" onclick="toolPrompt('code')">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Explain Code
-      </div>
-      <div class="tool-item" onclick="toolPrompt('ideas')">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-        Generate Ideas
-      </div>
+      <div class="tool-item" onclick="toolPrompt('grammar')"><span style="font-size:11px;font-weight:800;width:18px;text-align:center;flex-shrink:0;color:var(--text-2)">Aa</span>Grammar Check</div>
+      <div class="tool-item" onclick="toolPrompt('summarize')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Summarize</div>
+      <div class="tool-item" onclick="toolPrompt('translate')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Translate</div>
+      <div class="tool-item" onclick="toolPrompt('code')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Explain Code</div>
+      <div class="tool-item" onclick="toolPrompt('ideas')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Generate Ideas</div>
     </div>
 
-    <div>
+    <div class="hist-section">
       <div class="sec-title">Chat History</div>
-      <div id="history-list"></div>
+      <div class="hist-list" id="history-list"></div>
       <button class="clear-btn" onclick="clearHistory()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-        Clear history
+        Clear all history
       </button>
     </div>
-
   </div>
 </aside>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
 <script>
-  // ── Firebase auth guard ──
   firebase.initializeApp({
     apiKey:            "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
     authDomain:        "ai-pen-c85a0.firebaseapp.com",
@@ -775,62 +301,51 @@
   });
 
   const auth = firebase.auth();
+  let currentUserId = null;
 
   auth.onAuthStateChanged(user => {
     if (!user) { window.location.href = '/login.html'; return; }
+    currentUserId = user.uid;
     const initial = (user.displayName || user.email || user.phoneNumber || 'U')[0].toUpperCase();
     document.getElementById('user-avatar').textContent   = initial;
     document.getElementById('header-avatar').textContent = initial;
     document.getElementById('user-name').textContent     = user.displayName || 'User';
     document.getElementById('user-email').textContent    = user.email || user.phoneNumber || '';
     document.getElementById('auth-overlay').style.display = 'none';
+    loadChatsFromStorage();
   });
 
-  function toggleSignOut() {
-    document.getElementById('signout-menu').classList.toggle('open');
-  }
-  function signOut(e) {
-    e.stopPropagation();
-    auth.signOut().then(() => window.location.href = '/login.html');
-  }
+  function toggleSignOut() { document.getElementById('signout-menu').classList.toggle('open'); }
+  function signOut(e) { e.stopPropagation(); auth.signOut().then(() => window.location.href = '/login.html'); }
   document.addEventListener('click', e => {
-    if (!e.target.closest('.user-row'))
-      document.getElementById('signout-menu').classList.remove('open');
-    if (!e.target.closest('.model-wrap'))
-      document.getElementById('model-menu').classList.remove('open');
+    if (!e.target.closest('.user-row')) document.getElementById('signout-menu').classList.remove('open');
+    if (!e.target.closest('.model-wrap')) document.getElementById('model-menu').classList.remove('open');
   });
 
   // ── Models ──
   const MODELS = [
-    { id: 'gpt-3.5-turbo',   name: 'GPT-3.5 Turbo' },
-    { id: 'gpt-4',           name: 'GPT-4' },
-    { id: 'gpt-4o',          name: 'GPT-4o' },
+    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+    { id: 'gpt-4',         name: 'GPT-4' },
+    { id: 'gpt-4o',        name: 'GPT-4o' },
     { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet' },
   ];
   let currentModel = MODELS[0];
 
   function buildModelMenu() {
-    const menu = document.getElementById('model-menu');
-    menu.innerHTML = MODELS.map(m => `
-      <div class="model-opt ${m.id === currentModel.id ? 'selected' : ''}" onclick="selectModel('${m.id}')">
-        ${m.name}
-        ${m.id === currentModel.id ? '<span class="model-check">✓</span>' : ''}
+    document.getElementById('model-menu').innerHTML = MODELS.map(m =>
+      `<div class="model-opt ${m.id===currentModel.id?'selected':''}" onclick="selectModel('${m.id}')">
+        ${m.name}${m.id===currentModel.id?' <span style="color:var(--accent)">✓</span>':''}
       </div>`).join('');
   }
-
-  function toggleModelMenu() {
-    buildModelMenu();
-    document.getElementById('model-menu').classList.toggle('open');
-  }
-
+  function toggleModelMenu() { buildModelMenu(); document.getElementById('model-menu').classList.toggle('open'); }
   function selectModel(id) {
-    currentModel = MODELS.find(m => m.id === id) || MODELS[0];
+    currentModel = MODELS.find(m => m.id===id) || MODELS[0];
     document.getElementById('model-name').textContent = currentModel.name;
     document.getElementById('model-menu').classList.remove('open');
     showToast('Model: ' + currentModel.name);
   }
 
-  // ── Tool prompts ──
+  // ── Tools ──
   const TOOL_PROMPTS = {
     grammar:   'Please check and correct the grammar in the following text:\n\n',
     summarize: 'Please summarize the following text in 3-5 key bullet points:\n\n',
@@ -838,101 +353,127 @@
     code:      'Please explain this code and suggest improvements:\n\n',
     ideas:     'Please generate 10 creative ideas for: ',
   };
-
   function toolPrompt(type) {
-    const prompt = TOOL_PROMPTS[type];
-    if (!prompt) return;
+    const p = TOOL_PROMPTS[type]; if (!p) return;
     const el = document.getElementById('msg-input');
-    el.value = prompt;
-    el.focus();
-    el.setSelectionRange(prompt.length, prompt.length);
-    resize(el);
+    el.value = p; el.focus(); el.setSelectionRange(p.length, p.length); resize(el);
   }
 
-  // ── Nav ──
   function setNav(name) {
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.nav === name);
-    });
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.nav===name));
   }
 
-  // ── Toast ──
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
+  // ── Storage key (per user so multiple accounts don't conflict) ──
+  function storageKey() { return 'aipen_chats_' + (currentUserId || 'guest'); }
+
+  function saveChats() {
+    try {
+      localStorage.setItem(storageKey(), JSON.stringify({ chats, chatOrder, currentChatId }));
+    } catch(e) {}
+  }
+
+  function loadChatsFromStorage() {
+    try {
+      const raw = localStorage.getItem(storageKey());
+      if (raw) {
+        const data = JSON.parse(raw);
+        chats = data.chats || {};
+        chatOrder = data.chatOrder || [];
+        currentChatId = data.currentChatId || null;
+        if (currentChatId && chats[currentChatId]) {
+          loadChat(currentChatId, false);
+        } else {
+          currentChatId = null;
+          renderHistory();
+        }
+        return;
+      }
+    } catch(e) {}
+    renderHistory();
+  }
+
   // ── Chat state ──
   let busy = false;
-  let chats = {};      // { id: { id, title, ts, messages: [{role, text, time}] } }
-  let chatOrder = [];  // ids newest-first
+  let chats = {};       // { id: { id, title, ts, messages: [{role,text,time}] } }
+  let chatOrder = [];   // ids newest-first
   let currentChatId = null;
 
-  function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
-  }
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
   function relTime(ts) {
     const d = Date.now() - ts;
-    if (d < 86400000)  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (d < 86400000)  return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
     if (d < 172800000) return 'Yesterday';
-    return Math.floor(d / 86400000) + ' days ago';
+    if (d < 604800000) return Math.floor(d/86400000) + ' days ago';
+    return new Date(ts).toLocaleDateString();
   }
 
   function renderHistory() {
     const list = document.getElementById('history-list');
-    if (chatOrder.length === 0) {
-      list.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:4px 10px;">No chats yet</div>';
+    if (!chatOrder.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:4px 10px;margin-bottom:6px;">No chats yet</div>';
       return;
     }
     list.innerHTML = chatOrder.map(id => {
       const c = chats[id];
-      return `<div class="hist-row ${id === currentChatId ? 'active' : ''}" onclick="loadChat('${id}')">
+      if (!c) return '';
+      return `<div class="hist-row ${id===currentChatId?'active':''}" onclick="loadChat('${id}')">
         <span class="hist-n">${esc(c.title)}</span>
         <span class="hist-t">${relTime(c.ts)}</span>
+        <button class="hist-del" onclick="deleteChat(event,'${id}')" title="Delete">✕</button>
       </div>`;
     }).join('');
   }
 
-  function loadChat(id) {
+  function loadChat(id, save=true) {
     currentChatId = id;
     const chat = chats[id];
-    const wrap = document.getElementById('msgs');
-    wrap.innerHTML = '';
+    if (!chat) return;
+    document.getElementById('msgs').innerHTML = '';
     chat.messages.forEach(m => renderMsgEl(m.role, m.text, m.time));
     document.getElementById('chat-title').textContent = chat.title;
     renderHistory();
     scrollBottom();
+    if (save) saveChats();
+  }
+
+  function deleteChat(e, id) {
+    e.stopPropagation();
+    chatOrder = chatOrder.filter(x => x !== id);
+    delete chats[id];
+    if (currentChatId === id) {
+      currentChatId = chatOrder[0] || null;
+      if (currentChatId) {
+        loadChat(currentChatId, false);
+      } else {
+        document.getElementById('msgs').innerHTML = buildWelcomeHTML();
+        document.getElementById('chat-title').textContent = 'New Chat';
+      }
+    }
+    renderHistory();
+    saveChats();
   }
 
   // ── UI helpers ──
-  function resize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-  }
-  function onKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-  }
-  function scrollBottom() {
-    const c = document.getElementById('msgs-scroll');
-    c.scrollTop = c.scrollHeight;
-  }
-  function esc(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function getTime() {
-    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  function resize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
+  function onKey(e) { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+  function scrollBottom() { const c=document.getElementById('msgs-scroll'); c.scrollTop=c.scrollHeight; }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function getTime() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
   function renderMsgEl(role, text, time) {
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
     el.className = 'msg ' + role;
-    const actions = role === 'ai' ? `<div class="msg-actions">
+    const actions = role==='ai' ? `<div class="msg-actions">
       <button class="mact" title="Copy" onclick="copyMsg(this)">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
@@ -944,31 +485,35 @@
       </button>
     </div>` : '';
     el.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-time">${time}</div>${actions}`;
-    wrap.appendChild(el);
-    scrollBottom();
+    wrap.appendChild(el); scrollBottom();
     return el;
   }
 
   function copyMsg(btn) {
-    const text = btn.closest('.msg').querySelector('.bubble').textContent;
-    navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+    navigator.clipboard.writeText(btn.closest('.msg').querySelector('.bubble').textContent)
+      .then(() => showToast('Copied!'));
   }
 
   function addTyping() {
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
-    el.className = 'msg ai'; el.id = 'typing-row';
-    el.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+    el.className='msg ai'; el.id='typing-row';
+    el.innerHTML='<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
     wrap.appendChild(el); scrollBottom();
     return el;
   }
 
-  // ── Chat actions ──
+  // ── Auto-name chat from first message ──
+  function autoName(message) {
+    const words = message.trim().split(/\s+/);
+    let title = words.slice(0, 6).join(' ');
+    if (words.length > 6) title += '…';
+    return title.length > 40 ? title.slice(0, 40) + '…' : title;
+  }
+
   function quickSend(text) {
     const el = document.getElementById('msg-input');
-    el.value = text;
-    resize(el);
-    send();
+    el.value = text; resize(el); send();
   }
 
   function newChat() {
@@ -978,16 +523,17 @@
     document.getElementById('msg-input').value = '';
     document.getElementById('msg-input').style.height = 'auto';
     renderHistory();
+    saveChats();
   }
 
   function clearHistory() {
-    if (chatOrder.length === 0) { showToast('No history to clear'); return; }
-    chats = {};
-    chatOrder = [];
-    currentChatId = null;
+    if (!chatOrder.length) { showToast('No history to clear'); return; }
+    if (!confirm('Delete all chat history? This cannot be undone.')) return;
+    chats = {}; chatOrder = []; currentChatId = null;
     document.getElementById('msgs').innerHTML = buildWelcomeHTML();
     document.getElementById('chat-title').textContent = 'New Chat';
     renderHistory();
+    saveChats();
     showToast('History cleared');
   }
 
@@ -995,8 +541,7 @@
     return `<div class="welcome" id="welcome">
       <svg class="welcome-icon" width="62" height="62" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
-        <line x1="16" y1="8" x2="2" y2="22"/>
-        <line x1="17.5" y1="15" x2="9" y2="15"/>
+        <line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>
       </svg>
       <h1>Hello! I'm AI Pen</h1>
       <p class="sub">Your intelligent writing assistant. Click a card to get started.</p>
@@ -1013,7 +558,7 @@
           <div class="fcard-text"><div class="ft">Brainstorm ideas</div><div class="fd">Give me 10 ideas for a YouTube channel.</div></div>
           <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg></div>
         </div>
-        <div class="fcard" onclick="toolPrompt('code'); document.getElementById('msg-input').focus()">
+        <div class="fcard" onclick="toolPrompt('code');document.getElementById('msg-input').focus()">
           <div class="fcard-text"><div class="ft">Code help</div><div class="fd">Explain this code and suggest improvements.</div></div>
           <div class="fcard-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
         </div>
@@ -1027,20 +572,15 @@
     const input = document.getElementById('msg-input');
     const message = input.value.trim();
     if (!message) return;
-
     busy = true;
     document.getElementById('send-btn').disabled = true;
     input.value = ''; input.style.height = 'auto';
-
-    const w = document.getElementById('welcome');
-    if (w) w.remove();
-
+    const w = document.getElementById('welcome'); if (w) w.remove();
     const time = getTime();
 
-    // Create or update chat record
     if (!currentChatId) {
       const id = genId();
-      const title = message.length > 36 ? message.slice(0, 36) + '…' : message;
+      const title = autoName(message);
       chats[id] = { id, title, ts: Date.now(), messages: [] };
       chatOrder.unshift(id);
       currentChatId = id;
@@ -1062,25 +602,21 @@
       const data = await res.json();
       typer.remove();
       const reply = (data && data.reply) ? data.reply : 'Sorry, I could not get a response.';
-      const replyTime = getTime();
-      chat.messages.push({ role: 'ai', text: reply, time: replyTime });
-      renderMsgEl('ai', reply, replyTime);
-    } catch (err) {
+      const rt = getTime();
+      chat.messages.push({ role: 'ai', text: reply, time: rt });
+      renderMsgEl('ai', reply, rt);
+    } catch(err) {
       typer.remove();
-      const errMsg = 'Something went wrong. Please try again.';
-      chat.messages.push({ role: 'ai', text: errMsg, time: getTime() });
-      renderMsgEl('ai', errMsg, getTime());
-      console.error(err);
+      const em = 'Something went wrong. Please try again.';
+      chat.messages.push({ role: 'ai', text: em, time: getTime() });
+      renderMsgEl('ai', em, getTime());
     }
 
+    saveChats();
     busy = false;
     document.getElementById('send-btn').disabled = false;
     input.focus();
   }
-
-  // Init history
-  renderHistory();
 </script>
 </body>
 </html>
-
