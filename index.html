@@ -48,10 +48,16 @@
 
     .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
     .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
     .header-title { display: flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 600; }
     .header-right { display: flex; align-items: center; gap: 10px; }
     .hdr-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-2); transition: background 0.12s, color 0.12s; }
     .hdr-btn:hover { background: var(--card-hover); color: var(--text); }
+
+    .mob-menu-btn { display: none; width: 34px; height: 34px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); align-items: center; justify-content: center; cursor: pointer; color: var(--text-2); flex-shrink: 0; transition: background 0.12s, color 0.12s; }
+    .mob-menu-btn:hover { background: var(--card-hover); color: var(--text); }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 199; }
+    .sidebar-overlay.show { display: block; }
 
     .msgs-scroll { flex: 1; overflow-y: auto; padding-bottom: 110px; }
     .msgs-inner { max-width: 740px; margin: 0 auto; padding: 32px 28px 0; display: flex; flex-direction: column; gap: 18px; }
@@ -71,13 +77,15 @@
     .msg.user { align-items: flex-end; }
     .msg.ai { align-items: flex-start; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-    .bubble { padding: 12px 16px; font-size: 14px; line-height: 1.65; word-break: break-word; white-space: pre-wrap; max-width: 72%; }
-    .msg.user .bubble { background: var(--accent); color: #fff; border-radius: 18px 18px 4px 18px; }
+    .bubble { padding: 12px 16px; font-size: 14px; line-height: 1.65; word-break: break-word; max-width: 72%; }
+    .msg.user .bubble { background: var(--accent); color: #fff; border-radius: 18px 18px 4px 18px; white-space: pre-wrap; }
     .msg.ai .bubble { background: var(--card); border: 1px solid var(--border); border-radius: 18px 18px 18px 4px; color: var(--text); }
     .msg-time { font-size: 11px; color: var(--text-3); padding: 0 4px; }
-    .msg-actions { display: flex; gap: 6px; padding: 2px 4px; }
+    .msg-actions { display: flex; gap: 6px; padding: 2px 4px; flex-wrap: wrap; align-items: center; }
     .mact { background: none; border: none; color: var(--text-3); cursor: pointer; padding: 4px; border-radius: 5px; display: flex; align-items: center; transition: color 0.12s, background 0.12s; }
     .mact:hover { color: var(--text-2); background: var(--card); }
+    .regen-btn { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: none; border: 1px solid var(--border); border-radius: 7px; color: var(--text-2); font-size: 12px; cursor: pointer; transition: color 0.12s, background 0.12s, border-color 0.12s; font-family: inherit; }
+    .regen-btn:hover { color: var(--text); background: var(--card-hover); border-color: var(--accent); }
     .typing { display: flex; gap: 4px; align-items: center; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 18px 18px 18px 4px; width: fit-content; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-2); animation: bounce 1.3s infinite ease-in-out; }
     .dot:nth-child(1) { animation-delay: 0s; }
@@ -98,6 +106,17 @@
     .send-btn:disabled { background: var(--border); cursor: not-allowed; }
     .send-btn svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.5; }
 
+    /* Markdown */
+    .md-code-block { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; overflow-x: auto; margin: 6px 0; line-height: 1.6; white-space: pre; display: block; }
+    .md-inline-code { background: rgba(67,97,238,0.12); border: 1px solid rgba(67,97,238,0.2); border-radius: 4px; padding: 1px 6px; font-size: 12.5px; font-family: 'Fira Code', 'Courier New', monospace; }
+    .md-h1 { font-size: 18px; font-weight: 700; margin: 8px 0 4px; line-height: 1.3; }
+    .md-h2 { font-size: 16px; font-weight: 700; margin: 6px 0 3px; line-height: 1.3; }
+    .md-h3 { font-size: 14.5px; font-weight: 700; margin: 4px 0 2px; line-height: 1.3; }
+    .md-ul { padding-left: 18px; margin: 4px 0; }
+    .md-ol { padding-left: 18px; margin: 4px 0; }
+    .md-li { margin: 2px 0; line-height: 1.55; }
+    .md-blockquote { border-left: 3px solid var(--accent); padding: 4px 12px; margin: 6px 0; color: var(--text-2); font-style: italic; background: rgba(67,97,238,0.06); border-radius: 0 6px 6px 0; }
+
     .right-panel { width: var(--right-w); min-width: var(--right-w); height: 100vh; background: var(--panel); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
     .panel-scroll { flex: 1; overflow-y: auto; padding: 20px 14px; display: flex; flex-direction: column; gap: 22px; }
     .sec-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
@@ -113,7 +132,6 @@
     .tool-item:hover { background: var(--card); color: var(--text); }
     .tool-item:active { background: var(--card-hover); }
 
-    /* History */
     .hist-section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
     .hist-list { flex: 1; overflow-y: auto; }
     .hist-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-2); transition: background 0.12s, color 0.12s; margin-bottom: 2px; }
@@ -135,15 +153,20 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @media (max-width: 1100px) { .right-panel { display: none; } }
-    @media (max-width: 700px) { .sidebar { display: none; } }
+    @media (max-width: 700px) {
+      .sidebar { position: fixed; left: -260px; top: 0; z-index: 200; height: 100vh; transition: left 0.25s ease; box-shadow: 2px 0 24px rgba(0,0,0,0.5); }
+      .sidebar.open { left: 0; }
+      .mob-menu-btn { display: flex; }
+    }
   </style>
 </head>
 <body>
 
 <div id="auth-overlay"><div class="auth-spin"></div></div>
 <div class="toast" id="toast"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="logo-row">
     <svg class="logo-icon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
       <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
@@ -201,7 +224,14 @@
 
 <main class="main">
   <header class="chat-header">
-    <div class="header-title"><span id="chat-title">New Chat</span></div>
+    <div class="header-left">
+      <div class="mob-menu-btn" onclick="toggleSidebar()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </div>
+      <div class="header-title"><span id="chat-title">New Chat</span></div>
+    </div>
     <div class="header-right">
       <div class="hdr-btn" onclick="newChat()" title="New Chat">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -246,7 +276,7 @@
       <button class="attach-btn" title="Attach file" onclick="showToast('File upload coming soon!')">
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
       </button>
-      <textarea id="msg-input" rows="1" placeholder="Ask something..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+      <textarea id="msg-input" rows="1" placeholder="Ask something… (Shift+Enter for new line)" onkeydown="onKey(event)" oninput="resize(this)"></textarea>
       <button class="send-btn" id="send-btn" onclick="send()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
       </button>
@@ -322,19 +352,29 @@
     if (!e.target.closest('.model-wrap')) document.getElementById('model-menu').classList.remove('open');
   });
 
+  // Mobile sidebar
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('show');
+  }
+
   // ── Models ──
   const MODELS = [
-    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-    { id: 'gpt-4',         name: 'GPT-4' },
-    { id: 'gpt-4o',        name: 'GPT-4o' },
-    { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet' },
+    { id: 'gpt-3.5-turbo',   name: 'GPT-3.5 Turbo' },
+    { id: 'gpt-4',            name: 'GPT-4' },
+    { id: 'gpt-4o',           name: 'GPT-4o' },
+    { id: 'claude-3-sonnet',  name: 'Claude 3 Sonnet' },
   ];
   let currentModel = MODELS[0];
 
   function buildModelMenu() {
     document.getElementById('model-menu').innerHTML = MODELS.map(m =>
       `<div class="model-opt ${m.id===currentModel.id?'selected':''}" onclick="selectModel('${m.id}')">
-        ${m.name}${m.id===currentModel.id?' <span style="color:var(--accent)">✓</span>':''}
+        ${m.name}${m.id===currentModel.id?' <span style="color:var(--accent)">&#10003;</span>':''}
       </div>`).join('');
   }
   function toggleModelMenu() { buildModelMenu(); document.getElementById('model-menu').classList.toggle('open'); }
@@ -371,13 +411,11 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  // ── Storage key (per user so multiple accounts don't conflict) ──
+  // ── Storage ──
   function storageKey() { return 'aipen_chats_' + (currentUserId || 'guest'); }
 
   function saveChats() {
-    try {
-      localStorage.setItem(storageKey(), JSON.stringify({ chats, chatOrder, currentChatId }));
-    } catch(e) {}
+    try { localStorage.setItem(storageKey(), JSON.stringify({ chats, chatOrder, currentChatId })); } catch(e) {}
   }
 
   function loadChatsFromStorage() {
@@ -388,12 +426,8 @@
         chats = data.chats || {};
         chatOrder = data.chatOrder || [];
         currentChatId = data.currentChatId || null;
-        if (currentChatId && chats[currentChatId]) {
-          loadChat(currentChatId, false);
-        } else {
-          currentChatId = null;
-          renderHistory();
-        }
+        if (currentChatId && chats[currentChatId]) { loadChat(currentChatId, false); }
+        else { currentChatId = null; renderHistory(); }
         return;
       }
     } catch(e) {}
@@ -402,8 +436,8 @@
 
   // ── Chat state ──
   let busy = false;
-  let chats = {};       // { id: { id, title, ts, messages: [{role,text,time}] } }
-  let chatOrder = [];   // ids newest-first
+  let chats = {};
+  let chatOrder = [];
   let currentChatId = null;
 
   function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
@@ -423,25 +457,22 @@
       return;
     }
     list.innerHTML = chatOrder.map(id => {
-      const c = chats[id];
-      if (!c) return '';
+      const c = chats[id]; if (!c) return '';
       return `<div class="hist-row ${id===currentChatId?'active':''}" onclick="loadChat('${id}')">
         <span class="hist-n">${esc(c.title)}</span>
         <span class="hist-t">${relTime(c.ts)}</span>
-        <button class="hist-del" onclick="deleteChat(event,'${id}')" title="Delete">✕</button>
+        <button class="hist-del" onclick="deleteChat(event,'${id}')" title="Delete">&#x2715;</button>
       </div>`;
     }).join('');
   }
 
   function loadChat(id, save=true) {
     currentChatId = id;
-    const chat = chats[id];
-    if (!chat) return;
+    const chat = chats[id]; if (!chat) return;
     document.getElementById('msgs').innerHTML = '';
     chat.messages.forEach(m => renderMsgEl(m.role, m.text, m.time));
     document.getElementById('chat-title').textContent = chat.title;
-    renderHistory();
-    scrollBottom();
+    renderHistory(); scrollBottom();
     if (save) saveChats();
   }
 
@@ -451,29 +482,72 @@
     delete chats[id];
     if (currentChatId === id) {
       currentChatId = chatOrder[0] || null;
-      if (currentChatId) {
-        loadChat(currentChatId, false);
-      } else {
-        document.getElementById('msgs').innerHTML = buildWelcomeHTML();
-        document.getElementById('chat-title').textContent = 'New Chat';
-      }
+      if (currentChatId) { loadChat(currentChatId, false); }
+      else { document.getElementById('msgs').innerHTML = buildWelcomeHTML(); document.getElementById('chat-title').textContent = 'New Chat'; }
     }
-    renderHistory();
-    saveChats();
+    renderHistory(); saveChats();
+  }
+
+  // ── Markdown renderer ──
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function parseMarkdown(text) {
+    const parts = [];
+    const re = /```(\w*)\n?([\s\S]*?)```/g;
+    let last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) parts.push({ type: 'text', content: text.slice(last, m.index) });
+      parts.push({ type: 'code', content: m[2] });
+      last = re.lastIndex;
+    }
+    if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
+    return parts.map(p => p.type === 'code'
+      ? `<pre class="md-code-block">${esc(p.content.replace(/\n$/, ''))}</pre>`
+      : renderInlineMarkdown(p.content)
+    ).join('');
+  }
+
+  function renderInlineMarkdown(text) {
+    const lines = text.split('\n');
+    let html = '', inUl = false, inOl = false;
+    for (const line of lines) {
+      const isUl = /^[\-\*\+] /.test(line);
+      const isOl = /^\d+\. /.test(line);
+      if (!isUl && inUl) { html += '</ul>'; inUl = false; }
+      if (!isOl && inOl) { html += '</ol>'; inOl = false; }
+      if      (/^### /.test(line)) { html += `<div class="md-h3">${inlineStyles(line.slice(4))}</div>`; }
+      else if (/^## /.test(line))  { html += `<div class="md-h2">${inlineStyles(line.slice(3))}</div>`; }
+      else if (/^# /.test(line))   { html += `<div class="md-h1">${inlineStyles(line.slice(2))}</div>`; }
+      else if (/^> /.test(line))   { html += `<div class="md-blockquote">${inlineStyles(line.slice(2))}</div>`; }
+      else if (isUl) { if (!inUl) { html += '<ul class="md-ul">'; inUl = true; } html += `<li class="md-li">${inlineStyles(line.replace(/^[\-\*\+] /, ''))}</li>`; }
+      else if (isOl) { if (!inOl) { html += '<ol class="md-ol">'; inOl = true; } html += `<li class="md-li">${inlineStyles(line.replace(/^\d+\. /, ''))}</li>`; }
+      else if (!line.trim()) { html += '<br>'; }
+      else { html += `${inlineStyles(line)}<br>`; }
+    }
+    if (inUl) html += '</ul>';
+    if (inOl) html += '</ol>';
+    return html;
+  }
+
+  function inlineStyles(text) {
+    return esc(text)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code class="md-inline-code">$1</code>');
   }
 
   // ── UI helpers ──
   function resize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
   function onKey(e) { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
   function scrollBottom() { const c=document.getElementById('msgs-scroll'); c.scrollTop=c.scrollHeight; }
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function getTime() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
   function renderMsgEl(role, text, time) {
     const wrap = document.getElementById('msgs');
     const el = document.createElement('div');
     el.className = 'msg ' + role;
-    const actions = role==='ai' ? `<div class="msg-actions">
+    const bubbleContent = role === 'ai' ? parseMarkdown(text) : esc(text);
+    const actions = role === 'ai' ? `<div class="msg-actions">
       <button class="mact" title="Copy" onclick="copyMsg(this)">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
@@ -483,15 +557,61 @@
       <button class="mact" title="Dislike" onclick="showToast('Noted!')">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
       </button>
+      <button class="regen-btn" onclick="regenerate(this)">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+        Regenerate
+      </button>
     </div>` : '';
-    el.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-time">${time}</div>${actions}`;
+    el.innerHTML = `<div class="bubble">${bubbleContent}</div><div class="msg-time">${time}</div>${actions}`;
     wrap.appendChild(el); scrollBottom();
     return el;
   }
 
   function copyMsg(btn) {
-    navigator.clipboard.writeText(btn.closest('.msg').querySelector('.bubble').textContent)
-      .then(() => showToast('Copied!'));
+    const bubble = btn.closest('.msg').querySelector('.bubble');
+    navigator.clipboard.writeText(bubble.innerText).then(() => showToast('Copied!'));
+  }
+
+  async function regenerate(btn) {
+    if (busy || !currentChatId) return;
+    const chat = chats[currentChatId];
+    if (!chat || !chat.messages.length) return;
+    let lastAiIdx = -1;
+    for (let i = chat.messages.length - 1; i >= 0; i--) {
+      if (chat.messages[i].role === 'ai') { lastAiIdx = i; break; }
+    }
+    if (lastAiIdx === -1) return;
+    let lastUserMsg = null;
+    for (let i = lastAiIdx - 1; i >= 0; i--) {
+      if (chat.messages[i].role === 'user') { lastUserMsg = chat.messages[i]; break; }
+    }
+    if (!lastUserMsg) return;
+    chat.messages.splice(lastAiIdx, 1);
+    btn.closest('.msg').remove();
+    busy = true;
+    document.getElementById('send-btn').disabled = true;
+    const typer = addTyping();
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: lastUserMsg.text, model: currentModel.id })
+      });
+      const data = await res.json();
+      typer.remove();
+      const reply = (data && data.reply) ? data.reply : 'Sorry, I could not get a response.';
+      const rt = getTime();
+      chat.messages.push({ role: 'ai', text: reply, time: rt });
+      renderMsgEl('ai', reply, rt);
+    } catch(err) {
+      typer.remove();
+      const em = 'Something went wrong. Please try again.';
+      chat.messages.push({ role: 'ai', text: em, time: getTime() });
+      renderMsgEl('ai', em, getTime());
+    }
+    saveChats();
+    busy = false;
+    document.getElementById('send-btn').disabled = false;
   }
 
   function addTyping() {
@@ -503,7 +623,6 @@
     return el;
   }
 
-  // ── Auto-name chat from first message ──
   function autoName(message) {
     const words = message.trim().split(/\s+/);
     let title = words.slice(0, 6).join(' ');
@@ -522,8 +641,7 @@
     document.getElementById('chat-title').textContent = 'New Chat';
     document.getElementById('msg-input').value = '';
     document.getElementById('msg-input').style.height = 'auto';
-    renderHistory();
-    saveChats();
+    renderHistory(); saveChats();
   }
 
   function clearHistory() {
@@ -532,8 +650,7 @@
     chats = {}; chatOrder = []; currentChatId = null;
     document.getElementById('msgs').innerHTML = buildWelcomeHTML();
     document.getElementById('chat-title').textContent = 'New Chat';
-    renderHistory();
-    saveChats();
+    renderHistory(); saveChats();
     showToast('History cleared');
   }
 
@@ -620,3 +737,4 @@
 </script>
 </body>
 </html>
+
