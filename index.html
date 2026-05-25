@@ -1,809 +1,875 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Pen</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #080d1a; --sidebar: #0e1525; --panel: #0e1525;
-      --card: #131c30; --border: #1e2d47;
-      --accent: #7c3aed; --accent2: #6d28d9;
-      --green: #10b981; --red: #ef4444; --yellow: #f59e0b;
-      --text: #e2e8f0; --muted: #64748b; --radius: 12px;
-      --font: 'Inter', sans-serif;
-    }
-    body { font-family: var(--font); background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
-    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Pen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;
+  --s1:#0d1117;
+  --s2:#161b27;
+  --s3:#1e2535;
+  --border:#252f42;
+  --border2:#2d3a52;
+  --accent:#6d5df6;
+  --accent-dim:rgba(109,93,246,.15);
+  --accent-glow:rgba(109,93,246,.35);
+  --green:#22c55e;
+  --red:#f43f5e;
+  --yellow:#f59e0b;
+  --text:#e8eaf0;
+  --sub:#8892a4;
+  --muted:#4a5568;
+  --r:12px;
+  --font:'Inter',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;line-height:1}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-    /* ── SIDEBAR ── */
-    .sidebar { width: 250px; min-width: 250px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 14px; gap: 6px; }
-    .logo { display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 10px; }
-    .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
-    .logo-text { font-weight: 700; font-size: 16px; }
-    .btn-new { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 10px; transition: background 0.15s; width: 100%; }
-    .btn-new:hover { background: var(--accent2); }
-    .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding: 6px 8px 2px; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: background 0.15s; border: none; background: none; width: 100%; text-align: left; }
-    .nav-item:hover { background: rgba(255,255,255,0.05); }
-    .nav-item.active { background: rgba(124,58,237,0.18); color: #a78bfa; }
-    .nav-item .ni { font-size: 15px; width: 20px; text-align: center; }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
-    .shortcuts-section { flex: 1; overflow-y: auto; }
-    .shortcut-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; font-size: 12px; color: var(--muted); cursor: pointer; transition: background 0.15s; }
-    .shortcut-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
-    .usage-bar-wrap { padding: 8px 0; }
-    .usage-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
-    .usage-bar { height: 4px; background: var(--border); border-radius: 2px; }
-    .usage-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-    .user-row { display: flex; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 10px; cursor: pointer; transition: background 0.15s; margin-top: 4px; }
-    .user-row:hover { background: rgba(255,255,255,0.05); }
-    .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
-    .user-info { flex: 1; overflow: hidden; }
-    .user-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-email { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ─── SIDEBAR ─── */
+.sidebar{width:240px;min-width:240px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:14px 10px;gap:2px;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:8px}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#6d5df6,#a78bfa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 2px 12px rgba(109,93,246,.4)}
+.logo-name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-name span{color:#a78bfa}
+.new-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:6px;width:100%;font-family:var(--font);letter-spacing:.01em;transition:opacity .15s,transform .1s}
+.new-btn:hover{opacity:.88}
+.new-btn:active{transform:scale(.98)}
+.s-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;padding:10px 10px 4px}
+.s-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:500;color:var(--sub);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--font);transition:background .12s,color .12s}
+.s-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.s-item.active{background:var(--accent-dim);color:#a78bfa}
+.s-item .ic{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.s-div{border:none;border-top:1px solid var(--border);margin:6px 4px}
+.s-shortcuts{flex:1;overflow-y:auto;min-height:0}
+.s-sc{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:11.5px;color:var(--muted);cursor:pointer;transition:background .12s,color .12s}
+.s-sc:hover{background:rgba(255,255,255,.04);color:var(--sub)}
+.s-sc::before{content:'⌘';font-size:10px;color:var(--border2)}
+.usage-wrap{padding:4px 4px 0}
+.usage-top{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:5px}
+.usage-track{height:3px;background:var(--border);border-radius:2px}
+.usage-fill{height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa);border-radius:2px;transition:width .4s;width:0%}
+.user-chip{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .12s;margin-top:6px}
+.user-chip:hover{background:rgba(255,255,255,.05)}
+.u-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6d5df6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.u-info{flex:1;min-width:0}
+.u-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u-email{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.u-cog{font-size:11px;color:var(--muted)}
 
-    /* ── MAIN ── */
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-    .chat-header { padding: 18px 24px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
-    .greeting { font-size: 22px; font-weight: 700; }
-    .greeting-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .header-right { display: flex; align-items: center; gap: 8px; }
-    .status-badge { display: flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--green); }
-    .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); will-change: opacity; animation: pulse 2.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-    .icon-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--muted); transition: color 0.15s, background 0.15s; }
-    .icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.07); }
-    .messages { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
-    .msg-user { align-self: flex-end; background: var(--accent); color: #fff; border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 70%; font-size: 14px; line-height: 1.5; }
-    .msg-user-meta { align-self: flex-end; font-size: 10px; color: var(--muted); margin-top: -10px; }
-    .msg-ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 4px 16px 16px 16px; padding: 14px; max-width: 80%; }
-    .ai-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .ai-label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.06em; }
-    .ai-actions { display: flex; gap: 4px; }
-    .ai-action-btn { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: var(--muted); transition: color 0.15s, background 0.15s; }
-    .ai-action-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-    .ai-action-btn.liked { color: #10b981; border-color: #10b981; }
-    .ai-action-btn.disliked { color: #ef4444; border-color: #ef4444; }
-    .msg-text { font-size: 14px; line-height: 1.65; color: var(--text); }
-    .typing-indicator { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 4px 16px 16px 16px; padding: 14px 18px; display: none; }
-    .typing-dots { display: flex; gap: 4px; align-items: center; }
-    .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); will-change: transform; animation: bounce 1.4s ease-in-out infinite; }
-    .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
-    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
-    .chips-bar { padding: 10px 24px 0; display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
-    .chip { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); font-size: 12px; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; white-space: nowrap; }
-    .chip:hover { border-color: var(--accent); color: #a78bfa; background: rgba(124,58,237,0.1); }
-    .input-area { padding: 14px 24px 20px; flex-shrink: 0; position: relative; }
-    .input-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: flex-end; gap: 8px; transition: border-color 0.15s; }
-    .input-box:focus-within { border-color: var(--accent); }
-    .input-left { display: flex; gap: 4px; align-items: center; }
-    .input-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: var(--muted); transition: color 0.15s, background 0.15s; flex-shrink: 0; }
-    .input-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-    .input-btn.active { color: #ef4444; border-color: #ef4444; }
-    #chat-input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 14px; font-family: var(--font); resize: none; min-height: 22px; max-height: 120px; line-height: 1.5; }
-    #chat-input::placeholder { color: var(--muted); }
-    .send-btn { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 14px; transition: background 0.15s; flex-shrink: 0; }
-    .send-btn:hover { background: var(--accent2); }
-    .templates-popup { position: absolute; bottom: calc(100% + 6px); left: 24px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; width: 340px; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity 0.15s, transform 0.15s; }
-    .templates-popup.open { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .tpl-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
-    .tpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .tpl-item { padding: 10px; border-radius: 9px; border: 1px solid var(--border); background: var(--sidebar); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-    .tpl-item:hover { border-color: var(--accent); background: rgba(124,58,237,0.1); }
-    .tpl-item-icon { font-size: 18px; margin-bottom: 4px; }
-    .tpl-item-name { font-size: 12px; font-weight: 600; }
-    .tpl-item-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg)}
+.top-bar{padding:16px 22px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-left{}
+.tb-title{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.tb-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:7px}
+.ai-badge{display:flex;align-items:center;gap:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:600;color:var(--green)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);will-change:opacity;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--sub);transition:color .12s,background .12s}
+.tb-btn:hover{color:var(--text);background:var(--s3)}
+.messages{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.msg-u{align-self:flex-end;background:linear-gradient(135deg,#6d5df6,#8b7cf6);color:#fff;border-radius:14px 14px 3px 14px;padding:10px 14px;max-width:68%;font-size:13.5px;line-height:1.6;box-shadow:0 2px 12px rgba(109,93,246,.3)}
+.msg-u-time{align-self:flex-end;font-size:10px;color:var(--muted);margin-top:-8px}
+.msg-ai{align-self:flex-start;max-width:80%}
+.msg-ai-inner{background:var(--s2);border:1px solid var(--border);border-radius:3px 14px 14px 14px;padding:13px 15px}
+.ai-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.ai-tag{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.07em}
+.ai-tag-dot{width:5px;height:5px;border-radius:50%;background:#a78bfa}
+.ai-btns{display:flex;gap:3px}
+.ai-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--muted);transition:color .12s,background .12s}
+.ai-btn:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.ai-btn.liked{color:var(--green);border-color:var(--green)}
+.ai-btn.disliked{color:var(--red);border-color:var(--red)}
+.msg-txt{font-size:13.5px;line-height:1.7;color:var(--text)}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--accent);border-radius:1px;margin-left:1px;vertical-align:text-bottom;will-change:opacity;animation:blink .7s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.typing{align-self:flex-start;background:var(--s2);border:1px solid var(--border);border-radius:3px 14px 14px 14px;padding:13px 16px;display:none}
+.t-dots{display:flex;gap:4px;align-items:center}
+.t-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);will-change:transform;animation:tdot 1.4s ease-in-out infinite}
+.t-dot:nth-child(2){animation-delay:.2s}.t-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chips{padding:8px 22px 0;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--s2);font-size:11.5px;color:var(--sub);cursor:pointer;transition:border-color .12s,color .12s,background .12s;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:#a78bfa;background:var(--accent-dim)}
+.input-area{padding:12px 22px 18px;flex-shrink:0}
+.input-box{background:var(--s2);border:1px solid var(--border);border-radius:13px;padding:10px 11px;display:flex;align-items:flex-end;gap:7px;transition:border-color .15s}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(109,93,246,.1)}
+.i-left{display:flex;gap:3px;align-items:center}
+.i-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--muted);transition:color .12s,background .12s;flex-shrink:0}
+.i-btn:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.i-btn.on{color:var(--red);border-color:var(--red)}
+#chat-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13.5px;font-family:var(--font);resize:none;min-height:20px;max-height:110px;line-height:1.55}
+#chat-input::placeholder{color:var(--muted)}
+.send-btn{width:32px;height:32px;border-radius:8px;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:13px;transition:opacity .12s,transform .1s;flex-shrink:0;box-shadow:0 2px 10px rgba(109,93,246,.4)}
+.send-btn:hover{opacity:.85}
+.send-btn:active{transform:scale(.93)}
+.tpl-popup{position:absolute;bottom:calc(100% + 6px);left:22px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px;width:320px;z-index:100;box-shadow:0 12px 40px rgba(0,0,0,.6);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .15s,transform .15s}
+.tpl-popup.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.tpl-head{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tpl-card{padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--s1);cursor:pointer;transition:border-color .12s,background .12s}
+.tpl-card:hover{border-color:var(--accent);background:var(--accent-dim)}
+.tpl-icon{font-size:16px;margin-bottom:3px}
+.tpl-name{font-size:11.5px;font-weight:600}
+.tpl-desc{font-size:10px;color:var(--muted);margin-top:1px}
 
-    /* ── RIGHT PANEL ── */
-    .right-panel { width: 300px; min-width: 300px; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 14px; gap: 14px; overflow-y: auto; }
-    .rp-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-    .rp-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+/* ─── SCREENS ─── */
+.screen{display:none}.screen.active{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.scr-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.scr-title{font-size:17px;font-weight:700}
+.scr-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.grid-scroll{flex:1;overflow-y:auto;padding:18px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;align-content:start}
+.n-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:13px;cursor:pointer;transition:border-color .12s,transform .12s}
+.n-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.n-card-title{font-size:12.5px;font-weight:600;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n-card-body{font-size:11.5px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.n-card-date{font-size:10px;color:var(--muted);margin-top:9px}
+.empty-state{grid-column:1/-1;padding:50px;text-align:center;color:var(--muted);font-size:13px}
 
-    /* pen status */
-    .pen-status-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .pen-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .pen-info { flex: 1; }
-    .pen-name { font-size: 13px; font-weight: 600; }
-    .pen-status-text { font-size: 11px; margin-top: 2px; font-weight: 500; }
-    .pen-status-text.connected    { color: var(--green); }
-    .pen-status-text.disconnected { color: var(--muted); }
-    .pen-status-text.connecting   { color: var(--yellow); }
-    .battery-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-    .battery-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; }
-    .battery-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.4s; }
-    .battery-pct { font-size: 10px; color: var(--muted); }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-card { background: var(--sidebar); border: 1px solid var(--border); border-radius: 9px; padding: 10px; }
-    .stat-val { font-size: 18px; font-weight: 700; }
-    .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+/* ─── RIGHT PANEL ─── */
+.rp{width:290px;min-width:290px;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:14px 12px;gap:12px;overflow-y:auto}
+.rp-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:13px}
+.rp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:11px}
 
-    /* connect button */
-    .bt-connect-btn { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--sidebar); font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-family: var(--font); }
-    .bt-connect-btn:hover { border-color: var(--accent); color: #a78bfa; background: rgba(124,58,237,0.08); }
-    .bt-connect-btn.connected { border-color: rgba(239,68,68,0.35); color: #ef4444; background: rgba(239,68,68,0.07); }
-    .bt-connect-btn.connected:hover { background: rgba(239,68,68,0.14); }
-    .bt-connect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .bt-unavailable { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; font-style: italic; }
+/* pen status */
+.pen-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pen-icon-wrap{width:40px;height:40px;border-radius:9px;background:rgba(109,93,246,.12);border:1px solid rgba(109,93,246,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pen-name{font-size:13px;font-weight:600}
+.pen-status{font-size:11px;margin-top:2px;font-weight:500}
+.pen-status.disconnected{color:var(--muted)}
+.pen-status.connecting{color:var(--yellow)}
+.pen-status.connected{color:var(--green)}
+.bat-row{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.bat-track{flex:1;height:4px;background:var(--border);border-radius:2px}
+.bat-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
+.bat-pct{font-size:10px;color:var(--muted);width:28px;text-align:right}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.stat-v{font-size:17px;font-weight:700}
+.stat-l{font-size:10px;color:var(--muted);margin-top:1px}
+.bt-btn{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--s1);font-size:11.5px;font-weight:600;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);transition:border-color .12s,color .12s,background .12s}
+.bt-btn:hover{border-color:var(--accent);color:#a78bfa;background:var(--accent-dim)}
+.bt-btn.on{border-color:rgba(244,63,94,.35);color:var(--red);background:rgba(244,63,94,.07)}
+.bt-btn.on:hover{background:rgba(244,63,94,.13)}
+.bt-btn:disabled{opacity:.45;cursor:not-allowed}
+.bt-na{font-size:10.5px;color:var(--muted);text-align:center;margin-top:7px;font-style:italic}
 
-    /* live writing */
-    .writing-area { min-height: 90px; max-height: 140px; overflow-y: auto; background: var(--sidebar); border: 1px solid var(--border); border-radius: 9px; padding: 10px; font-family: 'Caveat', cursive; font-size: 18px; color: var(--text); outline: none; margin-bottom: 8px; line-height: 1.6; }
-    .writing-area:empty::before { content: attr(data-placeholder); color: var(--muted); }
-    .recognized-text { font-size: 11px; color: var(--muted); margin-bottom: 8px; min-height: 16px; font-style: italic; }
-    .writing-actions { display: flex; gap: 8px; }
-    .writing-btn { flex: 1; padding: 7px; border-radius: 7px; border: 1px solid var(--border); background: var(--sidebar); font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
-    .writing-btn:hover { color: var(--text); border-color: var(--accent); }
-    .ai-tools-row { display: flex; gap: 8px; }
-    .ai-tool-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--sidebar); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-    .ai-tool-btn:hover { border-color: var(--accent); background: rgba(124,58,237,0.1); }
-    .ai-tool-btn .t-icon { font-size: 16px; }
-    .ai-tool-btn .t-label { font-size: 9px; color: var(--muted); text-align: center; }
-    .note-item { padding: 9px; border-radius: 8px; border: 1px solid var(--border); background: var(--sidebar); margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s; }
-    .note-item:hover { border-color: var(--accent); }
-    .note-item:last-child { margin-bottom: 0; }
-    .note-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .note-preview { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .note-date { font-size: 10px; color: var(--muted); margin-top: 4px; }
-    .no-notes { font-size: 12px; color: var(--muted); text-align: center; padding: 10px 0; }
+/* writing */
+.write-area{min-height:80px;max-height:130px;overflow-y:auto;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:9px;font-family:'Caveat',cursive;font-size:17px;color:var(--text);outline:none;margin-bottom:7px;line-height:1.55}
+.write-area:empty::before{content:attr(data-placeholder);color:var(--muted)}
+.write-area:focus{border-color:var(--border2)}
+.voice-status{font-size:10.5px;color:var(--muted);margin-bottom:7px;min-height:15px;font-style:italic}
+.w-btns{display:flex;gap:6px}
+.w-btn{flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--s1);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);transition:color .12s,border-color .12s}
+.w-btn:hover{color:var(--text);border-color:var(--border2)}
 
-    /* settings overlay — no backdrop-filter */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: none; align-items: center; justify-content: center; z-index: 200; }
-    .overlay.open { display: flex; }
-    .settings-modal { background: var(--sidebar); border: 1px solid var(--border); border-radius: 16px; width: 640px; max-width: 95vw; max-height: 85vh; display: flex; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.7); }
-    .settings-nav { width: 190px; min-width: 190px; background: var(--bg); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; }
-    .settings-title { font-size: 14px; font-weight: 700; color: var(--text); padding: 4px 10px 14px; }
-    .settings-nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: var(--muted); cursor: pointer; transition: color 0.15s, background 0.15s; border: none; background: none; width: 100%; text-align: left; }
-    .settings-nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .settings-nav-item.active { color: #a78bfa; background: rgba(124,58,237,0.15); }
-    .settings-nav-item .sni { font-size: 15px; width: 18px; text-align: center; }
-    .settings-content { flex: 1; overflow-y: auto; padding: 24px; }
-    .settings-page { display: none; } .settings-page.active { display: block; }
-    .settings-page-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-    .settings-page-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
-    .settings-section { margin-bottom: 28px; }
-    .settings-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
-    .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 9px; background: var(--card); border: 1px solid var(--border); margin-bottom: 6px; }
-    .settings-row:last-child { margin-bottom: 0; }
-    .settings-row-left { flex: 1; }
-    .settings-row-label { font-size: 13px; font-weight: 500; }
-    .settings-row-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .toggle { width: 40px; height: 22px; background: var(--border); border-radius: 11px; position: relative; cursor: pointer; border: none; transition: background 0.2s; flex-shrink: 0; }
-    .toggle::after { content:''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform 0.2s; }
-    .toggle.on { background: var(--accent); }
-    .toggle.on::after { transform: translateX(18px); }
-    .settings-select { background: var(--sidebar); border: 1px solid var(--border); color: var(--text); border-radius: 7px; padding: 6px 10px; font-size: 12px; font-family: var(--font); outline: none; cursor: pointer; }
-    .settings-select:focus { border-color: var(--accent); }
-    .settings-input { background: var(--sidebar); border: 1px solid var(--border); color: var(--text); border-radius: 7px; padding: 6px 10px; font-size: 13px; font-family: var(--font); outline: none; width: 100%; }
-    .settings-input:focus { border-color: var(--accent); }
-    .settings-input-wrap { width: 100%; }
-    .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
-    .swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; flex-shrink: 0; }
-    .swatch.selected { border-color: #fff; }
-    .btn-danger { padding: 8px 16px; border-radius: 8px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .btn-danger:hover { background: rgba(239,68,68,0.2); }
-    .btn-accent { padding: 8px 16px; border-radius: 8px; background: var(--accent); border: none; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .btn-accent:hover { background: var(--accent2); }
-    .btn-outline { padding: 8px 16px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
-    .btn-outline:hover { border-color: var(--accent); color: #a78bfa; }
+/* tools */
+.tools-row{display:flex;gap:5px}
+.tool{flex:1;padding:7px 3px;border-radius:8px;border:1px solid var(--border);background:var(--s1);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:border-color .12s,background .12s}
+.tool:hover{border-color:var(--accent);background:var(--accent-dim)}
+.tool-ic{font-size:15px}
+.tool-lb{font-size:9px;color:var(--muted);text-align:center}
 
-    .screen { display: none; } .screen.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-    .notes-header { padding: 20px 24px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .notes-grid { flex: 1; overflow-y: auto; padding: 20px 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; align-content: start; }
-    .note-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
-    .note-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-    .note-card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-    .note-card-body { font-size: 12px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .note-card-date { font-size: 10px; color: var(--muted); margin-top: 10px; }
+/* notes */
+.rp-note{padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--s1);margin-bottom:5px;cursor:pointer;transition:border-color .12s}
+.rp-note:hover{border-color:var(--accent)}
+.rp-note:last-child{margin-bottom:0}
+.rp-note-title{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-note-prev{font-size:10.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-note-date{font-size:10px;color:var(--muted);margin-top:3px}
+.no-notes-sm{font-size:11.5px;color:var(--muted);text-align:center;padding:8px 0}
 
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 13px; color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 999; pointer-events: none; will-change: transform, opacity; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* ─── SETTINGS ─── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200}
+.overlay.open{display:flex}
+.s-modal{background:var(--s1);border:1px solid var(--border);border-radius:16px;width:620px;max-width:94vw;max-height:84vh;display:flex;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.8)}
+.s-nav{width:180px;min-width:180px;background:var(--bg);border-right:1px solid var(--border);padding:18px 10px;display:flex;flex-direction:column;gap:3px}
+.s-nav-title{font-size:13px;font-weight:700;padding:3px 10px 13px;color:var(--text)}
+.s-nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:12.5px;color:var(--sub);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--font);transition:color .12s,background .12s}
+.s-nav-item:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.s-nav-item.active{color:#a78bfa;background:var(--accent-dim)}
+.s-nav-item .si{font-size:13px;width:16px;text-align:center}
+.s-body{flex:1;overflow-y:auto;padding:22px}
+.s-page{display:none}.s-page.active{display:block}
+.s-pg-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.s-pg-sub{font-size:12px;color:var(--sub);margin-bottom:20px}
+.s-sec{margin-bottom:24px}
+.s-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:9px}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;background:var(--s2);border:1px solid var(--border);margin-bottom:5px}
+.s-row:last-child{margin-bottom:0}
+.s-row-l{flex:1}
+.s-row-label{font-size:12.5px;font-weight:500}
+.s-row-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.tog{width:36px;height:20px;background:var(--border2);border-radius:10px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
+.tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}
+.tog.on{background:var(--accent)}
+.tog.on::after{transform:translateX(16px)}
+.s-select{background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:var(--font);outline:none;cursor:pointer}
+.s-select:focus{border-color:var(--accent)}
+.s-input{background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 10px;font-size:12.5px;font-family:var(--font);outline:none;width:100%}
+.s-input:focus{border-color:var(--accent)}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}
+.sw{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.sw.sel{border-color:#fff}
+.btn-danger{padding:7px 14px;border-radius:7px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .12s}
+.btn-danger:hover{background:rgba(244,63,94,.18)}
+.btn-prim{padding:7px 14px;border-radius:7px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:opacity .12s}
+.btn-prim:hover{opacity:.85}
+.btn-out{padding:7px 14px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:border-color .12s,color .12s}
+.btn-out:hover{border-color:var(--accent);color:#a78bfa}
 
-    @media (max-width: 900px) { .sidebar { display: none; } .right-panel { display: none; } }
-  </style>
+/* toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--s3);border:1px solid var(--border2);border-radius:9px;padding:9px 16px;font-size:12.5px;color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.5);opacity:0;transition:opacity .18s,transform .18s;z-index:999;pointer-events:none;will-change:transform,opacity}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:880px){.sidebar,.rp{display:none}}
+</style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
-  <div class="logo"><div class="logo-icon">✦</div><span class="logo-text">AI Pen</span></div>
-  <button class="btn-new" onclick="newConversation()"><span>✦</span> New Chat</button>
-  <div class="nav-label">Main</div>
-  <button class="nav-item active" id="nav-chat" onclick="switchView('chat')"><span class="ni">💬</span> Chat</button>
-  <button class="nav-item" id="nav-notes" onclick="switchView('notes')"><span class="ni">📝</span> Notes</button>
-  <button class="nav-item" id="nav-sessions" onclick="switchView('sessions')"><span class="ni">🕐</span> Sessions</button>
-  <div class="nav-label">Tools</div>
-  <button class="nav-item" onclick="injectTool('summarize')"><span class="ni">📋</span> Summarize</button>
-  <button class="nav-item" onclick="injectTool('translate')"><span class="ni">🌐</span> Translate</button>
-  <button class="nav-item" onclick="openTemplates()"><span class="ni">📄</span> Templates</button>
-  <hr class="divider"/>
-  <div class="nav-label">Pen Shortcuts</div>
-  <div class="shortcuts-section">
-    <div class="shortcut-item" onclick="loadShortcut('Write a summary of')"><span>✦</span> Summarize Text</div>
-    <div class="shortcut-item" onclick="loadShortcut('Fix the grammar in:')"><span>✦</span> Fix Grammar</div>
-    <div class="shortcut-item" onclick="loadShortcut('Translate to Spanish:')"><span>✦</span> Translate</div>
-    <div class="shortcut-item" onclick="loadShortcut('Explain this simply:')"><span>✦</span> Explain Simply</div>
-    <div class="shortcut-item" onclick="loadShortcut('Continue writing:')"><span>✦</span> Continue Writing</div>
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    <div class="logo-name">AI<span>Pen</span></div>
   </div>
-  <hr class="divider"/>
-  <div class="usage-bar-wrap">
-    <div class="usage-label"><span>Messages used</span><span id="usage-count">0 / 100</span></div>
-    <div class="usage-bar"><div class="usage-fill" id="usage-fill"></div></div>
+  <button class="new-btn" onclick="newChat()">✦ &nbsp;New Chat</button>
+
+  <div class="s-label">Navigate</div>
+  <button class="s-item active" id="nav-chat" onclick="switchView('chat')"><span class="ic">💬</span>Chat</button>
+  <button class="s-item" id="nav-notes" onclick="switchView('notes')"><span class="ic">📝</span>Notes</button>
+  <button class="s-item" id="nav-sessions" onclick="switchView('sessions')"><span class="ic">🕐</span>Sessions</button>
+
+  <div class="s-label">Tools</div>
+  <button class="s-item" onclick="injectTool('summarize')"><span class="ic">📋</span>Summarize</button>
+  <button class="s-item" onclick="injectTool('translate')"><span class="ic">🌐</span>Translate</button>
+  <button class="s-item" onclick="toggleTpl()"><span class="ic">📄</span>Templates</button>
+
+  <hr class="s-div"/>
+  <div class="s-label">Shortcuts</div>
+  <div class="s-shortcuts">
+    <div class="s-sc" onclick="shortcut('Write a summary of')">Summarize Text</div>
+    <div class="s-sc" onclick="shortcut('Fix the grammar in:')">Fix Grammar</div>
+    <div class="s-sc" onclick="shortcut('Translate to Spanish:')">Translate</div>
+    <div class="s-sc" onclick="shortcut('Explain this simply:')">Explain Simply</div>
+    <div class="s-sc" onclick="shortcut('Continue writing:')">Continue Writing</div>
   </div>
-  <div class="user-row" onclick="openSettings()">
-    <div class="user-avatar" id="sidebar-avatar">U</div>
-    <div class="user-info"><div class="user-name" id="sidebar-name">User</div><div class="user-email" id="sidebar-email"></div></div>
-    <span style="font-size:12px;color:var(--muted)">⚙️</span>
+
+  <hr class="s-div"/>
+  <div class="usage-wrap">
+    <div class="usage-top"><span>Messages</span><span id="usage-txt">0 / 100</span></div>
+    <div class="usage-track"><div class="usage-fill" id="usage-fill"></div></div>
+  </div>
+  <div class="user-chip" onclick="openSettings()">
+    <div class="u-av" id="u-av">U</div>
+    <div class="u-info">
+      <div class="u-name" id="u-name">User</div>
+      <div class="u-email" id="u-email"></div>
+    </div>
+    <span class="u-cog">⚙</span>
   </div>
 </nav>
 
 <!-- MAIN -->
 <div class="main">
-  <!-- CHAT -->
+
+  <!-- CHAT SCREEN -->
   <div class="screen active" id="screen-chat">
-    <div class="chat-header">
-      <div><div class="greeting" id="greeting-text">Good morning</div><div class="greeting-sub" id="greeting-sub">What would you like to write today?</div></div>
-      <div class="header-right">
-        <div class="status-badge"><div class="pulse-dot"></div>AI Pen</div>
-        <button class="icon-btn" onclick="showToast('No new notifications')">🔔</button>
-        <button class="icon-btn" onclick="openSettings()">⚙️</button>
+    <div class="top-bar">
+      <div class="tb-left">
+        <div class="tb-title" id="tb-title">Good morning</div>
+        <div class="tb-sub" id="tb-sub">What would you like to write today?</div>
+      </div>
+      <div class="tb-right">
+        <div class="ai-badge"><div class="pulse"></div>AI Pen</div>
+        <button class="tb-btn" onclick="toast('No new notifications')">🔔</button>
+        <button class="tb-btn" onclick="openSettings()">⚙</button>
       </div>
     </div>
     <div class="messages" id="messages">
       <div class="msg-ai">
-        <div class="ai-header"><div class="ai-label"><span>✦</span>AI Pen</div><div class="ai-actions"><button class="ai-action-btn" onclick="copyMsg(this)">📋</button><button class="ai-action-btn" onclick="likeMsg(this)">👍</button><button class="ai-action-btn" onclick="dislikeMsg(this)">👎</button><button class="ai-action-btn" onclick="speakMsg(this)">🔊</button></div></div>
-        <div class="msg-text">Hello! I'm your AI Pen assistant. Ready to help you write, edit, translate, summarize, and more. What would you like to create today?</div>
+        <div class="msg-ai-inner">
+          <div class="ai-top">
+            <div class="ai-tag"><div class="ai-tag-dot"></div>AI Pen</div>
+            <div class="ai-btns">
+              <button class="ai-btn" onclick="copyMsg(this)">📋</button>
+              <button class="ai-btn" onclick="likeMsg(this)">👍</button>
+              <button class="ai-btn" onclick="dislikeMsg(this)">👎</button>
+              <button class="ai-btn" onclick="speakMsg(this)">🔊</button>
+            </div>
+          </div>
+          <div class="msg-txt">Hello! I'm your AI Pen assistant. Ready to help you write, edit, translate, summarize, and more. What would you like to create today?</div>
+        </div>
       </div>
-      <div class="typing-indicator" id="typing"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+      <div class="typing" id="typing"><div class="t-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div></div>
     </div>
-    <div class="chips-bar">
-      <div class="chip" onclick="chipAction('Help me brainstorm ideas')">💡 Brainstorm</div>
-      <div class="chip" onclick="chipAction('Fix my grammar')">✏️ Fix Grammar</div>
-      <div class="chip" onclick="chipAction('Summarize this text')">📋 Summarize</div>
-      <div class="chip" onclick="chipAction('Translate to Spanish')">🌐 Translate</div>
-      <div class="chip" onclick="chipAction('Continue my story')">📖 Continue Story</div>
+    <div class="chips" id="chips">
+      <div class="chip" onclick="chipFill('Help me brainstorm ideas')">💡 Brainstorm</div>
+      <div class="chip" onclick="chipFill('Fix my grammar')">✏️ Grammar</div>
+      <div class="chip" onclick="chipFill('Summarize this text')">📋 Summarize</div>
+      <div class="chip" onclick="chipFill('Translate to Spanish')">🌐 Translate</div>
+      <div class="chip" onclick="chipFill('Continue my story')">📖 Continue</div>
     </div>
-    <div class="input-area">
-      <div class="templates-popup" id="templates-popup">
-        <div class="tpl-title">Templates</div>
+    <div class="input-area" style="position:relative">
+      <div class="tpl-popup" id="tpl-popup">
+        <div class="tpl-head">Templates</div>
         <div class="tpl-grid">
-          <div class="tpl-item" onclick="useTemplate('Write a professional email about:')"><div class="tpl-item-icon">📧</div><div class="tpl-item-name">Email</div><div class="tpl-item-desc">Professional email draft</div></div>
-          <div class="tpl-item" onclick="useTemplate('Write a blog post about:')"><div class="tpl-item-icon">📰</div><div class="tpl-item-name">Blog Post</div><div class="tpl-item-desc">Full article with sections</div></div>
-          <div class="tpl-item" onclick="useTemplate('Write a short story about:')"><div class="tpl-item-icon">📖</div><div class="tpl-item-name">Story</div><div class="tpl-item-desc">Creative fiction writing</div></div>
-          <div class="tpl-item" onclick="useTemplate('Create a resume for someone who:')"><div class="tpl-item-icon">💼</div><div class="tpl-item-name">Resume</div><div class="tpl-item-desc">Professional CV format</div></div>
-          <div class="tpl-item" onclick="useTemplate('Write meeting notes for:')"><div class="tpl-item-icon">📋</div><div class="tpl-item-name">Meeting Notes</div><div class="tpl-item-desc">Structured meeting summary</div></div>
-          <div class="tpl-item" onclick="useTemplate('Write a social media post about:')"><div class="tpl-item-icon">📱</div><div class="tpl-item-name">Social Post</div><div class="tpl-item-desc">Engaging social content</div></div>
+          <div class="tpl-card" onclick="useTpl('Write a professional email about:')"><div class="tpl-icon">📧</div><div class="tpl-name">Email</div><div class="tpl-desc">Professional draft</div></div>
+          <div class="tpl-card" onclick="useTpl('Write a blog post about:')"><div class="tpl-icon">📰</div><div class="tpl-name">Blog Post</div><div class="tpl-desc">Full article</div></div>
+          <div class="tpl-card" onclick="useTpl('Write a short story about:')"><div class="tpl-icon">📖</div><div class="tpl-name">Story</div><div class="tpl-desc">Creative fiction</div></div>
+          <div class="tpl-card" onclick="useTpl('Create meeting notes for:')"><div class="tpl-icon">📋</div><div class="tpl-name">Meeting Notes</div><div class="tpl-desc">Structured summary</div></div>
+          <div class="tpl-card" onclick="useTpl('Write a social media post about:')"><div class="tpl-icon">📱</div><div class="tpl-name">Social Post</div><div class="tpl-desc">Engaging content</div></div>
+          <div class="tpl-card" onclick="useTpl('Create a resume for someone who:')"><div class="tpl-icon">💼</div><div class="tpl-name">Resume</div><div class="tpl-desc">CV format</div></div>
         </div>
       </div>
       <div class="input-box">
-        <div class="input-left">
-          <button class="input-btn" onclick="showToast('File attach coming soon')">➕</button>
-          <button class="input-btn" onclick="showToast('Language mode coming soon')">🌐</button>
-          <button class="input-btn" onclick="openTemplates()">📄</button>
+        <div class="i-left">
+          <button class="i-btn" onclick="toast('File attach coming soon')">➕</button>
+          <button class="i-btn" onclick="toggleTpl()">📄</button>
         </div>
-        <textarea id="chat-input" placeholder="Write or paste text to AI Pen…" rows="1" onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
-        <button class="input-btn" id="mic-btn" onclick="toggleVoice()">🎤</button>
-        <button class="send-btn" onclick="sendMessage()">➤</button>
+        <textarea id="chat-input" placeholder="Write or paste text to AI Pen…" rows="1" onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
+        <button class="i-btn" id="mic-btn" onclick="toggleVoice()">🎤</button>
+        <button class="send-btn" onclick="sendMsg()">➤</button>
       </div>
     </div>
   </div>
 
-  <!-- NOTES -->
+  <!-- NOTES SCREEN -->
   <div class="screen" id="screen-notes">
-    <div class="notes-header"><div><div style="font-size:20px;font-weight:700">Saved Notes</div><div style="font-size:13px;color:var(--muted);margin-top:2px">Your written notes from AI Pen</div></div><button class="btn-accent" onclick="createNote()">+ New Note</button></div>
-    <div class="notes-grid" id="notes-grid"></div>
+    <div class="scr-head">
+      <div><div class="scr-title">Notes</div><div class="scr-sub">Your saved writing</div></div>
+      <button class="btn-prim" onclick="createNote()">+ New Note</button>
+    </div>
+    <div class="grid-scroll" id="notes-grid"></div>
   </div>
 
-  <!-- SESSIONS -->
+  <!-- SESSIONS SCREEN -->
   <div class="screen" id="screen-sessions">
-    <div class="notes-header"><div><div style="font-size:20px;font-weight:700">Chat Sessions</div><div style="font-size:13px;color:var(--muted);margin-top:2px">Your previous conversations</div></div><button class="btn-outline" onclick="clearSessions()">Clear All</button></div>
-    <div class="notes-grid" id="sessions-grid"></div>
+    <div class="scr-head">
+      <div><div class="scr-title">Sessions</div><div class="scr-sub">Your chat history</div></div>
+      <button class="btn-out" onclick="clearSessions()">Clear All</button>
+    </div>
+    <div class="grid-scroll" id="sessions-grid"></div>
   </div>
 </div>
 
 <!-- RIGHT PANEL -->
-<aside class="right-panel">
+<aside class="rp">
 
-  <!-- AI Pen Status — Bluetooth-driven -->
-  <div class="rp-section">
-    <div class="rp-section-title">AI Pen Status</div>
-    <div class="pen-status-top">
-      <div class="pen-icon">🖊️</div>
-      <div class="pen-info">
+  <div class="rp-card">
+    <div class="rp-title">AI Pen Status</div>
+    <div class="pen-row">
+      <div class="pen-icon-wrap">🖊️</div>
+      <div>
         <div class="pen-name" id="pen-name">AI Pen</div>
-        <div class="pen-status-text disconnected" id="pen-status-text">● Not Connected</div>
+        <div class="pen-status disconnected" id="pen-status">● Not Connected</div>
       </div>
     </div>
-    <!-- battery row hidden until connected -->
-    <div class="battery-row" id="battery-row" style="display:none">
-      <div class="battery-track"><div class="battery-fill" id="battery-fill" style="width:0%"></div></div>
-      <span class="battery-pct" id="battery-pct">—</span>
+    <div class="bat-row" id="bat-row" style="display:none">
+      <div class="bat-track"><div class="bat-fill" id="bat-fill" style="width:0%"></div></div>
+      <span class="bat-pct" id="bat-pct">—</span>
     </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-val" id="stat-words">0</div><div class="stat-lbl">Words Today</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-msgs">0</div><div class="stat-lbl">Messages</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-notes">0</div><div class="stat-lbl">Notes Saved</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-streak">1</div><div class="stat-lbl">Day Streak</div></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v" id="s-words">0</div><div class="stat-l">Words</div></div>
+      <div class="stat"><div class="stat-v" id="s-msgs">0</div><div class="stat-l">Messages</div></div>
+      <div class="stat"><div class="stat-v" id="s-notes">0</div><div class="stat-l">Notes</div></div>
+      <div class="stat"><div class="stat-v" id="s-streak">1</div><div class="stat-l">Day Streak</div></div>
     </div>
-    <button class="bt-connect-btn" id="bt-btn" onclick="toggleBluetooth()">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6.5 6.5 17.5 17.5"/><polyline points="17.5 6.5 12 12 17.5 17.5"/><polyline points="6.5 17.5 12 12"/></svg>
-      <span id="bt-btn-label">Connect via Bluetooth</span>
+    <button class="bt-btn" id="bt-btn" onclick="toggleBT()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="6.5 6.5 17.5 17.5"/><polyline points="17.5 6.5 12 12 17.5 17.5"/><polyline points="6.5 17.5 12 12"/></svg>
+      <span id="bt-lbl">Connect via Bluetooth</span>
     </button>
-    <div class="bt-unavailable" id="bt-unavailable" style="display:none">Bluetooth not available in this browser</div>
+    <div class="bt-na" id="bt-na" style="display:none">Bluetooth not available in this browser</div>
   </div>
 
-  <!-- Live Writing -->
-  <div class="rp-section">
-    <div class="rp-section-title">Live Writing Input</div>
-    <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="Start writing here…" oninput="onWritingInput()"></div>
-    <div class="recognized-text" id="recognized-text">Voice recognition idle</div>
-    <div class="writing-actions">
-      <button class="writing-btn" onclick="copyWriting()">📋 Copy Text</button>
-      <button class="writing-btn" onclick="saveWritingAsNote()">💾 Save as Note</button>
+  <div class="rp-card">
+    <div class="rp-title">Live Writing</div>
+    <div class="write-area" id="write-area" contenteditable="true" data-placeholder="Start writing here…" oninput="onWrite()"></div>
+    <div class="voice-status" id="voice-status">Voice idle</div>
+    <div class="w-btns">
+      <button class="w-btn" onclick="copyWrite()">📋 Copy</button>
+      <button class="w-btn" onclick="saveWrite()">💾 Save Note</button>
     </div>
   </div>
 
-  <!-- AI Tools -->
-  <div class="rp-section">
-    <div class="rp-section-title">AI Tools</div>
-    <div class="ai-tools-row">
-      <button class="ai-tool-btn" onclick="injectTool('summarize')"><span class="t-icon">📋</span><span class="t-label">Summarize</span></button>
-      <button class="ai-tool-btn" onclick="injectTool('grammar')"><span class="t-icon">✏️</span><span class="t-label">Grammar</span></button>
-      <button class="ai-tool-btn" onclick="injectTool('translate')"><span class="t-icon">🌐</span><span class="t-label">Translate</span></button>
-      <button class="ai-tool-btn" onclick="injectTool('expand')"><span class="t-icon">📝</span><span class="t-label">Expand</span></button>
-      <button class="ai-tool-btn" onclick="injectTool('tone')"><span class="t-icon">🎨</span><span class="t-label">Tone</span></button>
+  <div class="rp-card">
+    <div class="rp-title">AI Tools</div>
+    <div class="tools-row">
+      <button class="tool" onclick="injectTool('summarize')"><span class="tool-ic">📋</span><span class="tool-lb">Summarize</span></button>
+      <button class="tool" onclick="injectTool('grammar')"><span class="tool-ic">✏️</span><span class="tool-lb">Grammar</span></button>
+      <button class="tool" onclick="injectTool('translate')"><span class="tool-ic">🌐</span><span class="tool-lb">Translate</span></button>
+      <button class="tool" onclick="injectTool('expand')"><span class="tool-ic">📝</span><span class="tool-lb">Expand</span></button>
+      <button class="tool" onclick="injectTool('tone')"><span class="tool-ic">🎨</span><span class="tool-lb">Tone</span></button>
     </div>
   </div>
 
-  <!-- Recent Notes -->
-  <div class="rp-section">
-    <div class="rp-section-title">Recent Notes</div>
-    <div id="recent-notes-list"><div class="no-notes">No notes yet. Save something!</div></div>
+  <div class="rp-card">
+    <div class="rp-title">Recent Notes</div>
+    <div id="rp-notes"><div class="no-notes-sm">No notes yet.</div></div>
   </div>
 </aside>
 
-<!-- SETTINGS OVERLAY -->
-<div class="overlay" id="settings-overlay" onclick="closeSettingsIfBg(event)">
-  <div class="settings-modal">
-    <div class="settings-nav">
-      <div class="settings-title">⚙️ Settings</div>
-      <button class="settings-nav-item active" onclick="showSettingsPage('appearance',this)"><span class="sni">🎨</span> Appearance</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('ai',this)"><span class="sni">✦</span> AI & Model</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('writing',this)"><span class="sni">✏️</span> Writing</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('notifications',this)"><span class="sni">🔔</span> Notifications</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('privacy',this)"><span class="sni">🔒</span> Privacy</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('account',this)"><span class="sni">👤</span> Account</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('about',this)"><span class="sni">ℹ️</span> About</button>
+<!-- SETTINGS -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="s-modal">
+    <div class="s-nav">
+      <div class="s-nav-title">⚙️ Settings</div>
+      <button class="s-nav-item active" onclick="sPage('appearance',this)"><span class="si">🎨</span> Appearance</button>
+      <button class="s-nav-item" onclick="sPage('ai',this)"><span class="si">✦</span> AI & Model</button>
+      <button class="s-nav-item" onclick="sPage('writing',this)"><span class="si">✏️</span> Writing</button>
+      <button class="s-nav-item" onclick="sPage('notifs',this)"><span class="si">🔔</span> Notifications</button>
+      <button class="s-nav-item" onclick="sPage('privacy',this)"><span class="si">🔒</span> Privacy</button>
+      <button class="s-nav-item" onclick="sPage('account',this)"><span class="si">👤</span> Account</button>
+      <button class="s-nav-item" onclick="sPage('about',this)"><span class="si">ℹ️</span> About</button>
       <div style="flex:1"></div>
-      <button class="settings-nav-item" onclick="closeSettings()" style="color:#ef4444"><span class="sni">✕</span> Close</button>
+      <button class="s-nav-item" onclick="closeSettings()" style="color:var(--red)"><span class="si">✕</span> Close</button>
     </div>
-    <div class="settings-content">
-      <div class="settings-page active" id="settings-appearance">
-        <div class="settings-page-title">Appearance</div><div class="settings-page-sub">Customize how AI Pen looks and feels</div>
-        <div class="settings-section"><div class="settings-section-title">Theme</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Color Theme</div><div class="settings-row-desc">Choose your interface color scheme</div></div><select class="settings-select" onchange="applyTheme(this.value)"><option value="dark">Dark (Default)</option><option value="darker">Darker</option><option value="midnight">Midnight Blue</option><option value="forest">Forest Dark</option></select></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Accent Color</div><div class="settings-row-desc">Main highlight color</div></div><div class="color-swatches"><div class="swatch selected" style="background:#7c3aed" data-color="#7c3aed" onclick="setAccent(this)"></div><div class="swatch" style="background:#2563eb" data-color="#2563eb" onclick="setAccent(this)"></div><div class="swatch" style="background:#0891b2" data-color="#0891b2" onclick="setAccent(this)"></div><div class="swatch" style="background:#059669" data-color="#059669" onclick="setAccent(this)"></div><div class="swatch" style="background:#d97706" data-color="#d97706" onclick="setAccent(this)"></div><div class="swatch" style="background:#dc2626" data-color="#dc2626" onclick="setAccent(this)"></div></div></div>
+    <div class="s-body">
+
+      <div class="s-page active" id="sp-appearance">
+        <div class="s-pg-title">Appearance</div><div class="s-pg-sub">Customize how AI Pen looks</div>
+        <div class="s-sec"><div class="s-sec-title">Theme</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Color Theme</div><div class="s-row-desc">Interface color scheme</div></div><select class="s-select" onchange="applyTheme(this.value)"><option value="dark">Dark</option><option value="darker">Darker</option><option value="midnight">Midnight</option><option value="forest">Forest</option></select></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Accent Color</div><div class="s-row-desc">Highlight color</div></div><div class="swatches"><div class="sw sel" style="background:#6d5df6" data-c="#6d5df6" onclick="setAccent(this)"></div><div class="sw" style="background:#2563eb" data-c="#2563eb" onclick="setAccent(this)"></div><div class="sw" style="background:#0891b2" data-c="#0891b2" onclick="setAccent(this)"></div><div class="sw" style="background:#059669" data-c="#059669" onclick="setAccent(this)"></div><div class="sw" style="background:#d97706" data-c="#d97706" onclick="setAccent(this)"></div><div class="sw" style="background:#e11d48" data-c="#e11d48" onclick="setAccent(this)"></div></div></div>
         </div>
-        <div class="settings-section"><div class="settings-section-title">Text & Layout</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Font Size</div><div class="settings-row-desc">Chat message font size</div></div><select class="settings-select" onchange="applyFontSize(this.value)"><option value="13">Small</option><option value="14" selected>Medium</option><option value="16">Large</option><option value="18">Extra Large</option></select></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Show Right Panel</div><div class="settings-row-desc">Show AI tools and writing panel</div></div><button class="toggle on" id="toggle-rightpanel" onclick="toggleSetting('rightpanel')"></button></div>
-        </div>
-      </div>
-      <div class="settings-page" id="settings-ai">
-        <div class="settings-page-title">AI & Model</div><div class="settings-page-sub">Configure AI behavior and response style</div>
-        <div class="settings-section"><div class="settings-section-title">Model</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">AI Model</div><div class="settings-row-desc">Select the language model</div></div><select class="settings-select" onchange="savePref('model',this.value)"><option value="gpt4">GPT-4o</option><option value="gpt35">GPT-3.5 Turbo</option><option value="claude3">Claude 3.5 Sonnet</option><option value="gemini">Gemini Pro</option></select></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Response Style</div><div class="settings-row-desc">How the AI formats replies</div></div><select class="settings-select" onchange="savePref('responseStyle',this.value)"><option value="balanced">Balanced</option><option value="concise">Concise</option><option value="detailed">Detailed</option><option value="creative">Creative</option></select></div>
-        </div>
-        <div class="settings-section"><div class="settings-section-title">Behavior</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Smart Suggestions</div><div class="settings-row-desc">Context-aware quick action chips</div></div><button class="toggle on" id="toggle-smart" onclick="toggleSetting('smart')"></button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Grammar Check</div><div class="settings-row-desc">Highlight grammar issues</div></div><button class="toggle on" id="toggle-grammar" onclick="toggleSetting('grammar')"></button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Memory</div><div class="settings-row-desc">Remember context across sessions</div></div><button class="toggle" id="toggle-memory" onclick="toggleSetting('memory')"></button></div>
+        <div class="s-sec"><div class="s-sec-title">Text</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Font Size</div><div class="s-row-desc">Chat message size</div></div><select class="s-select" onchange="applyFS(this.value)"><option value="12.5">Small</option><option value="13.5" selected>Medium</option><option value="15">Large</option><option value="17">Extra Large</option></select></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Show Right Panel</div><div class="s-row-desc">Tools and writing panel</div></div><button class="tog on" id="tog-rp" onclick="togSet('rp')"></button></div>
         </div>
       </div>
-      <div class="settings-page" id="settings-writing">
-        <div class="settings-page-title">Writing</div><div class="settings-page-sub">Voice and writing settings</div>
-        <div class="settings-section"><div class="settings-section-title">Voice Input</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Voice Language</div><div class="settings-row-desc">Language for speech recognition</div></div><select class="settings-select" id="voice-lang" onchange="savePref('voiceLang',this.value)"><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="es-ES">Spanish</option><option value="fr-FR">French</option><option value="de-DE">German</option><option value="pt-BR">Portuguese</option><option value="ja-JP">Japanese</option><option value="zh-CN">Chinese</option></select></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Read Aloud Speed</div><div class="settings-row-desc">Speech rate for AI responses</div></div><select class="settings-select" id="speech-rate" onchange="savePref('speechRate',this.value)"><option value="0.75">Slow</option><option value="1" selected>Normal</option><option value="1.25">Fast</option><option value="1.5">Very Fast</option></select></div>
+
+      <div class="s-page" id="sp-ai">
+        <div class="s-pg-title">AI & Model</div><div class="s-pg-sub">Configure AI behavior</div>
+        <div class="s-sec"><div class="s-sec-title">Model</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">AI Model</div><div class="s-row-desc">Language model to use</div></div><select class="s-select" onchange="sp('model',this.value)"><option value="gpt4">GPT-4o</option><option value="claude">Claude 3.5 Sonnet</option><option value="gemini">Gemini Pro</option><option value="gpt35">GPT-3.5 Turbo</option></select></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Response Style</div><div class="s-row-desc">How replies are formatted</div></div><select class="s-select" onchange="sp('style',this.value)"><option value="balanced">Balanced</option><option value="concise">Concise</option><option value="detailed">Detailed</option><option value="creative">Creative</option></select></div>
         </div>
-        <div class="settings-section"><div class="settings-section-title">Notes</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Auto-save Writing</div><div class="settings-row-desc">Auto-save live writing panel</div></div><button class="toggle" id="toggle-autosave" onclick="toggleSetting('autosave')"></button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Clear All Notes</div><div class="settings-row-desc">Permanently delete all saved notes</div></div><button class="btn-danger" onclick="clearNotes()">Clear Notes</button></div>
-        </div>
-      </div>
-      <div class="settings-page" id="settings-notifications">
-        <div class="settings-page-title">Notifications</div><div class="settings-page-sub">Control how AI Pen notifies you</div>
-        <div class="settings-section"><div class="settings-section-title">In-App</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Response Ready</div><div class="settings-row-desc">Notify when AI finishes a long response</div></div><button class="toggle on" id="toggle-notif-response" onclick="toggleSetting('notif-response')"></button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Streak Reminders</div><div class="settings-row-desc">Alert when your writing streak is at risk</div></div><button class="toggle on" id="toggle-notif-streak" onclick="toggleSetting('notif-streak')"></button></div>
+        <div class="s-sec"><div class="s-sec-title">Behavior</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Smart Suggestions</div><div class="s-row-desc">Context-aware chips</div></div><button class="tog on" id="tog-smart" onclick="togSet('smart')"></button></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Grammar Check</div><div class="s-row-desc">Highlight grammar issues</div></div><button class="tog on" id="tog-grammar" onclick="togSet('grammar')"></button></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Memory</div><div class="s-row-desc">Remember context across sessions</div></div><button class="tog" id="tog-memory" onclick="togSet('memory')"></button></div>
         </div>
       </div>
-      <div class="settings-page" id="settings-privacy">
-        <div class="settings-page-title">Privacy & Data</div><div class="settings-page-sub">Control how your data is stored</div>
-        <div class="settings-section"><div class="settings-section-title">Data Storage</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Save Chat History</div><div class="settings-row-desc">Store conversations locally</div></div><button class="toggle on" id="toggle-save-history" onclick="toggleSetting('save-history')"></button></div>
+
+      <div class="s-page" id="sp-writing">
+        <div class="s-pg-title">Writing</div><div class="s-pg-sub">Voice and note settings</div>
+        <div class="s-sec"><div class="s-sec-title">Voice</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Language</div><div class="s-row-desc">Speech recognition language</div></div><select class="s-select" id="vlang" onchange="sp('vlang',this.value)"><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="es-ES">Spanish</option><option value="fr-FR">French</option><option value="de-DE">German</option><option value="ja-JP">Japanese</option><option value="zh-CN">Chinese</option></select></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Read Aloud Speed</div><div class="s-row-desc">Speech rate</div></div><select class="s-select" id="srate" onchange="sp('srate',this.value)"><option value="0.75">Slow</option><option value="1" selected>Normal</option><option value="1.25">Fast</option><option value="1.5">Very Fast</option></select></div>
         </div>
-        <div class="settings-section"><div class="settings-section-title">Data Management</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Export My Data</div><div class="settings-row-desc">Download all your notes and history</div></div><button class="btn-outline" onclick="exportData()">Export</button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Clear Chat History</div><div class="settings-row-desc">Remove all saved conversations</div></div><button class="btn-danger" onclick="clearHistory()">Clear History</button></div>
-        </div>
-      </div>
-      <div class="settings-page" id="settings-account">
-        <div class="settings-page-title">Account</div><div class="settings-page-sub">Manage your profile</div>
-        <div class="settings-section"><div class="settings-section-title">Profile</div>
-          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px"><div class="settings-row-label">Display Name</div><div class="settings-input-wrap"><input class="settings-input" id="display-name-input" type="text" placeholder="Your display name"/></div><button class="btn-accent" onclick="saveDisplayName()">Save Name</button></div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Email / Phone</div><div class="settings-row-desc" id="account-email">—</div></div></div>
-        </div>
-        <div class="settings-section"><div class="settings-section-title">Security</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Change Password</div><div class="settings-row-desc">Send a password reset email</div></div><button class="btn-outline" onclick="sendPasswordReset()">Reset Password</button></div>
-        </div>
-        <div class="settings-section"><div class="settings-section-title">Session</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Sign Out</div><div class="settings-row-desc">Sign out of your AI Pen account</div></div><button class="btn-danger" onclick="signOut()">Sign Out</button></div>
+        <div class="s-sec"><div class="s-sec-title">Notes</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Auto-save Writing</div><div class="s-row-desc">Auto-save live writing panel</div></div><button class="tog" id="tog-autosave" onclick="togSet('autosave')"></button></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Clear All Notes</div><div class="s-row-desc">Delete all saved notes</div></div><button class="btn-danger" onclick="clearNotes()">Clear Notes</button></div>
         </div>
       </div>
-      <div class="settings-page" id="settings-about">
-        <div class="settings-page-title">About AI Pen</div><div class="settings-page-sub">App info and support</div>
-        <div class="settings-section"><div class="settings-section-title">App Info</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Version</div><div class="settings-row-desc">AI Pen Web</div></div><span style="font-size:13px;color:var(--muted)">v2.1.0</span></div>
-        </div>
-        <div class="settings-section"><div class="settings-section-title">Support</div>
-          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Send Feedback</div><div class="settings-row-desc">Help us improve AI Pen</div></div><button class="btn-outline" onclick="showToast('Feedback form coming soon!')">Feedback</button></div>
+
+      <div class="s-page" id="sp-notifs">
+        <div class="s-pg-title">Notifications</div><div class="s-pg-sub">Control alerts</div>
+        <div class="s-sec"><div class="s-sec-title">In-App</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Response Ready</div><div class="s-row-desc">Notify when AI finishes</div></div><button class="tog on" id="tog-nresp" onclick="togSet('nresp')"></button></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Streak Reminders</div><div class="s-row-desc">Writing streak alerts</div></div><button class="tog on" id="tog-nstreak" onclick="togSet('nstreak')"></button></div>
         </div>
       </div>
+
+      <div class="s-page" id="sp-privacy">
+        <div class="s-pg-title">Privacy & Data</div><div class="s-pg-sub">Control how data is stored</div>
+        <div class="s-sec"><div class="s-sec-title">Storage</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Save Chat History</div><div class="s-row-desc">Store conversations locally</div></div><button class="tog on" id="tog-hist" onclick="togSet('hist')"></button></div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">Data</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Export My Data</div><div class="s-row-desc">Download notes and history</div></div><button class="btn-out" onclick="exportData()">Export</button></div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Clear History</div><div class="s-row-desc">Remove all conversations</div></div><button class="btn-danger" onclick="clearHistory()">Clear</button></div>
+        </div>
+      </div>
+
+      <div class="s-page" id="sp-account">
+        <div class="s-pg-title">Account</div><div class="s-pg-sub">Manage your profile</div>
+        <div class="s-sec"><div class="s-sec-title">Profile</div>
+          <div class="s-row" style="flex-direction:column;align-items:flex-start;gap:9px">
+            <div class="s-row-label">Display Name</div>
+            <input class="s-input" id="disp-name" type="text" placeholder="Your name"/>
+            <button class="btn-prim" onclick="saveName()">Save Name</button>
+          </div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Email / Phone</div><div class="s-row-desc" id="acct-email">—</div></div></div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">Security</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Change Password</div><div class="s-row-desc">Send reset email</div></div><button class="btn-out" onclick="resetPwd()">Reset</button></div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">Session</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Sign Out</div><div class="s-row-desc">Sign out of AI Pen</div></div><button class="btn-danger" onclick="signOut()">Sign Out</button></div>
+        </div>
+      </div>
+
+      <div class="s-page" id="sp-about">
+        <div class="s-pg-title">About AI Pen</div><div class="s-pg-sub">App info</div>
+        <div class="s-sec"><div class="s-sec-title">Info</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Version</div><div class="s-row-desc">AI Pen Web</div></div><span style="font-size:12px;color:var(--muted)">v2.2.0</span></div>
+        </div>
+        <div class="s-sec"><div class="s-sec-title">Support</div>
+          <div class="s-row"><div class="s-row-l"><div class="s-row-label">Send Feedback</div><div class="s-row-desc">Help us improve</div></div><button class="btn-out" onclick="toast('Feedback form coming soon!')">Feedback</button></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast-el"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
-  firebase.initializeApp({
-    apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
-    authDomain:"ai-pen-c85a0.firebaseapp.com",
-    projectId:"ai-pen-c85a0",
-    storageBucket:"ai-pen-c85a0.firebasestorage.app",
-    messagingSenderId:"997852271146",
-    appId:"1:997852271146:web:f9b42d91dce0ead0d86953"
-  });
-  const auth = firebase.auth();
+firebase.initializeApp({
+  apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
+  authDomain:"ai-pen-c85a0.firebaseapp.com",
+  projectId:"ai-pen-c85a0",
+  storageBucket:"ai-pen-c85a0.firebasestorage.app",
+  messagingSenderId:"997852271146",
+  appId:"1:997852271146:web:f9b42d91dce0ead0d86953"
+});
+const auth = firebase.auth();
 
-  auth.onAuthStateChanged(user => {
-    if (!user) { window.location.href = '/login.html'; return; }
-    const name = user.displayName || user.email?.split('@')[0] || 'User';
-    document.getElementById('sidebar-avatar').textContent = name[0].toUpperCase();
-    document.getElementById('sidebar-name').textContent = name;
-    document.getElementById('sidebar-email').textContent = user.email || user.phoneNumber || '';
-    document.getElementById('display-name-input').value = name;
-    document.getElementById('account-email').textContent = user.email || user.phoneNumber || 'Signed in';
-    setGreeting(name); loadStats(); applySavedPrefs();
-    initBluetooth();
-  });
+auth.onAuthStateChanged(u => {
+  if (!u) { location.href = '/login.html'; return; }
+  const name = u.displayName || u.email?.split('@')[0] || 'User';
+  document.getElementById('u-av').textContent = name[0].toUpperCase();
+  document.getElementById('u-name').textContent = name;
+  document.getElementById('u-email').textContent = u.email || u.phoneNumber || '';
+  document.getElementById('disp-name').value = name;
+  document.getElementById('acct-email').textContent = u.email || u.phoneNumber || 'Signed in';
+  setGreeting(name);
+  loadStats();
+  applyPrefs();
+  initBT();
+});
 
-  // ── GREETING ──
-  function setGreeting(name) {
-    const h = new Date().getHours();
-    const [g,e] = h<12?['Good morning','☀️']:h<17?['Good afternoon','🌤️']:h<21?['Good evening','🌙']:['Good night','🌟'];
-    document.getElementById('greeting-text').textContent = `${g}, ${name}`;
-    document.getElementById('greeting-sub').textContent = `What would you like to write today? ${e}`;
+// ── GREETING ──
+function setGreeting(name) {
+  const h = new Date().getHours();
+  const [g,e] = h<12?['Good morning','☀️']:h<17?['Good afternoon','🌤️']:h<21?['Good evening','🌙']:['Good night','🌟'];
+  document.getElementById('tb-title').textContent = `${g}, ${name} ${e}`;
+}
+
+// ── BLUETOOTH ──
+let btDev = null, btSrv = null;
+function initBT() {
+  if (!navigator.bluetooth) {
+    document.getElementById('bt-btn').style.display = 'none';
+    document.getElementById('bt-na').style.display = 'block';
   }
-
-  // ── BLUETOOTH ──
-  let btDevice = null;
-  let btServer = null;
-
-  function initBluetooth() {
-    if (!navigator.bluetooth) {
-      document.getElementById('bt-btn').style.display = 'none';
-      document.getElementById('bt-unavailable').style.display = 'block';
-    }
-  }
-
-  async function toggleBluetooth() {
-    if (btDevice && btDevice.gatt.connected) {
-      disconnectBluetooth(); return;
-    }
-    if (!navigator.bluetooth) { showToast('Bluetooth not supported in this browser'); return; }
-    setPenStatus('connecting');
+}
+async function toggleBT() {
+  if (btDev && btDev.gatt.connected) { disconnectBT(); return; }
+  if (!navigator.bluetooth) { toast('Bluetooth not supported'); return; }
+  setPenStatus('connecting');
+  try {
+    btDev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['battery_service','device_information'] });
+    btDev.addEventListener('gattserverdisconnected', onBTDrop);
+    btSrv = await btDev.gatt.connect();
+    const name = btDev.name || 'AI Pen';
+    document.getElementById('pen-name').textContent = name;
+    setPenStatus('connected');
+    toast(`Connected to ${name}`);
     try {
-      btDevice = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['battery_service', 'device_information']
-      });
-      btDevice.addEventListener('gattserverdisconnected', onPenDisconnected);
-      btServer = await btDevice.gatt.connect();
-      const deviceName = btDevice.name || 'AI Pen';
-      document.getElementById('pen-name').textContent = deviceName;
-      setPenStatus('connected');
-      showToast(`Connected to ${deviceName}`);
-      // Try to read battery level
-      try {
-        const svc  = await btServer.getPrimaryService('battery_service');
-        const char = await svc.getCharacteristic('battery_level');
-        const val  = await char.readValue();
-        const pct  = val.getUint8(0);
-        setBattery(pct);
-        // Subscribe to battery notifications if available
-        char.addEventListener('characteristicvaluechanged', e => setBattery(e.target.value.getUint8(0)));
-        await char.startNotifications().catch(() => {});
-      } catch { /* device doesn't expose battery_service — that's fine */ }
-    } catch (err) {
-      // User cancelled or connection failed
-      if (err.name !== 'NotFoundError' && err.name !== 'AbortError') {
-        showToast('Could not connect. Make sure your pen is on and nearby.');
+      const svc = await btSrv.getPrimaryService('battery_service');
+      const ch = await svc.getCharacteristic('battery_level');
+      setBat(ch.readValue ? (await ch.readValue()).getUint8(0) : null);
+      ch.addEventListener('characteristicvaluechanged', e => setBat(e.target.value.getUint8(0)));
+      await ch.startNotifications().catch(()=>{});
+    } catch {}
+  } catch(err) {
+    if (err.name !== 'NotFoundError' && err.name !== 'AbortError') toast('Could not connect. Is the pen on?');
+    setPenStatus('disconnected'); btDev = null; btSrv = null;
+  }
+}
+function disconnectBT() {
+  if (btDev?.gatt.connected) btDev.gatt.disconnect();
+  setPenStatus('disconnected'); setBat(null);
+  document.getElementById('pen-name').textContent = 'AI Pen';
+  btDev = null; btSrv = null; toast('Disconnected');
+}
+function onBTDrop() {
+  setPenStatus('disconnected'); setBat(null);
+  document.getElementById('pen-name').textContent = 'AI Pen';
+  btDev = null; btSrv = null; toast('Pen disconnected');
+}
+function setPenStatus(s) {
+  const el = document.getElementById('pen-status');
+  const btn = document.getElementById('bt-btn');
+  const lbl = document.getElementById('bt-lbl');
+  el.className = 'pen-status ' + s;
+  if (s === 'connected') { el.textContent='● Connected'; btn.classList.add('on'); btn.disabled=false; lbl.textContent='Disconnect'; }
+  else if (s === 'connecting') { el.textContent='● Connecting…'; btn.classList.remove('on'); btn.disabled=true; lbl.textContent='Connecting…'; }
+  else { el.textContent='● Not Connected'; btn.classList.remove('on'); btn.disabled=false; lbl.textContent='Connect via Bluetooth'; }
+}
+function setBat(pct) {
+  const row = document.getElementById('bat-row');
+  if (pct === null) { row.style.display='none'; return; }
+  row.style.display = 'flex';
+  const fill = document.getElementById('bat-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = pct > 30 ? 'var(--green)' : pct > 15 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('bat-pct').textContent = pct + '%';
+}
+
+// ── CHAT ──
+let msgCount = 0, wordCount = 0;
+function grow(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } }
+function sendMsg() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim(); if (!text) return;
+  addUserMsg(text); inp.value=''; inp.style.height='auto';
+  wordCount += text.split(/\s+/).length;
+  updateStats(); streamAI(text);
+}
+function addUserMsg(text) {
+  const msgs = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  const b = document.createElement('div'); b.className='msg-u'; b.textContent=text;
+  const t = document.createElement('div'); t.className='msg-u-time'; t.textContent='✓✓ '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  msgs.insertBefore(t, typing); msgs.insertBefore(b, t);
+  msgs.scrollTop = msgs.scrollHeight; saveHistory();
+}
+function streamAI(txt) {
+  const typing = document.getElementById('typing');
+  typing.style.display = 'block';
+  document.getElementById('messages').scrollTop = 9999;
+  setTimeout(() => {
+    typing.style.display = 'none';
+    const reply = genReply(txt);
+    const msgs = document.getElementById('messages');
+    const card = document.createElement('div'); card.className='msg-ai';
+    card.innerHTML=`<div class="msg-ai-inner"><div class="ai-top"><div class="ai-tag"><div class="ai-tag-dot"></div>AI Pen</div><div class="ai-btns"><button class="ai-btn" onclick="copyMsg(this)">📋</button><button class="ai-btn" onclick="likeMsg(this)">👍</button><button class="ai-btn" onclick="dislikeMsg(this)">👎</button><button class="ai-btn" onclick="speakMsg(this)">🔊</button></div></div><div class="msg-txt"><span class="cursor"></span></div></div>`;
+    msgs.insertBefore(card, typing);
+    msgs.scrollTop = msgs.scrollHeight;
+    const el = card.querySelector('.msg-txt');
+    const cur = el.querySelector('.cursor');
+    let i = 0;
+    function tick() {
+      if (i < reply.length) {
+        cur.insertAdjacentText('beforebegin', reply[i++]);
+        msgs.scrollTop = msgs.scrollHeight;
+        setTimeout(tick, 16);
+      } else {
+        cur.remove();
+        msgCount++; updateStats(); saveHistory();
       }
-      setPenStatus('disconnected');
-      btDevice = null; btServer = null;
     }
-  }
+    tick();
+  }, 650);
+}
+function genReply(t) {
+  const s = t.toLowerCase();
+  if (s.includes('hello')||s.includes('hi')) return "Hello! I'm your AI Pen assistant — ready to help with writing, editing, and more. What can I do for you?";
+  if (s.includes('summarize')||s.includes('summary')) return "I can summarize that! Please share the text you'd like condensed.";
+  if (s.includes('translate')) return "I can help with translation! Share the text and the target language.";
+  if (s.includes('grammar')||s.includes('fix')) return "I'll review and fix the grammar. Share the text you'd like improved.";
+  if (s.includes('write')||s.includes('draft')) return "I'd love to help you write! Share the topic, tone, and length you're going for.";
+  return `Got it! I can write, edit, translate, summarize, brainstorm, fix grammar, and more. What would you like me to do with: "${t.substring(0,60)}${t.length>60?'…':''}"?`;
+}
+function copyMsg(btn) { navigator.clipboard.writeText(btn.closest('.msg-ai-inner').querySelector('.msg-txt').textContent).then(()=>toast('Copied!')); }
+function likeMsg(btn) { btn.classList.toggle('liked'); btn.closest('.ai-btns').querySelector(':nth-child(3)').classList.remove('disliked'); toast(btn.classList.contains('liked')?'Liked!':'Removed.'); }
+function dislikeMsg(btn) { btn.classList.toggle('disliked'); btn.closest('.ai-btns').querySelector(':nth-child(2)').classList.remove('liked'); toast(btn.classList.contains('disliked')?"Noted — we'll improve.":'Removed.'); }
+function speakMsg(btn) {
+  const text = btn.closest('.msg-ai-inner').querySelector('.msg-txt').textContent;
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); toast('Stopped.'); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = parseFloat(localStorage.getItem('p_srate')||'1');
+  speechSynthesis.speak(u); toast('Reading aloud…');
+}
+function chipFill(t) { const i=document.getElementById('chat-input'); i.value=t+' '; i.focus(); }
+function shortcut(t) { const i=document.getElementById('chat-input'); i.value=t+' '; i.focus(); switchView('chat'); }
+function newChat() {
+  if (!confirm('Start a new chat? Current chat will be saved.')) return;
+  saveHistory();
+  const msgs = document.getElementById('messages'); const typing = document.getElementById('typing');
+  while (msgs.firstChild && msgs.firstChild !== typing) msgs.removeChild(msgs.firstChild);
+  const card = document.createElement('div'); card.className='msg-ai';
+  card.innerHTML=`<div class="msg-ai-inner"><div class="ai-top"><div class="ai-tag"><div class="ai-tag-dot"></div>AI Pen</div></div><div class="msg-txt">New chat started! What would you like to create?</div></div>`;
+  msgs.insertBefore(card, typing);
+  toast('New conversation!');
+}
 
-  function disconnectBluetooth() {
-    if (btDevice && btDevice.gatt.connected) { btDevice.gatt.disconnect(); }
-    setPenStatus('disconnected');
-    setBattery(null);
-    document.getElementById('pen-name').textContent = 'AI Pen';
-    btDevice = null; btServer = null;
-    showToast('Pen disconnected');
-  }
+// ── VOICE ──
+let recog = null, voiceOn = false;
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { toast('Voice not supported'); return; }
+  if (voiceOn) { recog.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recog = new SR(); recog.lang = localStorage.getItem('p_vlang')||'en-US';
+  recog.continuous = true; recog.interimResults = true;
+  recog.onstart = () => { voiceOn=true; document.getElementById('mic-btn').classList.add('on'); document.getElementById('voice-status').textContent='Listening…'; };
+  recog.onresult = e => {
+    let fin='',interim='';
+    for (let i=e.resultIndex;i<e.results.length;i++) e.results[i].isFinal ? fin+=e.results[i][0].transcript : interim+=e.results[i][0].transcript;
+    if (fin) { const c=document.getElementById('chat-input'); c.value+=fin+' '; grow(c); }
+    document.getElementById('voice-status').textContent = interim || 'Recognized ✓';
+  };
+  recog.onerror = () => { toast('Voice error'); stopVoice(); };
+  recog.onend = stopVoice;
+  recog.start();
+}
+function stopVoice() { voiceOn=false; document.getElementById('mic-btn').classList.remove('on'); document.getElementById('voice-status').textContent='Voice idle'; }
 
-  function onPenDisconnected() {
-    setPenStatus('disconnected');
-    setBattery(null);
-    document.getElementById('pen-name').textContent = 'AI Pen';
-    btDevice = null; btServer = null;
-    showToast('Pen disconnected');
-  }
+// ── TEMPLATES ──
+let tplOpen = false;
+function toggleTpl() { tplOpen=!tplOpen; document.getElementById('tpl-popup').classList.toggle('open',tplOpen); }
+function useTpl(t) { document.getElementById('chat-input').value=t+' '; document.getElementById('chat-input').focus(); document.getElementById('tpl-popup').classList.remove('open'); tplOpen=false; }
+document.addEventListener('click', e => { if(tplOpen && !e.target.closest('#tpl-popup') && !e.target.closest('.i-btn')) { document.getElementById('tpl-popup').classList.remove('open'); tplOpen=false; } });
 
-  function setPenStatus(state) {
-    const el  = document.getElementById('pen-status-text');
-    const btn = document.getElementById('bt-btn');
-    const lbl = document.getElementById('bt-btn-label');
-    el.className = 'pen-status-text ' + state;
-    if (state === 'connected') {
-      el.textContent = '● Connected';
-      btn.classList.add('connected'); btn.disabled = false;
-      lbl.textContent = 'Disconnect';
-    } else if (state === 'connecting') {
-      el.textContent = '● Connecting…';
-      btn.classList.remove('connected'); btn.disabled = true;
-      lbl.textContent = 'Connecting…';
-    } else {
-      el.textContent = '● Not Connected';
-      btn.classList.remove('connected'); btn.disabled = false;
-      lbl.textContent = 'Connect via Bluetooth';
-    }
-  }
+// ── AI TOOLS ──
+function injectTool(type) {
+  const p = {summarize:'Summarize the following text:\n\n',grammar:'Fix grammar and improve:\n\n',translate:'Translate to Spanish:\n\n',expand:'Expand and add detail to:\n\n',tone:'Rewrite in a professional tone:\n\n'};
+  document.getElementById('chat-input').value = (p[type]||'') + (document.getElementById('write-area').textContent.trim()||'');
+  document.getElementById('chat-input').focus(); switchView('chat');
+}
 
-  function setBattery(pct) {
-    const row  = document.getElementById('battery-row');
-    const fill = document.getElementById('battery-fill');
-    const txt  = document.getElementById('battery-pct');
-    if (pct === null) { row.style.display = 'none'; return; }
-    row.style.display = 'flex';
-    fill.style.width  = pct + '%';
-    fill.style.background = pct > 30 ? 'var(--green)' : pct > 15 ? 'var(--yellow)' : 'var(--red)';
-    txt.textContent = pct + '%';
-  }
+// ── VIEWS ──
+function switchView(v) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.s-item[id^=nav]').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`screen-${v}`).classList.add('active');
+  document.getElementById(`nav-${v}`)?.classList.add('active');
+  if (v==='notes') renderNotes();
+  if (v==='sessions') renderSessions();
+}
 
-  // ── VIEW / CHAT ──
-  function switchView(v) {
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    document.getElementById(`screen-${v}`).classList.add('active');
-    document.getElementById(`nav-${v}`)?.classList.add('active');
-    if (v==='notes') renderNotesGrid();
-    if (v==='sessions') renderSessionsGrid();
-  }
-  let msgCount=0, totalWords=0;
-  function autoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
-  function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-  function sendMessage(){
-    const inp=document.getElementById('chat-input'); const text=inp.value.trim(); if(!text)return;
-    addUserMsg(text); inp.value=''; inp.style.height='auto';
-    totalWords+=text.split(/\s+/).length; updateStats(); simulateAI(text);
-  }
-  function addUserMsg(text){
-    const msgs=document.getElementById('messages'); const typing=document.getElementById('typing');
-    const b=document.createElement('div'); b.className='msg-user'; b.textContent=text;
-    const m=document.createElement('div'); m.className='msg-user-meta'; m.textContent='✓✓ '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    msgs.insertBefore(m,typing); msgs.insertBefore(b,m); msgs.scrollTop=msgs.scrollHeight; saveChatHistory();
-  }
-  function simulateAI(txt){
-    const t=document.getElementById('typing'); t.style.display='block'; document.getElementById('messages').scrollTop=9999;
-    setTimeout(()=>{t.style.display='none';addAIMsg(generateReply(txt));msgCount++;updateStats();saveChatHistory();},900+Math.min(txt.length*8,1800));
-  }
-  function generateReply(text){
-    const t=text.toLowerCase();
-    if(t.includes('hello')||t.includes('hi'))return"Hello! I'm your AI Pen assistant — ready to help with writing, editing, and more. What can I do for you?";
-    if(t.includes('summarize')||t.includes('summary'))return"I can summarize that! Please share the text you'd like condensed.";
-    if(t.includes('translate'))return"I can help with translation! Share the text and the target language.";
-    if(t.includes('grammar')||t.includes('fix'))return"I'll review and fix the grammar. Share the text you'd like improved.";
-    if(t.includes('write')||t.includes('draft'))return"I'd be happy to help you write! Share the topic, tone, and length you're looking for.";
-    return`Got it! I can write, edit, translate, summarize, brainstorm, fix grammar, and more. What would you like me to do with: "${text.substring(0,50)}${text.length>50?'…':''}"?`;
-  }
-  function addAIMsg(text){
-    const msgs=document.getElementById('messages');
-    const card=document.createElement('div'); card.className='msg-ai';
-    card.innerHTML=`<div class="ai-header"><div class="ai-label"><span>✦</span>AI Pen</div><div class="ai-actions"><button class="ai-action-btn" onclick="copyMsg(this)">📋</button><button class="ai-action-btn" onclick="likeMsg(this)">👍</button><button class="ai-action-btn" onclick="dislikeMsg(this)">👎</button><button class="ai-action-btn" onclick="speakMsg(this)">🔊</button></div></div><div class="msg-text">${escHtml(text)}</div>`;
-    msgs.insertBefore(card,document.getElementById('typing')); msgs.scrollTop=msgs.scrollHeight;
-  }
-  function copyMsg(btn){navigator.clipboard.writeText(btn.closest('.msg-ai').querySelector('.msg-text').textContent).then(()=>showToast('Copied!'));}
-  function likeMsg(btn){btn.classList.toggle('liked');btn.closest('.ai-actions').querySelector(':nth-child(3)').classList.remove('disliked');showToast(btn.classList.contains('liked')?'Liked!':'Like removed.');}
-  function dislikeMsg(btn){btn.classList.toggle('disliked');btn.closest('.ai-actions').querySelector(':nth-child(2)').classList.remove('liked');showToast(btn.classList.contains('disliked')?"Got it — we'll improve.":'Dislike removed.');}
-  function speakMsg(btn){
-    const text=btn.closest('.msg-ai').querySelector('.msg-text').textContent;
-    if(window.speechSynthesis.speaking){window.speechSynthesis.cancel();showToast('Stopped.');return;}
-    const u=new SpeechSynthesisUtterance(text); u.rate=parseFloat(localStorage.getItem('pref_speechRate')||'1'); window.speechSynthesis.speak(u); showToast('Reading aloud…');
-  }
-  function chipAction(text){document.getElementById('chat-input').value=text+' ';document.getElementById('chat-input').focus();}
-  function newConversation(){
-    if(!confirm('Start a new conversation? Current chat will be saved.'))return;
-    saveChatHistory(); const msgs=document.getElementById('messages'); const typing=document.getElementById('typing');
-    while(msgs.firstChild&&msgs.firstChild!==typing)msgs.removeChild(msgs.firstChild);
-    addAIMsg('New conversation started! What would you like to create?'); showToast('New conversation started!');
-  }
-  function loadShortcut(p){document.getElementById('chat-input').value=p+' ';document.getElementById('chat-input').focus();switchView('chat');}
-  function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+// ── WRITING ──
+let _as;
+function onWrite() {
+  if (localStorage.getItem('p_autosave') !== 'true') return;
+  clearTimeout(_as);
+  _as = setTimeout(()=>{ const t=document.getElementById('write-area').textContent.trim(); if(t) saveNote('Auto-save',t); }, 3000);
+}
+function copyWrite() { const t=document.getElementById('write-area').textContent; if(!t.trim()){toast('Nothing to copy');return;} navigator.clipboard.writeText(t).then(()=>toast('Copied!')); }
+function saveWrite() { const t=document.getElementById('write-area').textContent.trim(); if(!t){toast('Nothing to save');return;} saveNote('Note '+new Date().toLocaleDateString(),t); toast('Saved!'); loadRpNotes(); }
 
-  // ── VOICE ──
-  let recognition=null, voiceActive=false;
-  function toggleVoice(){
-    if(!('webkitSpeechRecognition'in window||'SpeechRecognition'in window)){showToast('Voice not supported in this browser');return;}
-    if(voiceActive){recognition.stop();return;}
-    const SRec=window.SpeechRecognition||window.webkitSpeechRecognition;
-    recognition=new SRec(); recognition.lang=localStorage.getItem('pref_voiceLang')||'en-US';
-    recognition.continuous=true; recognition.interimResults=true;
-    recognition.onstart=()=>{voiceActive=true;document.getElementById('mic-btn').classList.add('active');document.getElementById('recognized-text').textContent='Listening…';};
-    recognition.onresult=e=>{
-      let fin='',int='';
-      for(let i=e.resultIndex;i<e.results.length;i++) e.results[i].isFinal?fin+=e.results[i][0].transcript:int+=e.results[i][0].transcript;
-      if(fin){document.getElementById('chat-input').value+=fin+' ';autoGrow(document.getElementById('chat-input'));}
-      document.getElementById('recognized-text').textContent=int||'Voice recognized ✓';
-    };
-    recognition.onerror=()=>{showToast('Voice error — try again');stopVoice();};
-    recognition.onend=stopVoice; recognition.start();
-  }
-  function stopVoice(){voiceActive=false;document.getElementById('mic-btn').classList.remove('active');document.getElementById('recognized-text').textContent='Voice recognition idle';}
+// ── NOTES ──
+function getNotes() { try{return JSON.parse(localStorage.getItem('ap_notes')||'[]');}catch{return[];} }
+function saveNote(title, content) { const n=getNotes(); n.unshift({id:Date.now(),title,content,date:new Date().toLocaleDateString()}); localStorage.setItem('ap_notes',JSON.stringify(n.slice(0,100))); updateStats(); }
+function createNote() { const t=prompt('Note title:'); if(!t)return; const c=prompt('Content:'); if(!c)return; saveNote(t,c); renderNotes(); loadRpNotes(); toast('Note created!'); }
+function clearNotes() { if(!confirm('Delete all notes?'))return; localStorage.removeItem('ap_notes'); loadRpNotes(); renderNotes(); updateStats(); toast('Notes cleared.'); }
+function loadRpNotes() {
+  const notes = getNotes().slice(0,4);
+  const el = document.getElementById('rp-notes');
+  el.innerHTML = notes.length ? notes.map(n=>`<div class="rp-note" onclick="openNote(${n.id})"><div class="rp-note-title">${esc(n.title)}</div><div class="rp-note-prev">${esc(n.content.substring(0,55))}</div><div class="rp-note-date">${n.date}</div></div>`).join('') : '<div class="no-notes-sm">No notes yet.</div>';
+}
+function openNote(id) { const n=getNotes().find(x=>x.id===id); if(n){document.getElementById('write-area').textContent=n.content; toast('Note loaded!');} }
+function renderNotes() {
+  const notes = getNotes(); const grid = document.getElementById('notes-grid');
+  grid.innerHTML = notes.length ? notes.map(n=>`<div class="n-card" onclick="openNoteSwitch(${n.id})"><div class="n-card-title">${esc(n.title)}</div><div class="n-card-body">${esc(n.content)}</div><div class="n-card-date">${n.date}</div></div>`).join('') : '<div class="empty-state">No notes yet. Save something from the writing panel.</div>';
+}
+function openNoteSwitch(id) { openNote(id); switchView('chat'); }
 
-  // ── TEMPLATES ──
-  let tplOpen=false;
-  function openTemplates(){tplOpen=!tplOpen;document.getElementById('templates-popup').classList.toggle('open',tplOpen);}
-  function useTemplate(text){document.getElementById('chat-input').value=text+' ';document.getElementById('chat-input').focus();document.getElementById('templates-popup').classList.remove('open');tplOpen=false;}
-  document.addEventListener('click',e=>{if(tplOpen&&!e.target.closest('#templates-popup')&&!e.target.closest('.input-btn')){document.getElementById('templates-popup').classList.remove('open');tplOpen=false;}});
+// ── SESSIONS ──
+function saveHistory() {
+  if (localStorage.getItem('p_hist')==='false') return;
+  const umsgs = document.getElementById('messages').querySelectorAll('.msg-u'); if(!umsgs.length) return;
+  const sessions = JSON.parse(localStorage.getItem('ap_sessions')||'[]');
+  const preview = umsgs[0].textContent.substring(0,60);
+  const ex = sessions.find(s=>s.id===window._sid);
+  if (ex) { ex.preview=preview; ex.count=umsgs.length; }
+  else { window._sid=Date.now(); sessions.unshift({id:window._sid,preview,count:umsgs.length,date:new Date().toLocaleDateString()}); }
+  localStorage.setItem('ap_sessions', JSON.stringify(sessions.slice(0,50)));
+}
+function renderSessions() {
+  const sessions = JSON.parse(localStorage.getItem('ap_sessions')||'[]');
+  const grid = document.getElementById('sessions-grid');
+  grid.innerHTML = sessions.length ? sessions.map(s=>`<div class="n-card"><div class="n-card-title">${esc(s.preview)}…</div><div class="n-card-body">${s.count} message(s)</div><div class="n-card-date">${s.date}</div></div>`).join('') : '<div class="empty-state">No sessions yet.</div>';
+}
+function clearSessions() { if(!confirm('Clear all sessions?'))return; localStorage.removeItem('ap_sessions'); renderSessions(); toast('Cleared.'); }
 
-  // ── AI TOOLS ──
-  function injectTool(type){
-    const p={summarize:'Summarize the following text:\n\n',grammar:'Fix the grammar and improve:\n\n',translate:'Translate to Spanish:\n\n',expand:'Expand and add more detail to:\n\n',tone:'Rewrite in a more professional tone:\n\n'};
-    document.getElementById('chat-input').value=p[type]+(document.getElementById('writing-area').textContent.trim()||'');
-    document.getElementById('chat-input').focus(); switchView('chat');
-  }
+// ── STATS ──
+function updateStats() {
+  document.getElementById('s-words').textContent = wordCount;
+  document.getElementById('s-msgs').textContent = msgCount;
+  document.getElementById('s-notes').textContent = getNotes().length;
+  const pct = Math.min(msgCount, 100);
+  document.getElementById('usage-fill').style.width = pct + '%';
+  document.getElementById('usage-txt').textContent = msgCount + ' / 100';
+}
+function loadStats() { document.getElementById('s-notes').textContent = getNotes().length; loadRpNotes(); }
 
-  // ── WRITING ──
-  let _autosaveTimer;
-  function onWritingInput(){
-    if(localStorage.getItem('pref_autosave')!=='true')return;
-    clearTimeout(_autosaveTimer);
-    _autosaveTimer=setTimeout(()=>{const t=document.getElementById('writing-area').textContent.trim();if(t)saveNote('Auto-save',t);},3000);
-  }
-  function copyWriting(){const t=document.getElementById('writing-area').textContent;if(!t.trim()){showToast('Nothing to copy');return;}navigator.clipboard.writeText(t).then(()=>showToast('Copied!'));}
-  function saveWritingAsNote(){const t=document.getElementById('writing-area').textContent.trim();if(!t){showToast('Nothing to save');return;}saveNote('Note '+new Date().toLocaleDateString(),t);showToast('Saved as note!');loadRecentNotes();}
+// ── SETTINGS ──
+function openSettings() { document.getElementById('overlay').classList.add('open'); loadToggles(); }
+function closeSettings() { document.getElementById('overlay').classList.remove('open'); }
+function overlayClick(e) { if(e.target===document.getElementById('overlay'))closeSettings(); }
+function sPage(page, btn) {
+  document.querySelectorAll('.s-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.s-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`sp-${page}`)?.classList.add('active'); btn.classList.add('active');
+}
+function loadToggles() {
+  const keys = ['rp','smart','grammar','memory','autosave','nresp','nstreak','hist'];
+  const defaultOn = ['rp','smart','grammar','nresp','nstreak','hist'];
+  keys.forEach(k => {
+    const el = document.getElementById(`tog-${k}`); if(!el) return;
+    const v = localStorage.getItem(`p_${k}`);
+    el.classList.toggle('on', v===null ? defaultOn.includes(k) : v==='true');
+  });
+  const vl=document.getElementById('vlang'); if(vl&&localStorage.getItem('p_vlang'))vl.value=localStorage.getItem('p_vlang');
+  const sr=document.getElementById('srate'); if(sr&&localStorage.getItem('p_srate'))sr.value=localStorage.getItem('p_srate');
+}
+function togSet(k) {
+  const el = document.getElementById(`tog-${k}`); el.classList.toggle('on');
+  localStorage.setItem(`p_${k}`, el.classList.contains('on'));
+  if (k==='rp') document.querySelector('.rp').style.display = el.classList.contains('on') ? '' : 'none';
+}
+function sp(k,v) { localStorage.setItem(`p_${k}`,v); }
 
-  // ── NOTES ──
-  function getNotes(){try{return JSON.parse(localStorage.getItem('aipen_notes')||'[]');}catch{return[];}}
-  function saveNote(title,content){const n=getNotes();n.unshift({id:Date.now(),title,content,date:new Date().toLocaleDateString()});localStorage.setItem('aipen_notes',JSON.stringify(n.slice(0,100)));updateStats();}
-  function createNote(){const t=prompt('Note title:');if(!t)return;const c=prompt('Content:');if(!c)return;saveNote(t,c);renderNotesGrid();loadRecentNotes();showToast('Note created!');}
-  function clearNotes(){if(!confirm('Delete all notes?'))return;localStorage.removeItem('aipen_notes');loadRecentNotes();renderNotesGrid();updateStats();showToast('All notes cleared.');}
-  function loadRecentNotes(){
-    const notes=getNotes().slice(0,4); const el=document.getElementById('recent-notes-list');
-    el.innerHTML=notes.length?notes.map(n=>`<div class="note-item" onclick="openNote(${n.id})"><div class="note-title">${escHtml(n.title)}</div><div class="note-preview">${escHtml(n.content.substring(0,60))}</div><div class="note-date">${n.date}</div></div>`).join(''):'<div class="no-notes">No notes yet. Save something!</div>';
-  }
-  function openNote(id){const n=getNotes().find(n=>n.id===id);if(n){document.getElementById('writing-area').textContent=n.content;showToast('Note loaded!');}}
-  function renderNotesGrid(){
-    const notes=getNotes(); const grid=document.getElementById('notes-grid');
-    grid.innerHTML=notes.length?notes.map(n=>`<div class="note-card" onclick="openNoteSwitch(${n.id})"><div class="note-card-title">${escHtml(n.title)}</div><div class="note-card-body">${escHtml(n.content)}</div><div class="note-card-date">${n.date}</div></div>`).join(''):'<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No notes yet.</div>';
-  }
-  function openNoteSwitch(id){openNote(id);switchView('chat');}
+// ── APPEARANCE ──
+function applyTheme(t) {
+  const themes = {
+    dark:{bg:'#07090f',s1:'#0d1117',s2:'#161b27',border:'#252f42'},
+    darker:{bg:'#030508',s1:'#07090f',s2:'#0d1117',border:'#1a2232'},
+    midnight:{bg:'#050810',s1:'#080d1a',s2:'#0e1525',border:'#1e2d47'},
+    forest:{bg:'#050908',s1:'#090f0d',s2:'#111a16',border:'#1a2e24'}
+  };
+  const c = themes[t]||themes.dark; const r = document.documentElement.style;
+  r.setProperty('--bg',c.bg); r.setProperty('--s1',c.s1); r.setProperty('--s2',c.s2); r.setProperty('--border',c.border);
+  sp('theme',t); toast('Theme applied!');
+}
+function setAccent(el) {
+  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('sel')); el.classList.add('sel');
+  document.documentElement.style.setProperty('--accent', el.dataset.c);
+  sp('accent',el.dataset.c); toast('Accent updated!');
+}
+function applyFS(size) { document.querySelectorAll('.msg-txt,.msg-u').forEach(el=>el.style.fontSize=size+'px'); sp('fs',size); toast('Font updated!'); }
 
-  // ── SESSIONS ──
-  function saveChatHistory(){
-    if(localStorage.getItem('pref_save-history')==='false')return;
-    const userMsgs=document.getElementById('messages').querySelectorAll('.msg-user');
-    if(!userMsgs.length)return;
-    const sessions=JSON.parse(localStorage.getItem('aipen_sessions')||'[]');
-    const preview=userMsgs[0].textContent.substring(0,60);
-    const ex=sessions.find(s=>s.id===window._sid);
-    if(ex){ex.preview=preview;ex.count=userMsgs.length;}
-    else{window._sid=Date.now();sessions.unshift({id:window._sid,preview,count:userMsgs.length,date:new Date().toLocaleDateString()});}
-    localStorage.setItem('aipen_sessions',JSON.stringify(sessions.slice(0,50)));
-  }
-  function renderSessionsGrid(){
-    const sessions=JSON.parse(localStorage.getItem('aipen_sessions')||'[]'); const grid=document.getElementById('sessions-grid');
-    grid.innerHTML=sessions.length?sessions.map(s=>`<div class="note-card"><div class="note-card-title">${escHtml(s.preview)}…</div><div class="note-card-body">${s.count} message(s)</div><div class="note-card-date">${s.date}</div></div>`).join(''):'<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No sessions yet.</div>';
-  }
-  function clearSessions(){if(!confirm('Clear all sessions?'))return;localStorage.removeItem('aipen_sessions');renderSessionsGrid();showToast('Sessions cleared.');}
+// ── ACCOUNT ──
+function saveName() {
+  const name = document.getElementById('disp-name').value.trim();
+  if (name.length < 2) { toast('Name too short'); return; }
+  auth.currentUser?.updateProfile({displayName:name}).then(()=>{ document.getElementById('u-name').textContent=name; document.getElementById('u-av').textContent=name[0].toUpperCase(); toast('Name saved!'); }).catch(()=>toast('Could not update'));
+}
+function resetPwd() { const e=auth.currentUser?.email; if(!e){toast('No email on account');return;} auth.sendPasswordResetEmail(e).then(()=>toast('Reset email sent!')).catch(()=>toast('Failed')); }
+function signOut() { if(!confirm('Sign out?'))return; auth.signOut().then(()=>location.href='/login.html'); }
+function exportData() {
+  const d = {notes:getNotes(),sessions:JSON.parse(localStorage.getItem('ap_sessions')||'[]')};
+  const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'})); a.download='aipen-data.json'; a.click(); toast('Exported!');
+}
+function clearHistory() { if(!confirm('Clear history?'))return; localStorage.removeItem('ap_sessions'); toast('Cleared.'); }
 
-  // ── STATS ──
-  function updateStats(){
-    document.getElementById('stat-words').textContent=totalWords;
-    document.getElementById('stat-msgs').textContent=msgCount;
-    document.getElementById('stat-notes').textContent=getNotes().length;
-    const pct=Math.min(msgCount,100);
-    document.getElementById('usage-fill').style.width=pct+'%';
-    document.getElementById('usage-count').textContent=msgCount+' / 100';
-  }
-  function loadStats(){document.getElementById('stat-notes').textContent=getNotes().length;loadRecentNotes();}
+// ── TOAST ──
+let _tt;
+function toast(msg) { const el=document.getElementById('toast-el'); el.textContent=msg; el.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2600); }
 
-  // ── SETTINGS ──
-  function openSettings(){document.getElementById('settings-overlay').classList.add('open');loadSettingsValues();}
-  function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');}
-  function closeSettingsIfBg(e){if(e.target===document.getElementById('settings-overlay'))closeSettings();}
-  function showSettingsPage(page,btn){
-    document.querySelectorAll('.settings-page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.remove('active'));
-    document.getElementById(`settings-${page}`)?.classList.add('active'); btn.classList.add('active');
-  }
-  function loadSettingsValues(){
-    ['rightpanel','smart','grammar','memory','autosave','notif-response','notif-streak','save-history'].forEach(k=>{
-      const el=document.getElementById(`toggle-${k}`); if(!el)return;
-      const stored=localStorage.getItem(`pref_${k}`);
-      const defaultOn=['rightpanel','smart','grammar','notif-response','notif-streak','save-history'].includes(k);
-      el.classList.toggle('on',stored===null?defaultOn:stored==='true');
-    });
-    const vl=document.getElementById('voice-lang'); if(vl&&localStorage.getItem('pref_voiceLang'))vl.value=localStorage.getItem('pref_voiceLang');
-    const sr=document.getElementById('speech-rate'); if(sr&&localStorage.getItem('pref_speechRate'))sr.value=localStorage.getItem('pref_speechRate');
-  }
-  function toggleSetting(key){
-    const el=document.getElementById(`toggle-${key}`); el.classList.toggle('on');
-    localStorage.setItem(`pref_${key}`,el.classList.contains('on'));
-    if(key==='rightpanel')document.querySelector('.right-panel').style.display=el.classList.contains('on')?'':'none';
-  }
-  function savePref(k,v){localStorage.setItem(`pref_${k}`,v);}
+// ── PREFS ──
+function applyPrefs() {
+  const acc = localStorage.getItem('p_accent'); if(acc){ document.documentElement.style.setProperty('--accent',acc); document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('sel',s.dataset.c===acc)); }
+  const t = localStorage.getItem('p_theme'); if(t)applyTheme(t);
+  if (localStorage.getItem('p_rp')==='false') document.querySelector('.rp').style.display='none';
+  const fs = localStorage.getItem('p_fs'); if(fs) document.querySelectorAll('.msg-txt,.msg-u').forEach(el=>el.style.fontSize=fs+'px');
+}
 
-  // ── APPEARANCE ──
-  function applyTheme(theme){
-    const themes={dark:{bg:'#080d1a',sidebar:'#0e1525',card:'#131c30',border:'#1e2d47'},darker:{bg:'#030610',sidebar:'#080d1a',card:'#0e1525',border:'#172030'},midnight:{bg:'#05080f',sidebar:'#0a1020',card:'#0f1830',border:'#1a2840'},forest:{bg:'#060d0a',sidebar:'#0b1510',card:'#10201a',border:'#1a3025'}};
-    const t=themes[theme]||themes.dark; const r=document.documentElement.style;
-    r.setProperty('--bg',t.bg);r.setProperty('--sidebar',t.sidebar);r.setProperty('--panel',t.sidebar);r.setProperty('--card',t.card);r.setProperty('--border',t.border);
-    savePref('theme',theme); showToast('Theme applied!');
-  }
-  function setAccent(el){
-    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected')); el.classList.add('selected');
-    document.documentElement.style.setProperty('--accent',el.dataset.color);
-    document.documentElement.style.setProperty('--accent2',el.dataset.color);
-    savePref('accent',el.dataset.color); showToast('Accent updated!');
-  }
-  function applyFontSize(size){document.querySelectorAll('.msg-text,.msg-user').forEach(el=>el.style.fontSize=size+'px');savePref('fontSize',size);showToast('Font size updated!');}
-
-  // ── ACCOUNT ──
-  function saveDisplayName(){
-    const name=document.getElementById('display-name-input').value.trim();
-    if(name.length<2){showToast('Name must be at least 2 characters');return;}
-    auth.currentUser?.updateProfile({displayName:name}).then(()=>{document.getElementById('sidebar-name').textContent=name;document.getElementById('sidebar-avatar').textContent=name[0].toUpperCase();showToast('Name saved!');}).catch(()=>showToast('Could not update name'));
-  }
-  function sendPasswordReset(){const e=auth.currentUser?.email;if(!e){showToast('No email on this account');return;}auth.sendPasswordResetEmail(e).then(()=>showToast('Reset email sent!')).catch(()=>showToast('Could not send reset email'));}
-  function signOut(){if(!confirm('Sign out?'))return;auth.signOut().then(()=>window.location.href='/login.html');}
-  function exportData(){
-    const data={notes:getNotes(),sessions:JSON.parse(localStorage.getItem('aipen_sessions')||'[]')};
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='aipen-data.json';a.click();showToast('Data exported!');
-  }
-  function clearHistory(){if(!confirm('Clear all chat history?'))return;localStorage.removeItem('aipen_sessions');showToast('Chat history cleared.');}
-
-  // ── TOAST ──
-  let _tt;
-  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);}
-
-  // ── SAVED PREFS ──
-  function applySavedPrefs(){
-    const accent=localStorage.getItem('pref_accent');
-    if(accent){document.documentElement.style.setProperty('--accent',accent);document.documentElement.style.setProperty('--accent2',accent);document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('selected',s.dataset.color===accent));}
-    const theme=localStorage.getItem('pref_theme');if(theme)applyTheme(theme);
-    if(localStorage.getItem('pref_rightpanel')==='false')document.querySelector('.right-panel').style.display='none';
-    const fs=localStorage.getItem('pref_fontSize');if(fs)document.querySelectorAll('.msg-text,.msg-user').forEach(el=>el.style.fontSize=fs+'px');
-  }
+// ── UTIL ──
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 </script>
 </body>
 </html>
