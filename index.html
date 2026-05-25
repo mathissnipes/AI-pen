@@ -104,7 +104,7 @@
     .usage-bar-wrap { padding: 8px 0; }
     .usage-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
     .usage-bar { height: 4px; background: var(--border); border-radius: 2px; }
-    .usage-fill { height: 100%; width: 68%; background: var(--accent); border-radius: 2px; }
+    .usage-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
 
     .user-row {
       display: flex; align-items: center; gap: 10px;
@@ -120,7 +120,6 @@
     .user-info { flex: 1; overflow: hidden; }
     .user-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-email { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-menu-btn { font-size: 12px; color: var(--muted); }
 
     /* ── MAIN CHAT ── */
     .main {
@@ -145,20 +144,22 @@
       background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25);
       border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--green);
     }
+    /* Optimised pulse: opacity-only, no box-shadow, uses transform for GPU compositing */
     .pulse-dot {
       width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-      animation: pulse 2s infinite;
+      will-change: opacity;
+      animation: pulse 2.5s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-      50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(16,185,129,0); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
     }
     .icon-btn {
       width: 34px; height: 34px; border-radius: 8px;
       border: 1px solid var(--border); background: var(--card);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 14px; color: var(--muted);
-      transition: all 0.15s;
+      transition: color 0.15s, background 0.15s;
     }
     .icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.07); }
 
@@ -171,7 +172,6 @@
     .messages::-webkit-scrollbar-track { background: transparent; }
     .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    /* user bubble */
     .msg-user {
       align-self: flex-end;
       background: var(--accent);
@@ -188,7 +188,6 @@
       margin-top: -10px;
     }
 
-    /* AI card */
     .msg-ai {
       align-self: flex-start;
       background: var(--card);
@@ -212,14 +211,13 @@
       border: 1px solid var(--border); background: none;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 11px; color: var(--muted);
-      transition: all 0.15s;
+      transition: color 0.15s, background 0.15s;
     }
     .ai-action-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
     .ai-action-btn.liked { color: #10b981; border-color: #10b981; }
     .ai-action-btn.disliked { color: #ef4444; border-color: #ef4444; }
     .msg-text { font-size: 14px; line-height: 1.65; color: var(--text); }
 
-    /* typing indicator */
     .typing-indicator {
       align-self: flex-start;
       background: var(--card); border: 1px solid var(--border);
@@ -228,19 +226,20 @@
       display: none;
     }
     .typing-dots { display: flex; gap: 4px; align-items: center; }
+    /* Optimised: transform-only bounce (GPU composited, no layout/paint) */
     .typing-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: var(--muted);
-      animation: bounce 1.4s infinite;
+      will-change: transform;
+      animation: bounce 1.4s ease-in-out infinite;
     }
     .typing-dot:nth-child(2) { animation-delay: 0.2s; }
     .typing-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce {
-      0%,60%,100% { transform: translateY(0); }
+      0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-6px); }
     }
 
-    /* quick action chips */
     .chips-bar {
       padding: 10px 24px 0;
       display: flex; gap: 8px; flex-wrap: wrap;
@@ -250,11 +249,10 @@
       padding: 6px 14px; border-radius: 20px;
       border: 1px solid var(--border); background: var(--card);
       font-size: 12px; color: var(--muted);
-      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; white-space: nowrap;
     }
     .chip:hover { border-color: var(--accent); color: #a78bfa; background: rgba(124,58,237,0.1); }
 
-    /* input area */
     .input-area {
       padding: 14px 24px 20px;
       flex-shrink: 0;
@@ -274,7 +272,7 @@
       border: 1px solid var(--border); background: none;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 13px; color: var(--muted);
-      transition: all 0.15s; flex-shrink: 0;
+      transition: color 0.15s, background 0.15s; flex-shrink: 0;
     }
     .input-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
     .input-btn.active { color: #ef4444; border-color: #ef4444; }
@@ -295,24 +293,25 @@
     .send-btn:hover { background: var(--accent2); }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* templates popup */
+    /* templates popup — positioned relative to input-area */
+    .input-area { position: relative; }
     .templates-popup {
-      position: absolute; bottom: 80px; left: 50%;
-      transform: translateX(-50%) translateY(10px);
+      position: absolute; bottom: calc(100% + 6px); left: 24px;
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 12px;
       width: 340px; z-index: 100;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
       opacity: 0; pointer-events: none;
-      transition: all 0.15s;
+      transform: translateY(6px);
+      transition: opacity 0.15s, transform 0.15s;
     }
-    .templates-popup.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .templates-popup.open { opacity: 1; pointer-events: all; transform: translateY(0); }
     .tpl-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
     .tpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .tpl-item {
       padding: 10px; border-radius: 9px;
       border: 1px solid var(--border); background: var(--sidebar);
-      cursor: pointer; transition: all 0.15s;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
     }
     .tpl-item:hover { border-color: var(--accent); background: rgba(124,58,237,0.1); }
     .tpl-item-icon { font-size: 18px; margin-bottom: 4px; }
@@ -343,7 +342,6 @@
       letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px;
     }
 
-    /* pen status */
     .pen-status-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .pen-icon {
       width: 44px; height: 44px; border-radius: 10px;
@@ -355,7 +353,7 @@
     .pen-connected { font-size: 11px; color: var(--green); }
     .battery-bar { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
     .battery-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; }
-    .battery-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+    .battery-fill { height: 100%; background: var(--green); border-radius: 3px; }
     .battery-pct { font-size: 10px; color: var(--muted); }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .stat-card {
@@ -365,7 +363,6 @@
     .stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
     .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-    /* live writing */
     .writing-area {
       min-height: 90px; max-height: 140px; overflow-y: auto;
       background: var(--sidebar); border: 1px solid var(--border);
@@ -384,27 +381,25 @@
       flex: 1; padding: 7px; border-radius: 7px;
       border: 1px solid var(--border); background: var(--sidebar);
       font-size: 11px; font-weight: 600; color: var(--muted);
-      cursor: pointer; transition: all 0.15s;
+      cursor: pointer; transition: color 0.15s, border-color 0.15s;
     }
     .writing-btn:hover { color: var(--text); border-color: var(--accent); }
 
-    /* ai tools */
     .ai-tools-row { display: flex; gap: 8px; }
     .ai-tool-btn {
       flex: 1; padding: 8px 4px; border-radius: 8px;
       border: 1px solid var(--border); background: var(--sidebar);
       display: flex; flex-direction: column; align-items: center; gap: 4px;
-      cursor: pointer; transition: all 0.15s;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
     }
     .ai-tool-btn:hover { border-color: var(--accent); background: rgba(124,58,237,0.1); }
     .ai-tool-btn .t-icon { font-size: 16px; }
     .ai-tool-btn .t-label { font-size: 9px; color: var(--muted); text-align: center; }
 
-    /* recent notes */
     .note-item {
       padding: 9px; border-radius: 8px;
       border: 1px solid var(--border); background: var(--sidebar);
-      margin-bottom: 6px; cursor: pointer; transition: all 0.15s;
+      margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s;
     }
     .note-item:hover { border-color: var(--accent); }
     .note-item:last-child { margin-bottom: 0; }
@@ -413,15 +408,14 @@
     .note-date { font-size: 10px; color: var(--muted); margin-top: 4px; }
     .no-notes { font-size: 12px; color: var(--muted); text-align: center; padding: 10px 0; }
 
-    /* ── OVERLAYS ── */
+    /* ── SETTINGS OVERLAY — no backdrop-filter (GPU killer) ── */
     .overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.72);
       display: none; align-items: center; justify-content: center;
-      z-index: 200; backdrop-filter: blur(4px);
+      z-index: 200;
     }
     .overlay.open { display: flex; }
 
-    /* ── SETTINGS MODAL ── */
     .settings-modal {
       background: var(--sidebar);
       border: 1px solid var(--border);
@@ -432,7 +426,7 @@
       box-shadow: 0 24px 64px rgba(0,0,0,0.7);
     }
     .settings-nav {
-      width: 200px; min-width: 200px;
+      width: 190px; min-width: 190px;
       background: var(--bg);
       border-right: 1px solid var(--border);
       padding: 20px 12px;
@@ -440,20 +434,18 @@
     }
     .settings-title {
       font-size: 14px; font-weight: 700; color: var(--text);
-      padding: 4px 10px 14px; letter-spacing: 0.01em;
+      padding: 4px 10px 14px;
     }
     .settings-nav-item {
       display: flex; align-items: center; gap: 9px;
       padding: 8px 10px; border-radius: 8px;
       font-size: 13px; color: var(--muted); cursor: pointer;
-      transition: all 0.15s; border: none; background: none; width: 100%; text-align: left;
+      transition: color 0.15s, background 0.15s; border: none; background: none; width: 100%; text-align: left;
     }
     .settings-nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
     .settings-nav-item.active { color: #a78bfa; background: rgba(124,58,237,0.15); }
     .settings-nav-item .sni { font-size: 15px; width: 18px; text-align: center; }
-    .settings-content {
-      flex: 1; overflow-y: auto; padding: 24px;
-    }
+    .settings-content { flex: 1; overflow-y: auto; padding: 24px; }
     .settings-content::-webkit-scrollbar { width: 4px; }
     .settings-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .settings-page { display: none; }
@@ -472,7 +464,6 @@
     .settings-row-left { flex: 1; }
     .settings-row-label { font-size: 13px; font-weight: 500; }
     .settings-row-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    /* toggle */
     .toggle {
       width: 40px; height: 22px;
       background: var(--border); border-radius: 11px;
@@ -487,14 +478,12 @@
     }
     .toggle.on { background: var(--accent); }
     .toggle.on::after { transform: translateX(18px); }
-    /* select */
     .settings-select {
       background: var(--sidebar); border: 1px solid var(--border);
       color: var(--text); border-radius: 7px; padding: 6px 10px;
       font-size: 12px; font-family: var(--font); outline: none; cursor: pointer;
     }
     .settings-select:focus { border-color: var(--accent); }
-    /* input */
     .settings-input {
       background: var(--sidebar); border: 1px solid var(--border);
       color: var(--text); border-radius: 7px; padding: 6px 10px;
@@ -502,7 +491,6 @@
     }
     .settings-input:focus { border-color: var(--accent); }
     .settings-input-wrap { width: 100%; }
-    /* color swatches */
     .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
     .swatch {
       width: 28px; height: 28px; border-radius: 50%;
@@ -510,15 +498,13 @@
       transition: border-color 0.15s; flex-shrink: 0;
     }
     .swatch.selected { border-color: #fff; }
-    /* danger btn */
     .btn-danger {
       padding: 8px 16px; border-radius: 8px;
       background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
       color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: all 0.15s;
+      transition: background 0.15s;
     }
     .btn-danger:hover { background: rgba(239,68,68,0.2); }
-    /* accent btn */
     .btn-accent {
       padding: 8px 16px; border-radius: 8px;
       background: var(--accent); border: none;
@@ -530,11 +516,10 @@
       padding: 8px 16px; border-radius: 8px;
       background: none; border: 1px solid var(--border);
       color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: all 0.15s;
+      transition: border-color 0.15s, color 0.15s;
     }
     .btn-outline:hover { border-color: var(--accent); color: #a78bfa; }
 
-    /* notes screen */
     .screen { display: none; }
     .screen.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
     .notes-header {
@@ -550,31 +535,29 @@
     .note-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 14px; cursor: pointer;
-      transition: all 0.15s;
+      transition: border-color 0.15s, transform 0.15s;
     }
     .note-card:hover { border-color: var(--accent); transform: translateY(-1px); }
     .note-card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
     .note-card-body { font-size: 12px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .note-card-date { font-size: 10px; color: var(--muted); margin-top: 10px; }
 
-    /* notification toast */
     .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
       background: var(--card); border: 1px solid var(--border);
       border-radius: 10px; padding: 10px 18px;
       font-size: 13px; color: var(--text);
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      opacity: 0; transition: all 0.25s; z-index: 999;
-      pointer-events: none;
+      opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 999;
+      pointer-events: none; will-change: transform, opacity;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* scrollbar global */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    /* mobile */
     @media (max-width: 900px) {
       .sidebar { display: none; }
       .right-panel { display: none; }
@@ -584,7 +567,7 @@
 <body>
 
 <!-- SIDEBAR -->
-<nav class="sidebar" id="sidebar">
+<nav class="sidebar">
   <div class="logo">
     <div class="logo-icon">✦</div>
     <span class="logo-text">AI Pen</span>
@@ -618,7 +601,7 @@
 
   <hr class="divider" />
   <div class="nav-label">Pen Shortcuts</div>
-  <div class="shortcuts-section" id="shortcuts-section">
+  <div class="shortcuts-section">
     <div class="shortcut-item" onclick="loadShortcut('Write a summary of')"><span class="si">✦</span> Summarize Text</div>
     <div class="shortcut-item" onclick="loadShortcut('Fix the grammar in:')"><span class="si">✦</span> Fix Grammar</div>
     <div class="shortcut-item" onclick="loadShortcut('Translate to Spanish:')"><span class="si">✦</span> Translate</div>
@@ -628,7 +611,7 @@
   <hr class="divider" />
 
   <div class="usage-bar-wrap">
-    <div class="usage-label"><span>Messages used</span><span id="usage-count">68 / 100</span></div>
+    <div class="usage-label"><span>Messages used</span><span id="usage-count">0 / 100</span></div>
     <div class="usage-bar"><div class="usage-fill" id="usage-fill"></div></div>
   </div>
 
@@ -636,14 +619,14 @@
     <div class="user-avatar" id="sidebar-avatar">U</div>
     <div class="user-info">
       <div class="user-name" id="sidebar-name">User</div>
-      <div class="user-email" id="sidebar-email">user@email.com</div>
+      <div class="user-email" id="sidebar-email"></div>
     </div>
-    <span class="user-menu-btn">⚙️</span>
+    <span style="font-size:12px;color:var(--muted)">⚙️</span>
   </div>
 </nav>
 
-<!-- MAIN AREA -->
-<div class="main" id="main-area">
+<!-- MAIN -->
+<div class="main">
 
   <!-- CHAT SCREEN -->
   <div class="screen active" id="screen-chat">
@@ -654,21 +637,20 @@
       </div>
       <div class="header-right">
         <div class="status-badge"><div class="pulse-dot"></div>AI Pen Connected</div>
-        <button class="icon-btn" title="Notifications" onclick="showToast('No new notifications')">🔔</button>
-        <button class="icon-btn" title="Settings" onclick="openSettings()">⚙️</button>
+        <button class="icon-btn" onclick="showToast('No new notifications')">🔔</button>
+        <button class="icon-btn" onclick="openSettings()">⚙️</button>
       </div>
     </div>
 
     <div class="messages" id="messages">
-      <!-- initial AI welcome message -->
-      <div class="msg-ai" id="welcome-msg">
+      <div class="msg-ai">
         <div class="ai-header">
           <div class="ai-label"><span class="ai-label-icon">✦</span>AI Pen</div>
           <div class="ai-actions">
-            <button class="ai-action-btn" title="Copy" onclick="copyMsg(this)">📋</button>
-            <button class="ai-action-btn" title="Like" onclick="likeMsg(this)">👍</button>
-            <button class="ai-action-btn" title="Dislike" onclick="dislikeMsg(this)">👎</button>
-            <button class="ai-action-btn" title="Read aloud" onclick="speakMsg(this)">🔊</button>
+            <button class="ai-action-btn" onclick="copyMsg(this)">📋</button>
+            <button class="ai-action-btn" onclick="likeMsg(this)">👍</button>
+            <button class="ai-action-btn" onclick="dislikeMsg(this)">👎</button>
+            <button class="ai-action-btn" onclick="speakMsg(this)">🔊</button>
           </div>
         </div>
         <div class="msg-text">Hello! I'm your AI Pen assistant. I'm connected and ready to help you write, edit, translate, summarize, and much more. What would you like to create today?</div>
@@ -676,7 +658,7 @@
       <div class="typing-indicator" id="typing"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
     </div>
 
-    <div class="chips-bar" id="chips-bar">
+    <div class="chips-bar">
       <div class="chip" onclick="chipAction('Help me brainstorm ideas')">💡 Brainstorm</div>
       <div class="chip" onclick="chipAction('Fix my grammar')">✏️ Fix Grammar</div>
       <div class="chip" onclick="chipAction('Summarize this text')">📋 Summarize</div>
@@ -685,15 +667,26 @@
     </div>
 
     <div class="input-area">
+      <div class="templates-popup" id="templates-popup">
+        <div class="tpl-title">Templates</div>
+        <div class="tpl-grid">
+          <div class="tpl-item" onclick="useTemplate('Write a professional email about:')"><div class="tpl-item-icon">📧</div><div class="tpl-item-name">Email</div><div class="tpl-item-desc">Professional email draft</div></div>
+          <div class="tpl-item" onclick="useTemplate('Write a blog post about:')"><div class="tpl-item-icon">📰</div><div class="tpl-item-name">Blog Post</div><div class="tpl-item-desc">Full article with sections</div></div>
+          <div class="tpl-item" onclick="useTemplate('Write a short story about:')"><div class="tpl-item-icon">📖</div><div class="tpl-item-name">Story</div><div class="tpl-item-desc">Creative fiction writing</div></div>
+          <div class="tpl-item" onclick="useTemplate('Create a resume for someone who:')"><div class="tpl-item-icon">💼</div><div class="tpl-item-name">Resume</div><div class="tpl-item-desc">Professional CV format</div></div>
+          <div class="tpl-item" onclick="useTemplate('Write meeting notes for:')"><div class="tpl-item-icon">📋</div><div class="tpl-item-name">Meeting Notes</div><div class="tpl-item-desc">Structured meeting summary</div></div>
+          <div class="tpl-item" onclick="useTemplate('Write a social media post about:')"><div class="tpl-item-icon">📱</div><div class="tpl-item-name">Social Post</div><div class="tpl-item-desc">Engaging social content</div></div>
+        </div>
+      </div>
       <div class="input-box">
         <div class="input-left">
-          <button class="input-btn" title="Attach" onclick="showToast('File attach coming soon')">➕</button>
-          <button class="input-btn" title="Language" onclick="showToast('Language mode coming soon')">🌐</button>
-          <button class="input-btn" title="Templates" onclick="openTemplates()">📄</button>
+          <button class="input-btn" onclick="showToast('File attach coming soon')">➕</button>
+          <button class="input-btn" onclick="showToast('Language mode coming soon')">🌐</button>
+          <button class="input-btn" onclick="openTemplates()">📄</button>
         </div>
         <textarea id="chat-input" placeholder="Write or paste text to AI Pen…" rows="1" onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
-        <button class="input-btn" title="Voice input" id="mic-btn" onclick="toggleVoice()">🎤</button>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+        <button class="input-btn" id="mic-btn" onclick="toggleVoice()">🎤</button>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
       </div>
     </div>
   </div>
@@ -726,7 +719,6 @@
 
 <!-- RIGHT PANEL -->
 <aside class="right-panel">
-  <!-- Pen Status -->
   <div class="rp-section">
     <div class="rp-section-title">AI Pen Status</div>
     <div class="pen-status-top">
@@ -737,8 +729,8 @@
       </div>
     </div>
     <div class="battery-bar">
-      <div class="battery-track"><div class="battery-fill" id="battery-fill" style="width:82%"></div></div>
-      <span class="battery-pct" id="battery-pct">82%</span>
+      <div class="battery-track"><div class="battery-fill" style="width:82%"></div></div>
+      <span class="battery-pct">82%</span>
     </div>
     <div class="stat-grid" style="margin-top:10px">
       <div class="stat-card"><div class="stat-val" id="stat-words">0</div><div class="stat-lbl">Words Today</div></div>
@@ -748,7 +740,6 @@
     </div>
   </div>
 
-  <!-- Live Writing Input -->
   <div class="rp-section">
     <div class="rp-section-title">Live Writing Input</div>
     <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="Start writing here…" oninput="onWritingInput()"></div>
@@ -759,7 +750,6 @@
     </div>
   </div>
 
-  <!-- AI Tools -->
   <div class="rp-section">
     <div class="rp-section-title">AI Tools</div>
     <div class="ai-tools-row">
@@ -771,79 +761,36 @@
     </div>
   </div>
 
-  <!-- Recent Notes -->
   <div class="rp-section">
     <div class="rp-section-title">Recent Notes</div>
     <div id="recent-notes-list"><div class="no-notes">No notes yet. Save something!</div></div>
   </div>
 </aside>
 
-<!-- TEMPLATES POPUP -->
-<div class="templates-popup" id="templates-popup">
-  <div class="tpl-title">Templates</div>
-  <div class="tpl-grid">
-    <div class="tpl-item" onclick="useTemplate('Write a professional email about:')">
-      <div class="tpl-item-icon">📧</div>
-      <div class="tpl-item-name">Email</div>
-      <div class="tpl-item-desc">Professional email draft</div>
-    </div>
-    <div class="tpl-item" onclick="useTemplate('Write a blog post about:')">
-      <div class="tpl-item-icon">📰</div>
-      <div class="tpl-item-name">Blog Post</div>
-      <div class="tpl-item-desc">Full article with sections</div>
-    </div>
-    <div class="tpl-item" onclick="useTemplate('Write a short story about:')">
-      <div class="tpl-item-icon">📖</div>
-      <div class="tpl-item-name">Story</div>
-      <div class="tpl-item-desc">Creative fiction writing</div>
-    </div>
-    <div class="tpl-item" onclick="useTemplate('Create a resume for someone who:')">
-      <div class="tpl-item-icon">💼</div>
-      <div class="tpl-item-name">Resume</div>
-      <div class="tpl-item-desc">Professional CV format</div>
-    </div>
-    <div class="tpl-item" onclick="useTemplate('Write meeting notes for:')">
-      <div class="tpl-item-icon">📋</div>
-      <div class="tpl-item-name">Meeting Notes</div>
-      <div class="tpl-item-desc">Structured meeting summary</div>
-    </div>
-    <div class="tpl-item" onclick="useTemplate('Write a social media post about:')">
-      <div class="tpl-item-icon">📱</div>
-      <div class="tpl-item-name">Social Post</div>
-      <div class="tpl-item-desc">Engaging social content</div>
-    </div>
-  </div>
-</div>
-
 <!-- SETTINGS OVERLAY -->
 <div class="overlay" id="settings-overlay" onclick="closeSettingsIfBg(event)">
   <div class="settings-modal">
     <div class="settings-nav">
       <div class="settings-title">⚙️ Settings</div>
-      <button class="settings-nav-item active" onclick="showSettingsPage('appearance')"><span class="sni">🎨</span> Appearance</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('ai')"><span class="sni">✦</span> AI & Model</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('writing')"><span class="sni">✏️</span> Writing</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('notifications')"><span class="sni">🔔</span> Notifications</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('privacy')"><span class="sni">🔒</span> Privacy</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('account')"><span class="sni">👤</span> Account</button>
-      <button class="settings-nav-item" onclick="showSettingsPage('about')"><span class="sni">ℹ️</span> About</button>
+      <button class="settings-nav-item active" onclick="showSettingsPage('appearance',this)"><span class="sni">🎨</span> Appearance</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('ai',this)"><span class="sni">✦</span> AI & Model</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('writing',this)"><span class="sni">✏️</span> Writing</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('notifications',this)"><span class="sni">🔔</span> Notifications</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('privacy',this)"><span class="sni">🔒</span> Privacy</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('account',this)"><span class="sni">👤</span> Account</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('about',this)"><span class="sni">ℹ️</span> About</button>
       <div style="flex:1"></div>
       <button class="settings-nav-item" onclick="closeSettings()" style="color:#ef4444"><span class="sni">✕</span> Close</button>
     </div>
-
     <div class="settings-content">
-      <!-- APPEARANCE -->
+
       <div class="settings-page active" id="settings-appearance">
         <div class="settings-page-title">Appearance</div>
         <div class="settings-page-sub">Customize how AI Pen looks and feels</div>
-
         <div class="settings-section">
           <div class="settings-section-title">Theme</div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Color Theme</div>
-              <div class="settings-row-desc">Choose your interface color scheme</div>
-            </div>
+            <div class="settings-row-left"><div class="settings-row-label">Color Theme</div><div class="settings-row-desc">Choose your interface color scheme</div></div>
             <select class="settings-select" id="theme-select" onchange="applyTheme(this.value)">
               <option value="dark">Dark (Default)</option>
               <option value="darker">Darker</option>
@@ -852,65 +799,43 @@
             </select>
           </div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Accent Color</div>
-              <div class="settings-row-desc">Main highlight color throughout the app</div>
-            </div>
+            <div class="settings-row-left"><div class="settings-row-label">Accent Color</div><div class="settings-row-desc">Main highlight color throughout the app</div></div>
             <div class="color-swatches">
-              <div class="swatch selected" style="background:#7c3aed" data-color="#7c3aed" onclick="setAccent(this)" title="Purple"></div>
-              <div class="swatch" style="background:#2563eb" data-color="#2563eb" onclick="setAccent(this)" title="Blue"></div>
-              <div class="swatch" style="background:#0891b2" data-color="#0891b2" onclick="setAccent(this)" title="Cyan"></div>
-              <div class="swatch" style="background:#059669" data-color="#059669" onclick="setAccent(this)" title="Green"></div>
-              <div class="swatch" style="background:#d97706" data-color="#d97706" onclick="setAccent(this)" title="Amber"></div>
-              <div class="swatch" style="background:#dc2626" data-color="#dc2626" onclick="setAccent(this)" title="Red"></div>
+              <div class="swatch selected" style="background:#7c3aed" data-color="#7c3aed" onclick="setAccent(this)"></div>
+              <div class="swatch" style="background:#2563eb" data-color="#2563eb" onclick="setAccent(this)"></div>
+              <div class="swatch" style="background:#0891b2" data-color="#0891b2" onclick="setAccent(this)"></div>
+              <div class="swatch" style="background:#059669" data-color="#059669" onclick="setAccent(this)"></div>
+              <div class="swatch" style="background:#d97706" data-color="#d97706" onclick="setAccent(this)"></div>
+              <div class="swatch" style="background:#dc2626" data-color="#dc2626" onclick="setAccent(this)"></div>
             </div>
           </div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Text & Layout</div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Font Size</div>
-              <div class="settings-row-desc">Chat message font size</div>
-            </div>
-            <select class="settings-select" id="font-size-select" onchange="applyFontSize(this.value)">
+            <div class="settings-row-left"><div class="settings-row-label">Font Size</div><div class="settings-row-desc">Chat message font size</div></div>
+            <select class="settings-select" onchange="applyFontSize(this.value)">
               <option value="13">Small</option>
-              <option value="14" selected>Medium (Default)</option>
+              <option value="14" selected>Medium</option>
               <option value="16">Large</option>
               <option value="18">Extra Large</option>
             </select>
           </div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Compact Mode</div>
-              <div class="settings-row-desc">Reduce spacing for more content on screen</div>
-            </div>
-            <button class="toggle" id="toggle-compact" onclick="toggleSetting('compact')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Show Right Panel</div>
-              <div class="settings-row-desc">Show AI tools and writing panel</div>
-            </div>
+            <div class="settings-row-left"><div class="settings-row-label">Show Right Panel</div><div class="settings-row-desc">Show AI tools and writing panel</div></div>
             <button class="toggle on" id="toggle-rightpanel" onclick="toggleSetting('rightpanel')"></button>
           </div>
         </div>
       </div>
 
-      <!-- AI & MODEL -->
       <div class="settings-page" id="settings-ai">
         <div class="settings-page-title">AI & Model</div>
         <div class="settings-page-sub">Configure AI behavior and response style</div>
-
         <div class="settings-section">
           <div class="settings-section-title">Model</div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">AI Model</div>
-              <div class="settings-row-desc">Select the underlying language model</div>
-            </div>
-            <select class="settings-select" id="model-select" onchange="savePref('model', this.value)">
+            <div class="settings-row-left"><div class="settings-row-label">AI Model</div><div class="settings-row-desc">Select the underlying language model</div></div>
+            <select class="settings-select" onchange="savePref('model',this.value)">
               <option value="gpt4">GPT-4o</option>
               <option value="gpt35">GPT-3.5 Turbo</option>
               <option value="claude3">Claude 3.5 Sonnet</option>
@@ -918,11 +843,8 @@
             </select>
           </div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Response Style</div>
-              <div class="settings-row-desc">How the AI formats and presents replies</div>
-            </div>
-            <select class="settings-select" id="response-style" onchange="savePref('responseStyle', this.value)">
+            <div class="settings-row-left"><div class="settings-row-label">Response Style</div><div class="settings-row-desc">How the AI formats replies</div></div>
+            <select class="settings-select" onchange="savePref('responseStyle',this.value)">
               <option value="balanced">Balanced</option>
               <option value="concise">Concise</option>
               <option value="detailed">Detailed</option>
@@ -930,53 +852,22 @@
             </select>
           </div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Behavior</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Auto-complete Suggestions</div>
-              <div class="settings-row-desc">Show AI writing suggestions as you type</div>
-            </div>
-            <button class="toggle on" id="toggle-autocomplete" onclick="toggleSetting('autocomplete')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Grammar Check</div>
-              <div class="settings-row-desc">Automatically highlight grammar issues</div>
-            </div>
-            <button class="toggle on" id="toggle-grammar" onclick="toggleSetting('grammar')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Smart Suggestions</div>
-              <div class="settings-row-desc">Context-aware quick action chips</div>
-            </div>
-            <button class="toggle on" id="toggle-smart" onclick="toggleSetting('smart')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Memory</div>
-              <div class="settings-row-desc">Remember context across sessions</div>
-            </div>
-            <button class="toggle" id="toggle-memory" onclick="toggleSetting('memory')"></button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Smart Suggestions</div><div class="settings-row-desc">Context-aware quick action chips</div></div><button class="toggle on" id="toggle-smart" onclick="toggleSetting('smart')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Grammar Check</div><div class="settings-row-desc">Automatically highlight grammar issues</div></div><button class="toggle on" id="toggle-grammar" onclick="toggleSetting('grammar')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Memory</div><div class="settings-row-desc">Remember context across sessions</div></div><button class="toggle" id="toggle-memory" onclick="toggleSetting('memory')"></button></div>
         </div>
       </div>
 
-      <!-- WRITING -->
       <div class="settings-page" id="settings-writing">
         <div class="settings-page-title">Writing</div>
-        <div class="settings-page-sub">Adjust writing input and pen settings</div>
-
+        <div class="settings-page-sub">Adjust writing input and voice settings</div>
         <div class="settings-section">
           <div class="settings-section-title">Voice Input</div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Voice Language</div>
-              <div class="settings-row-desc">Language for speech recognition</div>
-            </div>
-            <select class="settings-select" id="voice-lang" onchange="savePref('voiceLang', this.value)">
+            <div class="settings-row-left"><div class="settings-row-label">Voice Language</div><div class="settings-row-desc">Language for speech recognition</div></div>
+            <select class="settings-select" id="voice-lang" onchange="savePref('voiceLang',this.value)">
               <option value="en-US">English (US)</option>
               <option value="en-GB">English (UK)</option>
               <option value="es-ES">Spanish</option>
@@ -987,295 +878,135 @@
               <option value="zh-CN">Chinese</option>
             </select>
           </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Auto-send on Silence</div>
-              <div class="settings-row-desc">Send message automatically after voice stops</div>
-            </div>
-            <button class="toggle" id="toggle-autosend" onclick="toggleSetting('autosend')"></button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Auto-send on Silence</div><div class="settings-row-desc">Send automatically after voice stops</div></div><button class="toggle" id="toggle-autosend" onclick="toggleSetting('autosend')"></button></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Text to Speech</div>
           <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Read Aloud Speed</div>
-              <div class="settings-row-desc">Speech rate for AI responses</div>
-            </div>
-            <select class="settings-select" id="speech-rate" onchange="savePref('speechRate', this.value)">
+            <div class="settings-row-left"><div class="settings-row-label">Read Aloud Speed</div><div class="settings-row-desc">Speech rate for AI responses</div></div>
+            <select class="settings-select" id="speech-rate" onchange="savePref('speechRate',this.value)">
               <option value="0.75">Slow</option>
               <option value="1" selected>Normal</option>
               <option value="1.25">Fast</option>
               <option value="1.5">Very Fast</option>
             </select>
           </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Voice</div>
-              <div class="settings-row-desc">Text-to-speech voice style</div>
-            </div>
-            <select class="settings-select" id="speech-voice" onchange="savePref('speechVoice', this.value)">
-              <option value="default">Default</option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-            </select>
-          </div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Notes</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Auto-save Writing</div>
-              <div class="settings-row-desc">Automatically save the live writing panel</div>
-            </div>
-            <button class="toggle" id="toggle-autosave" onclick="toggleSetting('autosave')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Clear All Notes</div>
-              <div class="settings-row-desc">Permanently delete all saved notes</div>
-            </div>
-            <button class="btn-danger" onclick="clearNotes()">Clear Notes</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Auto-save Writing</div><div class="settings-row-desc">Automatically save the live writing panel</div></div><button class="toggle" id="toggle-autosave" onclick="toggleSetting('autosave')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Clear All Notes</div><div class="settings-row-desc">Permanently delete all saved notes</div></div><button class="btn-danger" onclick="clearNotes()">Clear Notes</button></div>
         </div>
       </div>
 
-      <!-- NOTIFICATIONS -->
       <div class="settings-page" id="settings-notifications">
         <div class="settings-page-title">Notifications</div>
         <div class="settings-page-sub">Control how and when AI Pen notifies you</div>
-
         <div class="settings-section">
           <div class="settings-section-title">In-App</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Response Ready</div>
-              <div class="settings-row-desc">Notify when AI finishes a long response</div>
-            </div>
-            <button class="toggle on" id="toggle-notif-response" onclick="toggleSetting('notif-response')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Daily Writing Reminder</div>
-              <div class="settings-row-desc">Remind you to write each day</div>
-            </div>
-            <button class="toggle" id="toggle-notif-daily" onclick="toggleSetting('notif-daily')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Streak Reminders</div>
-              <div class="settings-row-desc">Alert when your writing streak is at risk</div>
-            </div>
-            <button class="toggle on" id="toggle-notif-streak" onclick="toggleSetting('notif-streak')"></button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Response Ready</div><div class="settings-row-desc">Notify when AI finishes a long response</div></div><button class="toggle on" id="toggle-notif-response" onclick="toggleSetting('notif-response')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Daily Writing Reminder</div><div class="settings-row-desc">Remind you to write each day</div></div><button class="toggle" id="toggle-notif-daily" onclick="toggleSetting('notif-daily')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Streak Reminders</div><div class="settings-row-desc">Alert when your writing streak is at risk</div></div><button class="toggle on" id="toggle-notif-streak" onclick="toggleSetting('notif-streak')"></button></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Sounds</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Sound Effects</div>
-              <div class="settings-row-desc">Play sounds for actions and notifications</div>
-            </div>
-            <button class="toggle" id="toggle-sounds" onclick="toggleSetting('sounds')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Typing Sounds</div>
-              <div class="settings-row-desc">Subtle sounds while using voice input</div>
-            </div>
-            <button class="toggle" id="toggle-typing-sound" onclick="toggleSetting('typing-sound')"></button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Sound Effects</div><div class="settings-row-desc">Play sounds for actions</div></div><button class="toggle" id="toggle-sounds" onclick="toggleSetting('sounds')"></button></div>
         </div>
       </div>
 
-      <!-- PRIVACY -->
       <div class="settings-page" id="settings-privacy">
         <div class="settings-page-title">Privacy & Data</div>
         <div class="settings-page-sub">Control how your data is stored and used</div>
-
         <div class="settings-section">
           <div class="settings-section-title">Data Storage</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Save Chat History</div>
-              <div class="settings-row-desc">Store conversations locally in this browser</div>
-            </div>
-            <button class="toggle on" id="toggle-save-history" onclick="toggleSetting('save-history')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Analytics</div>
-              <div class="settings-row-desc">Help improve AI Pen with anonymous usage data</div>
-            </div>
-            <button class="toggle on" id="toggle-analytics" onclick="toggleSetting('analytics')"></button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Save Chat History</div><div class="settings-row-desc">Store conversations locally in this browser</div></div><button class="toggle on" id="toggle-save-history" onclick="toggleSetting('save-history')"></button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Analytics</div><div class="settings-row-desc">Help improve AI Pen with anonymous usage data</div></div><button class="toggle on" id="toggle-analytics" onclick="toggleSetting('analytics')"></button></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Data Management</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Export My Data</div>
-              <div class="settings-row-desc">Download all your notes and chat history</div>
-            </div>
-            <button class="btn-outline" onclick="exportData()">Export</button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Clear Chat History</div>
-              <div class="settings-row-desc">Remove all saved conversations</div>
-            </div>
-            <button class="btn-danger" onclick="clearHistory()">Clear History</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Export My Data</div><div class="settings-row-desc">Download all your notes and chat history</div></div><button class="btn-outline" onclick="exportData()">Export</button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Clear Chat History</div><div class="settings-row-desc">Remove all saved conversations</div></div><button class="btn-danger" onclick="clearHistory()">Clear History</button></div>
         </div>
       </div>
 
-      <!-- ACCOUNT -->
       <div class="settings-page" id="settings-account">
         <div class="settings-page-title">Account</div>
         <div class="settings-page-sub">Manage your profile and account settings</div>
-
         <div class="settings-section">
           <div class="settings-section-title">Profile</div>
           <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
             <div class="settings-row-label">Display Name</div>
-            <div class="settings-input-wrap">
-              <input class="settings-input" id="display-name-input" type="text" placeholder="Your display name" />
-            </div>
+            <div class="settings-input-wrap"><input class="settings-input" id="display-name-input" type="text" placeholder="Your display name" /></div>
             <button class="btn-accent" onclick="saveDisplayName()">Save Name</button>
           </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Email Address</div>
-              <div class="settings-row-desc" id="account-email">Loading…</div>
-            </div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Account Type</div>
-              <div class="settings-row-desc" id="account-type">Free Plan</div>
-            </div>
-            <button class="btn-accent" onclick="showToast('Upgrade coming soon!')">Upgrade</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Email Address</div><div class="settings-row-desc" id="account-email">—</div></div></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Account Type</div><div class="settings-row-desc">Free Plan</div></div><button class="btn-accent" onclick="showToast('Upgrade coming soon!')">Upgrade</button></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Security</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Change Password</div>
-              <div class="settings-row-desc">Send a password reset email</div>
-            </div>
-            <button class="btn-outline" onclick="sendPasswordReset()">Reset Password</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Change Password</div><div class="settings-row-desc">Send a password reset email</div></div><button class="btn-outline" onclick="sendPasswordReset()">Reset Password</button></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Session</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Sign Out</div>
-              <div class="settings-row-desc">Sign out of your AI Pen account</div>
-            </div>
-            <button class="btn-danger" onclick="signOut()">Sign Out</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Sign Out</div><div class="settings-row-desc">Sign out of your AI Pen account</div></div><button class="btn-danger" onclick="signOut()">Sign Out</button></div>
         </div>
       </div>
 
-      <!-- ABOUT -->
       <div class="settings-page" id="settings-about">
         <div class="settings-page-title">About AI Pen</div>
-        <div class="settings-page-sub">Information about the app and its version</div>
-
+        <div class="settings-page-sub">App information and support</div>
         <div class="settings-section">
           <div class="settings-section-title">App Info</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Version</div>
-              <div class="settings-row-desc">AI Pen Web</div>
-            </div>
-            <span style="font-size:13px;color:var(--muted)">v2.1.0</span>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Build</div>
-              <div class="settings-row-desc">Latest release</div>
-            </div>
-            <span style="font-size:13px;color:var(--muted)">2026.05</span>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Version</div><div class="settings-row-desc">AI Pen Web</div></div><span style="font-size:13px;color:var(--muted)">v2.1.0</span></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Build</div><div class="settings-row-desc">Latest release</div></div><span style="font-size:13px;color:var(--muted)">2026.05</span></div>
         </div>
-
         <div class="settings-section">
           <div class="settings-section-title">Support</div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Feedback</div>
-              <div class="settings-row-desc">Help us improve AI Pen</div>
-            </div>
-            <button class="btn-outline" onclick="showToast('Feedback form coming soon!')">Send Feedback</button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-row-label">Report a Bug</div>
-              <div class="settings-row-desc">Let us know if something isn't working</div>
-            </div>
-            <button class="btn-outline" onclick="showToast('Bug report sent!')">Report</button>
-          </div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Feedback</div><div class="settings-row-desc">Help us improve AI Pen</div></div><button class="btn-outline" onclick="showToast('Feedback form coming soon!')">Send Feedback</button></div>
+          <div class="settings-row"><div class="settings-row-left"><div class="settings-row-label">Report a Bug</div><div class="settings-row-desc">Something not working?</div></div><button class="btn-outline" onclick="showToast('Bug report sent!')">Report</button></div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
-  // ── Firebase config ──
   const firebaseConfig = {
-    apiKey: "AIzaSyDYuqJR3_5h2cqOQ3_m0e7zBuQ1njVpMIk",
-    authDomain: "ai-pen-app.firebaseapp.com",
-    projectId: "ai-pen-app",
-    storageBucket: "ai-pen-app.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
+    apiKey: "AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
+    authDomain: "ai-pen-c85a0.firebaseapp.com",
+    projectId: "ai-pen-c85a0",
+    storageBucket: "ai-pen-c85a0.firebasestorage.app",
+    messagingSenderId: "997852271146",
+    appId: "1:997852271146:web:f9b42d91dce0ead0d86953"
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // ── Auth guard ──
   auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = '/login.html';
-      return;
-    }
+    if (!user) { window.location.href = '/login.html'; return; }
     const name = user.displayName || user.email?.split('@')[0] || 'User';
-    const initial = name[0].toUpperCase();
-    document.getElementById('sidebar-avatar').textContent = initial;
+    document.getElementById('sidebar-avatar').textContent = name[0].toUpperCase();
     document.getElementById('sidebar-name').textContent = name;
     document.getElementById('sidebar-email').textContent = user.email || user.phoneNumber || '';
     document.getElementById('display-name-input').value = name;
     document.getElementById('account-email').textContent = user.email || user.phoneNumber || 'Signed in';
-    document.getElementById('account-type').textContent = 'Free Plan';
     setGreeting(name);
     loadStats();
+    applySavedPrefs();
   });
 
-  // ── Greeting ──
   function setGreeting(name) {
     const h = new Date().getHours();
-    const parts = h < 12 ? ['Good morning', '☀️'] : h < 17 ? ['Good afternoon', '🌤️'] : h < 21 ? ['Good evening', '🌙'] : ['Good night', '🌟'];
-    document.getElementById('greeting-text').textContent = `${parts[0]}, ${name}`;
-    document.getElementById('greeting-sub').textContent = `What would you like to write today? ${parts[1]}`;
+    const [g, e] = h < 12 ? ['Good morning','☀️'] : h < 17 ? ['Good afternoon','🌤️'] : h < 21 ? ['Good evening','🌙'] : ['Good night','🌟'];
+    document.getElementById('greeting-text').textContent = `${g}, ${name}`;
+    document.getElementById('greeting-sub').textContent = `What would you like to write today? ${e}`;
   }
 
-  // ── View switching ──
   function switchView(view) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1285,9 +1016,7 @@
     if (view === 'sessions') renderSessionsGrid();
   }
 
-  // ── Chat ──
-  let msgCount = 0;
-  let totalWords = 0;
+  let msgCount = 0, totalWords = 0;
 
   function autoGrow(el) {
     el.style.height = 'auto';
@@ -1311,13 +1040,14 @@
 
   function addUserMsg(text) {
     const msgs = document.getElementById('messages');
+    const typing = document.getElementById('typing');
     const bubble = document.createElement('div');
     bubble.className = 'msg-user';
     bubble.textContent = text;
     const meta = document.createElement('div');
     meta.className = 'msg-user-meta';
     meta.textContent = '✓✓ ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    msgs.insertBefore(meta, document.getElementById('typing'));
+    msgs.insertBefore(meta, typing);
     msgs.insertBefore(bubble, meta);
     msgs.scrollTop = msgs.scrollHeight;
     saveChatHistory();
@@ -1327,458 +1057,223 @@
     const typing = document.getElementById('typing');
     typing.style.display = 'block';
     document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-    const delay = 800 + Math.min(userText.length * 10, 2000);
     setTimeout(() => {
       typing.style.display = 'none';
-      const reply = generateReply(userText);
-      addAIMsg(reply);
+      addAIMsg(generateReply(userText));
       msgCount++;
       updateStats();
       saveChatHistory();
-    }, delay);
+    }, 900 + Math.min(userText.length * 8, 1800));
   }
 
   function generateReply(text) {
     const t = text.toLowerCase();
-    if (t.includes('hello') || t.includes('hi')) return "Hello! I'm your AI Pen assistant, ready to help you with writing, editing, and more. What can I do for you today?";
-    if (t.includes('summarize') || t.includes('summary')) return "I can summarize that for you! Please share the text you'd like me to condense, and I'll create a clear, concise summary highlighting the key points.";
-    if (t.includes('translate')) return "I can help with translation! Please share the text and let me know which language you'd like it translated into.";
-    if (t.includes('grammar') || t.includes('fix')) return "I'll check the grammar and correct any errors. Please share the text you'd like me to review and improve.";
-    if (t.includes('write') || t.includes('draft')) return "I'd be happy to help you write! Could you give me a bit more detail about the topic, tone, and length you're looking for? The more context you provide, the better I can tailor the response.";
-    if (t.includes('explain')) return "Great question! I'll break this down in a clear and simple way. Could you share what specifically you'd like explained, or paste the content you need help understanding?";
-    return `I've received your message: "${text.substring(0, 60)}${text.length > 60 ? '…' : ''}"\n\nI'm your AI writing assistant — I can help you write, edit, translate, summarize, brainstorm ideas, fix grammar, and much more. What would you like me to do with this?`;
+    if (t.includes('hello') || t.includes('hi')) return "Hello! I'm your AI Pen assistant, ready to help with writing, editing, and more. What can I do for you today?";
+    if (t.includes('summarize') || t.includes('summary')) return "I can summarize that for you! Please share the text you'd like me to condense into a clear, concise summary.";
+    if (t.includes('translate')) return "I can help with translation! Share the text and tell me which language you'd like it translated into.";
+    if (t.includes('grammar') || t.includes('fix')) return "I'll check the grammar and correct any errors. Share the text you'd like me to review and improve.";
+    if (t.includes('write') || t.includes('draft')) return "I'd be happy to help you write! Share more about the topic, tone, and length you're looking for.";
+    if (t.includes('explain')) return "I'll break this down clearly. Share what you'd like explained or paste the content you need help understanding.";
+    return `Got it! I'm your AI writing assistant — I can write, edit, translate, summarize, brainstorm, fix grammar, and much more. What would you like me to do with: "${text.substring(0,50)}${text.length>50?'…':''}"?`;
   }
 
   function addAIMsg(text) {
     const msgs = document.getElementById('messages');
     const card = document.createElement('div');
     card.className = 'msg-ai';
-    card.innerHTML = `
-      <div class="ai-header">
-        <div class="ai-label"><span class="ai-label-icon">✦</span>AI Pen</div>
-        <div class="ai-actions">
-          <button class="ai-action-btn" title="Copy" onclick="copyMsg(this)">📋</button>
-          <button class="ai-action-btn" title="Like" onclick="likeMsg(this)">👍</button>
-          <button class="ai-action-btn" title="Dislike" onclick="dislikeMsg(this)">👎</button>
-          <button class="ai-action-btn" title="Read aloud" onclick="speakMsg(this)">🔊</button>
-        </div>
-      </div>
-      <div class="msg-text">${escHtml(text)}</div>`;
+    card.innerHTML = `<div class="ai-header"><div class="ai-label"><span class="ai-label-icon">✦</span>AI Pen</div><div class="ai-actions"><button class="ai-action-btn" onclick="copyMsg(this)">📋</button><button class="ai-action-btn" onclick="likeMsg(this)">👍</button><button class="ai-action-btn" onclick="dislikeMsg(this)">👎</button><button class="ai-action-btn" onclick="speakMsg(this)">🔊</button></div></div><div class="msg-text">${escHtml(text)}</div>`;
     msgs.insertBefore(card, document.getElementById('typing'));
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function copyMsg(btn) {
-    const text = btn.closest('.msg-ai').querySelector('.msg-text').textContent;
-    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
-  }
-  function likeMsg(btn) {
-    btn.classList.toggle('liked');
-    btn.closest('.ai-actions').querySelector('[title="Dislike"]').classList.remove('disliked');
-    showToast(btn.classList.contains('liked') ? 'Liked! Thanks for the feedback.' : 'Like removed.');
-  }
-  function dislikeMsg(btn) {
-    btn.classList.toggle('disliked');
-    btn.closest('.ai-actions').querySelector('[title="Like"]').classList.remove('liked');
-    showToast(btn.classList.contains('disliked') ? 'Got it — we\'ll improve.' : 'Dislike removed.');
-  }
+  function copyMsg(btn) { navigator.clipboard.writeText(btn.closest('.msg-ai').querySelector('.msg-text').textContent).then(() => showToast('Copied!')); }
+  function likeMsg(btn) { btn.classList.toggle('liked'); btn.closest('.ai-actions').querySelector(':nth-child(3)').classList.remove('disliked'); showToast(btn.classList.contains('liked') ? 'Liked!' : 'Like removed.'); }
+  function dislikeMsg(btn) { btn.classList.toggle('disliked'); btn.closest('.ai-actions').querySelector(':nth-child(2)').classList.remove('liked'); showToast(btn.classList.contains('disliked') ? "Got it — we'll improve." : 'Dislike removed.'); }
   function speakMsg(btn) {
     const text = btn.closest('.msg-ai').querySelector('.msg-text').textContent;
-    if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); showToast('Stopped reading.'); return; }
+    if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); showToast('Stopped.'); return; }
     const utt = new SpeechSynthesisUtterance(text);
-    const rate = parseFloat(localStorage.getItem('pref_speechRate') || '1');
-    utt.rate = rate;
+    utt.rate = parseFloat(localStorage.getItem('pref_speechRate') || '1');
     window.speechSynthesis.speak(utt);
     showToast('Reading aloud…');
   }
 
-  function chipAction(text) {
-    document.getElementById('chat-input').value = text + ' ';
-    document.getElementById('chat-input').focus();
-  }
+  function chipAction(text) { document.getElementById('chat-input').value = text + ' '; document.getElementById('chat-input').focus(); }
 
   function newConversation() {
     if (!confirm('Start a new conversation? Current chat will be saved.')) return;
     saveChatHistory();
     const msgs = document.getElementById('messages');
-    while (msgs.firstChild && msgs.firstChild.id !== 'typing') msgs.removeChild(msgs.firstChild);
-    // re-add welcome
-    const card = document.createElement('div');
-    card.className = 'msg-ai';
-    card.innerHTML = `<div class="ai-header"><div class="ai-label"><span class="ai-label-icon">✦</span>AI Pen</div><div class="ai-actions"><button class="ai-action-btn" title="Copy" onclick="copyMsg(this)">📋</button><button class="ai-action-btn" title="Like" onclick="likeMsg(this)">👍</button><button class="ai-action-btn" title="Dislike" onclick="dislikeMsg(this)">👎</button><button class="ai-action-btn" title="Read aloud" onclick="speakMsg(this)">🔊</button></div></div><div class="msg-text">New conversation started! I'm ready to help you write anything. What would you like to create?</div>`;
-    msgs.insertBefore(card, document.getElementById('typing'));
+    const typing = document.getElementById('typing');
+    while (msgs.firstChild && msgs.firstChild !== typing) msgs.removeChild(msgs.firstChild);
+    addAIMsg('New conversation started! What would you like to create?');
     showToast('New conversation started!');
   }
 
-  function loadShortcut(prompt) {
-    document.getElementById('chat-input').value = prompt + ' ';
-    document.getElementById('chat-input').focus();
-    switchView('chat');
-  }
+  function loadShortcut(prompt) { document.getElementById('chat-input').value = prompt + ' '; document.getElementById('chat-input').focus(); switchView('chat'); }
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 
-  function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-  }
-
-  // ── Voice input ──
-  let recognition = null;
-  let voiceActive = false;
-
+  // ── Voice ──
+  let recognition = null, voiceActive = false;
   function toggleVoice() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      showToast('Voice input not supported in this browser'); return;
-    }
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { showToast('Voice not supported in this browser'); return; }
     if (voiceActive) { recognition.stop(); return; }
     const SRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SRec();
-    const lang = localStorage.getItem('pref_voiceLang') || 'en-US';
-    recognition.lang = lang;
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.onstart = () => {
-      voiceActive = true;
-      document.getElementById('mic-btn').classList.add('active');
-      document.getElementById('recognized-text').textContent = 'Listening…';
-    };
+    recognition.lang = localStorage.getItem('pref_voiceLang') || 'en-US';
+    recognition.continuous = true; recognition.interimResults = true;
+    recognition.onstart = () => { voiceActive = true; document.getElementById('mic-btn').classList.add('active'); document.getElementById('recognized-text').textContent = 'Listening…'; };
     recognition.onresult = e => {
-      let final = '', interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) final += e.results[i][0].transcript;
-        else interim += e.results[i][0].transcript;
-      }
-      if (final) {
-        document.getElementById('chat-input').value += final + ' ';
-        autoGrow(document.getElementById('chat-input'));
-      }
-      document.getElementById('recognized-text').textContent = interim || 'Voice recognized ✓';
+      let fin = '', int = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) e.results[i].isFinal ? fin += e.results[i][0].transcript : int += e.results[i][0].transcript;
+      if (fin) { document.getElementById('chat-input').value += fin + ' '; autoGrow(document.getElementById('chat-input')); }
+      document.getElementById('recognized-text').textContent = int || 'Voice recognized ✓';
     };
-    recognition.onerror = () => { showToast('Voice error — please try again'); stopVoice(); };
-    recognition.onend = () => stopVoice();
+    recognition.onerror = () => { showToast('Voice error — try again'); stopVoice(); };
+    recognition.onend = stopVoice;
     recognition.start();
   }
-
-  function stopVoice() {
-    voiceActive = false;
-    document.getElementById('mic-btn').classList.remove('active');
-    document.getElementById('recognized-text').textContent = 'Voice recognition idle';
-  }
+  function stopVoice() { voiceActive = false; document.getElementById('mic-btn').classList.remove('active'); document.getElementById('recognized-text').textContent = 'Voice recognition idle'; }
 
   // ── Templates ──
-  let templatesOpen = false;
-  function openTemplates() {
-    templatesOpen = !templatesOpen;
-    document.getElementById('templates-popup').classList.toggle('open', templatesOpen);
-  }
-  function useTemplate(text) {
-    document.getElementById('chat-input').value = text + ' ';
-    document.getElementById('chat-input').focus();
-    document.getElementById('templates-popup').classList.remove('open');
-    templatesOpen = false;
-  }
-  document.addEventListener('click', e => {
-    if (templatesOpen && !e.target.closest('#templates-popup') && !e.target.closest('.input-btn')) {
-      document.getElementById('templates-popup').classList.remove('open');
-      templatesOpen = false;
-    }
-  });
+  let tplOpen = false;
+  function openTemplates() { tplOpen = !tplOpen; document.getElementById('templates-popup').classList.toggle('open', tplOpen); }
+  function useTemplate(text) { document.getElementById('chat-input').value = text + ' '; document.getElementById('chat-input').focus(); document.getElementById('templates-popup').classList.remove('open'); tplOpen = false; }
+  document.addEventListener('click', e => { if (tplOpen && !e.target.closest('#templates-popup') && !e.target.closest('.input-btn')) { document.getElementById('templates-popup').classList.remove('open'); tplOpen = false; } });
 
-  // ── AI Tools (right panel) ──
+  // ── AI Tools ──
   function injectTool(type) {
-    const prompts = {
-      summarize: 'Summarize the following text:\n\n',
-      grammar: 'Fix the grammar and improve the writing of:\n\n',
-      translate: 'Translate the following to Spanish:\n\n',
-      expand: 'Expand and add more detail to:\n\n',
-      tone: 'Rewrite this in a more professional tone:\n\n'
-    };
-    const writing = document.getElementById('writing-area').textContent.trim();
-    document.getElementById('chat-input').value = prompts[type] + (writing || '');
-    document.getElementById('chat-input').focus();
-    switchView('chat');
+    const p = { summarize:'Summarize the following text:\n\n', grammar:'Fix the grammar and improve:\n\n', translate:'Translate to Spanish:\n\n', expand:'Expand and add more detail to:\n\n', tone:'Rewrite in a more professional tone:\n\n' };
+    document.getElementById('chat-input').value = p[type] + (document.getElementById('writing-area').textContent.trim() || '');
+    document.getElementById('chat-input').focus(); switchView('chat');
   }
 
-  // ── Live writing panel ──
+  // ── Live writing ──
+  let _autosaveTimer;
   function onWritingInput() {
-    const text = document.getElementById('writing-area').textContent;
-    if (localStorage.getItem('pref_autosave') === 'true') {
-      clearTimeout(window._autosaveTimer);
-      window._autosaveTimer = setTimeout(() => {
-        if (text.trim()) saveNote('Auto-save', text);
-      }, 3000);
-    }
+    if (localStorage.getItem('pref_autosave') !== 'true') return;
+    clearTimeout(_autosaveTimer);
+    _autosaveTimer = setTimeout(() => { const t = document.getElementById('writing-area').textContent.trim(); if (t) saveNote('Auto-save', t); }, 3000);
   }
-
-  function copyWriting() {
-    const text = document.getElementById('writing-area').textContent;
-    if (!text.trim()) { showToast('Nothing to copy'); return; }
-    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
-  }
-
-  function saveWritingAsNote() {
-    const text = document.getElementById('writing-area').textContent.trim();
-    if (!text) { showToast('Nothing to save'); return; }
-    const title = 'Note ' + new Date().toLocaleDateString();
-    saveNote(title, text);
-    showToast('Saved as note!');
-    loadRecentNotes();
-  }
+  function copyWriting() { const t = document.getElementById('writing-area').textContent; if (!t.trim()) { showToast('Nothing to copy'); return; } navigator.clipboard.writeText(t).then(() => showToast('Copied!')); }
+  function saveWritingAsNote() { const t = document.getElementById('writing-area').textContent.trim(); if (!t) { showToast('Nothing to save'); return; } saveNote('Note ' + new Date().toLocaleDateString(), t); showToast('Saved as note!'); loadRecentNotes(); }
 
   // ── Notes ──
-  function getNotes() {
-    try { return JSON.parse(localStorage.getItem('aipen_notes') || '[]'); } catch { return []; }
-  }
-  function saveNote(title, content) {
-    const notes = getNotes();
-    notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString() });
-    localStorage.setItem('aipen_notes', JSON.stringify(notes.slice(0, 100)));
-    updateStats();
-  }
-  function createNote() {
-    const title = prompt('Note title:');
-    if (!title) return;
-    const content = prompt('Note content:');
-    if (!content) return;
-    saveNote(title, content);
-    renderNotesGrid();
-    loadRecentNotes();
-    showToast('Note created!');
-  }
-  function clearNotes() {
-    if (!confirm('Delete all notes? This cannot be undone.')) return;
-    localStorage.removeItem('aipen_notes');
-    loadRecentNotes();
-    renderNotesGrid();
-    updateStats();
-    showToast('All notes cleared.');
-  }
+  function getNotes() { try { return JSON.parse(localStorage.getItem('aipen_notes') || '[]'); } catch { return []; } }
+  function saveNote(title, content) { const n = getNotes(); n.unshift({id:Date.now(),title,content,date:new Date().toLocaleDateString()}); localStorage.setItem('aipen_notes', JSON.stringify(n.slice(0,100))); updateStats(); }
+  function createNote() { const title=prompt('Note title:'); if(!title)return; const content=prompt('Content:'); if(!content)return; saveNote(title,content); renderNotesGrid(); loadRecentNotes(); showToast('Note created!'); }
+  function clearNotes() { if(!confirm('Delete all notes?'))return; localStorage.removeItem('aipen_notes'); loadRecentNotes(); renderNotesGrid(); updateStats(); showToast('All notes cleared.'); }
   function loadRecentNotes() {
-    const notes = getNotes().slice(0, 4);
+    const notes = getNotes().slice(0,4);
     const el = document.getElementById('recent-notes-list');
-    if (!notes.length) { el.innerHTML = '<div class="no-notes">No notes yet. Save something!</div>'; return; }
-    el.innerHTML = notes.map(n => `
-      <div class="note-item" onclick="openNote(${n.id})">
-        <div class="note-title">${escHtml(n.title)}</div>
-        <div class="note-preview">${escHtml(n.content.substring(0,60))}</div>
-        <div class="note-date">${n.date}</div>
-      </div>`).join('');
+    el.innerHTML = notes.length ? notes.map(n=>`<div class="note-item" onclick="openNote(${n.id})"><div class="note-title">${escHtml(n.title)}</div><div class="note-preview">${escHtml(n.content.substring(0,60))}</div><div class="note-date">${n.date}</div></div>`).join('') : '<div class="no-notes">No notes yet. Save something!</div>';
   }
-  function openNote(id) {
-    const note = getNotes().find(n => n.id === id);
-    if (!note) return;
-    document.getElementById('writing-area').textContent = note.content;
-    showToast('Note loaded into writing panel');
-  }
+  function openNote(id) { const n=getNotes().find(n=>n.id===id); if(n){document.getElementById('writing-area').textContent=n.content; showToast('Note loaded!');} }
   function renderNotesGrid() {
-    const notes = getNotes();
-    const grid = document.getElementById('notes-grid');
-    if (!notes.length) { grid.innerHTML = '<div class="no-notes" style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No notes saved yet. Start writing!</div>'; return; }
-    grid.innerHTML = notes.map(n => `
-      <div class="note-card" onclick="openNoteAndSwitch(${n.id})">
-        <div class="note-card-title">${escHtml(n.title)}</div>
-        <div class="note-card-body">${escHtml(n.content)}</div>
-        <div class="note-card-date">${n.date}</div>
-      </div>`).join('');
+    const notes=getNotes(); const grid=document.getElementById('notes-grid');
+    grid.innerHTML = notes.length ? notes.map(n=>`<div class="note-card" onclick="openNoteSwitch(${n.id})"><div class="note-card-title">${escHtml(n.title)}</div><div class="note-card-body">${escHtml(n.content)}</div><div class="note-card-date">${n.date}</div></div>`).join('') : '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No notes yet.</div>';
   }
-  function openNoteAndSwitch(id) {
-    openNote(id);
-    switchView('chat');
-  }
+  function openNoteSwitch(id) { openNote(id); switchView('chat'); }
 
   // ── Sessions ──
   function saveChatHistory() {
     if (localStorage.getItem('pref_save-history') === 'false') return;
-    const msgs = document.getElementById('messages');
-    const userMsgs = msgs.querySelectorAll('.msg-user');
+    const userMsgs = document.getElementById('messages').querySelectorAll('.msg-user');
     if (!userMsgs.length) return;
     const sessions = JSON.parse(localStorage.getItem('aipen_sessions') || '[]');
-    const preview = userMsgs[0].textContent.substring(0, 60);
-    const existing = sessions.find(s => s.id === window._sessionId);
-    if (existing) { existing.preview = preview; existing.count = userMsgs.length; }
-    else {
-      window._sessionId = Date.now();
-      sessions.unshift({ id: window._sessionId, preview, count: userMsgs.length, date: new Date().toLocaleDateString() });
-    }
-    localStorage.setItem('aipen_sessions', JSON.stringify(sessions.slice(0, 50)));
+    const preview = userMsgs[0].textContent.substring(0,60);
+    const ex = sessions.find(s=>s.id===window._sid);
+    if (ex) { ex.preview=preview; ex.count=userMsgs.length; }
+    else { window._sid=Date.now(); sessions.unshift({id:window._sid,preview,count:userMsgs.length,date:new Date().toLocaleDateString()}); }
+    localStorage.setItem('aipen_sessions', JSON.stringify(sessions.slice(0,50)));
   }
   function renderSessionsGrid() {
-    const sessions = JSON.parse(localStorage.getItem('aipen_sessions') || '[]');
-    const grid = document.getElementById('sessions-grid');
-    if (!sessions.length) { grid.innerHTML = '<div class="no-notes" style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No sessions yet. Start chatting!</div>'; return; }
-    grid.innerHTML = sessions.map(s => `
-      <div class="note-card">
-        <div class="note-card-title">${escHtml(s.preview)}…</div>
-        <div class="note-card-body">${s.count} message(s)</div>
-        <div class="note-card-date">${s.date}</div>
-      </div>`).join('');
+    const sessions=JSON.parse(localStorage.getItem('aipen_sessions')||'[]'); const grid=document.getElementById('sessions-grid');
+    grid.innerHTML = sessions.length ? sessions.map(s=>`<div class="note-card"><div class="note-card-title">${escHtml(s.preview)}…</div><div class="note-card-body">${s.count} message(s)</div><div class="note-card-date">${s.date}</div></div>`).join('') : '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No sessions yet.</div>';
   }
-  function clearSessions() {
-    if (!confirm('Clear all session history?')) return;
-    localStorage.removeItem('aipen_sessions');
-    renderSessionsGrid();
-    showToast('Sessions cleared.');
-  }
+  function clearSessions() { if(!confirm('Clear all sessions?'))return; localStorage.removeItem('aipen_sessions'); renderSessionsGrid(); showToast('Sessions cleared.'); }
 
   // ── Stats ──
   function updateStats() {
-    const notes = getNotes();
     document.getElementById('stat-words').textContent = totalWords;
     document.getElementById('stat-msgs').textContent = msgCount;
-    document.getElementById('stat-notes').textContent = notes.length;
-    const usedPct = Math.min(Math.round((msgCount / 100) * 100), 100);
-    document.getElementById('usage-fill').style.width = usedPct + '%';
+    document.getElementById('stat-notes').textContent = getNotes().length;
+    const pct = Math.min(Math.round(msgCount), 100);
+    document.getElementById('usage-fill').style.width = pct + '%';
     document.getElementById('usage-count').textContent = msgCount + ' / 100';
   }
-  function loadStats() {
-    const notes = getNotes();
-    document.getElementById('stat-notes').textContent = notes.length;
-    loadRecentNotes();
-  }
+  function loadStats() { document.getElementById('stat-notes').textContent = getNotes().length; loadRecentNotes(); }
 
   // ── Settings ──
-  function openSettings() {
-    document.getElementById('settings-overlay').classList.add('open');
-    loadSettingsValues();
-  }
-  function closeSettings() {
-    document.getElementById('settings-overlay').classList.remove('open');
-  }
-  function closeSettingsIfBg(e) {
-    if (e.target === document.getElementById('settings-overlay')) closeSettings();
-  }
-  function showSettingsPage(page) {
-    document.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+  function openSettings() { document.getElementById('settings-overlay').classList.add('open'); loadSettingsValues(); }
+  function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+  function closeSettingsIfBg(e) { if (e.target===document.getElementById('settings-overlay')) closeSettings(); }
+  function showSettingsPage(page, btn) {
+    document.querySelectorAll('.settings-page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.remove('active'));
     document.getElementById(`settings-${page}`)?.classList.add('active');
-    event.currentTarget.classList.add('active');
+    btn.classList.add('active');
   }
   function loadSettingsValues() {
-    // toggles
-    ['compact','rightpanel','autocomplete','grammar','smart','memory','autosend','autosave',
-     'sounds','typing-sound','notif-response','notif-daily','notif-streak','save-history','analytics'
-    ].forEach(k => {
-      const el = document.getElementById(`toggle-${k}`);
-      if (el) {
-        const val = localStorage.getItem(`pref_${k}`);
-        const defaultOn = ['rightpanel','autocomplete','grammar','smart','notif-response','notif-streak','save-history','analytics'].includes(k);
-        el.classList.toggle('on', val === null ? defaultOn : val === 'true');
-      }
+    ['rightpanel','smart','grammar','memory','autosend','autosave','sounds','notif-response','notif-daily','notif-streak','save-history','analytics'].forEach(k => {
+      const el = document.getElementById(`toggle-${k}`); if (!el) return;
+      const stored = localStorage.getItem(`pref_${k}`);
+      const defaultOn = ['rightpanel','smart','grammar','notif-response','notif-streak','save-history','analytics'].includes(k);
+      el.classList.toggle('on', stored === null ? defaultOn : stored === 'true');
     });
-    // selects
-    ['model','responseStyle','voiceLang','speechRate','speechVoice'].forEach(k => {
-      const el = document.getElementById(k === 'model' ? 'model-select' : k === 'responseStyle' ? 'response-style' : k === 'voiceLang' ? 'voice-lang' : k === 'speechRate' ? 'speech-rate' : 'speech-voice');
-      if (el && localStorage.getItem(`pref_${k}`)) el.value = localStorage.getItem(`pref_${k}`);
-    });
+    const vl = document.getElementById('voice-lang'); if (vl && localStorage.getItem('pref_voiceLang')) vl.value = localStorage.getItem('pref_voiceLang');
+    const sr = document.getElementById('speech-rate'); if (sr && localStorage.getItem('pref_speechRate')) sr.value = localStorage.getItem('pref_speechRate');
   }
   function toggleSetting(key) {
     const el = document.getElementById(`toggle-${key}`);
     el.classList.toggle('on');
     localStorage.setItem(`pref_${key}`, el.classList.contains('on'));
-    if (key === 'rightpanel') {
-      document.querySelector('.right-panel').style.display = el.classList.contains('on') ? '' : 'none';
-    }
-    if (key === 'compact') {
-      document.body.style.setProperty('--compact', el.classList.contains('on') ? '1' : '0');
-    }
+    if (key==='rightpanel') document.querySelector('.right-panel').style.display = el.classList.contains('on') ? '' : 'none';
   }
-  function savePref(key, val) { localStorage.setItem(`pref_${key}`, val); }
+  function savePref(k,v) { localStorage.setItem(`pref_${k}`,v); }
 
-  // ── Appearance ──
   function applyTheme(theme) {
-    const themes = {
-      dark: { bg:'#080d1a', sidebar:'#0e1525', card:'#131c30', border:'#1e2d47' },
-      darker: { bg:'#030610', sidebar:'#080d1a', card:'#0e1525', border:'#172030' },
-      midnight: { bg:'#05080f', sidebar:'#0a1020', card:'#0f1830', border:'#1a2840' },
-      forest: { bg:'#060d0a', sidebar:'#0b1510', card:'#10201a', border:'#1a3025' }
-    };
-    const t = themes[theme] || themes.dark;
-    document.documentElement.style.setProperty('--bg', t.bg);
-    document.documentElement.style.setProperty('--sidebar', t.sidebar);
-    document.documentElement.style.setProperty('--panel', t.sidebar);
-    document.documentElement.style.setProperty('--card', t.card);
-    document.documentElement.style.setProperty('--border', t.border);
-    savePref('theme', theme);
-    showToast('Theme applied!');
+    const themes = { dark:{bg:'#080d1a',sidebar:'#0e1525',card:'#131c30',border:'#1e2d47'}, darker:{bg:'#030610',sidebar:'#080d1a',card:'#0e1525',border:'#172030'}, midnight:{bg:'#05080f',sidebar:'#0a1020',card:'#0f1830',border:'#1a2840'}, forest:{bg:'#060d0a',sidebar:'#0b1510',card:'#10201a',border:'#1a3025'} };
+    const t = themes[theme]||themes.dark;
+    const r = document.documentElement.style;
+    r.setProperty('--bg',t.bg); r.setProperty('--sidebar',t.sidebar); r.setProperty('--panel',t.sidebar); r.setProperty('--card',t.card); r.setProperty('--border',t.border);
+    savePref('theme',theme); showToast('Theme applied!');
   }
   function setAccent(el) {
-    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
-    el.classList.add('selected');
-    const color = el.dataset.color;
-    document.documentElement.style.setProperty('--accent', color);
-    document.documentElement.style.setProperty('--accent2', color);
-    savePref('accent', color);
-    showToast('Accent color updated!');
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected')); el.classList.add('selected');
+    document.documentElement.style.setProperty('--accent',el.dataset.color);
+    document.documentElement.style.setProperty('--accent2',el.dataset.color);
+    savePref('accent',el.dataset.color); showToast('Accent updated!');
   }
-  function applyFontSize(size) {
-    document.querySelectorAll('.msg-text,.msg-user').forEach(el => el.style.fontSize = size + 'px');
-    savePref('fontSize', size);
-    showToast('Font size updated!');
-  }
+  function applyFontSize(size) { document.querySelectorAll('.msg-text,.msg-user').forEach(el=>el.style.fontSize=size+'px'); savePref('fontSize',size); showToast('Font size updated!'); }
 
-  // ── Account actions ──
   function saveDisplayName() {
     const name = document.getElementById('display-name-input').value.trim();
-    if (!name || name.length < 2) { showToast('Name must be at least 2 characters'); return; }
-    auth.currentUser?.updateProfile({ displayName: name }).then(() => {
-      document.getElementById('sidebar-name').textContent = name;
-      document.getElementById('sidebar-avatar').textContent = name[0].toUpperCase();
-      showToast('Display name saved!');
-    }).catch(() => showToast('Could not update name'));
+    if (name.length < 2) { showToast('Name must be at least 2 characters'); return; }
+    auth.currentUser?.updateProfile({displayName:name}).then(()=>{ document.getElementById('sidebar-name').textContent=name; document.getElementById('sidebar-avatar').textContent=name[0].toUpperCase(); showToast('Name saved!'); }).catch(()=>showToast('Could not update name'));
   }
-  function sendPasswordReset() {
-    const email = auth.currentUser?.email;
-    if (!email) { showToast('No email on this account'); return; }
-    auth.sendPasswordResetEmail(email).then(() => showToast('Password reset email sent!')).catch(() => showToast('Could not send reset email'));
-  }
-  function signOut() {
-    if (!confirm('Sign out of AI Pen?')) return;
-    auth.signOut().then(() => window.location.href = '/login.html');
-  }
+  function sendPasswordReset() { const e=auth.currentUser?.email; if(!e){showToast('No email on this account');return;} auth.sendPasswordResetEmail(e).then(()=>showToast('Reset email sent!')).catch(()=>showToast('Could not send reset email')); }
+  function signOut() { if(!confirm('Sign out?'))return; auth.signOut().then(()=>window.location.href='/login.html'); }
 
-  // ── Data management ──
   function exportData() {
-    const data = {
-      notes: getNotes(),
-      sessions: JSON.parse(localStorage.getItem('aipen_sessions') || '[]'),
-      preferences: Object.keys(localStorage).filter(k => k.startsWith('pref_')).reduce((o, k) => { o[k] = localStorage[k]; return o; }, {})
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'aipen-data.json';
-    a.click();
-    showToast('Data exported!');
+    const data={notes:getNotes(),sessions:JSON.parse(localStorage.getItem('aipen_sessions')||'[]'),prefs:Object.keys(localStorage).filter(k=>k.startsWith('pref_')).reduce((o,k)=>{o[k]=localStorage[k];return o;},{})};
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})); a.download='aipen-data.json'; a.click(); showToast('Data exported!');
   }
-  function clearHistory() {
-    if (!confirm('Clear all chat history?')) return;
-    localStorage.removeItem('aipen_sessions');
-    showToast('Chat history cleared.');
-  }
+  function clearHistory() { if(!confirm('Clear all chat history?'))return; localStorage.removeItem('aipen_sessions'); showToast('Chat history cleared.'); }
 
-  // ── Toast ──
   let _toastTimer;
   function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(_toastTimer);
-    _toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(_toastTimer); _toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
   }
 
-  // ── Apply saved preferences on load ──
-  (function applySavedPrefs() {
-    const accent = localStorage.getItem('pref_accent');
-    if (accent) {
-      document.documentElement.style.setProperty('--accent', accent);
-      document.documentElement.style.setProperty('--accent2', accent);
-      document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === accent));
-    }
-    const theme = localStorage.getItem('pref_theme');
-    if (theme) applyTheme(theme);
-    const rightPanel = localStorage.getItem('pref_rightpanel');
-    if (rightPanel === 'false') document.querySelector('.right-panel').style.display = 'none';
-    const fontSize = localStorage.getItem('pref_fontSize');
-    if (fontSize) document.querySelectorAll('.msg-text,.msg-user').forEach(el => el.style.fontSize = fontSize + 'px');
-  })();
+  function applySavedPrefs() {
+    const accent=localStorage.getItem('pref_accent');
+    if(accent){document.documentElement.style.setProperty('--accent',accent);document.documentElement.style.setProperty('--accent2',accent);document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('selected',s.dataset.color===accent));}
+    const theme=localStorage.getItem('pref_theme'); if(theme)applyTheme(theme);
+    if(localStorage.getItem('pref_rightpanel')==='false')document.querySelector('.right-panel').style.display='none';
+    const fs=localStorage.getItem('pref_fontSize'); if(fs)document.querySelectorAll('.msg-text,.msg-user').forEach(el=>el.style.fontSize=fs+'px');
+  }
 </script>
 </body>
 </html>
