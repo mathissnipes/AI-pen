@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+v<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -160,56 +160,49 @@ button,select,input,textarea{font-family:inherit;font-size:13px}
 /* messages */
 .messages{
   flex:1;overflow-y:auto;
-  padding:28px 32px;
-  display:flex;flex-direction:column;gap:20px;
+  padding:32px 36px;
+  display:flex;flex-direction:column;gap:28px;
 }
-.msg-row-user{display:flex;justify-content:flex-end}
-.msg-row-ai{display:flex;justify-content:flex-start;gap:10px;align-items:flex-start}
+.msg-row-user{display:flex;justify-content:flex-end;align-items:flex-end;gap:8px}
+.msg-row-ai{display:flex;justify-content:flex-start;gap:12px;align-items:flex-start}
 .ai-avatar{
-  width:28px;height:28px;min-width:28px;border-radius:50%;
+  width:32px;height:32px;min-width:32px;border-radius:10px;
   background:linear-gradient(135deg,var(--accent),#c084fc);
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:#fff;font-weight:700;
-  margin-top:2px;
+  font-size:13px;color:#fff;font-weight:700;flex-shrink:0;
+  box-shadow:0 3px 12px rgba(124,92,252,.3);
 }
 .bubble-user{
-  max-width:65%;
-  background:linear-gradient(135deg,#7c5cfc,#a78bfa);
+  max-width:68%;
+  background:linear-gradient(135deg,#7c5cfc,#9f7aea);
   color:#fff;
-  padding:12px 16px;
-  border-radius:18px 18px 4px 18px;
+  padding:11px 16px;
+  border-radius:20px 20px 5px 20px;
   font-size:13.5px;line-height:1.65;
   word-break:break-word;white-space:pre-wrap;
-  box-shadow:0 4px 20px rgba(124,92,252,.25);
 }
-.bubble-user-time{font-size:10px;color:var(--text-3);text-align:right;margin-top:5px}
-.bubble-ai-wrap{max-width:75%}
+.bubble-user-time{font-size:10px;color:var(--text-3);text-align:right;margin-top:4px}
+.bubble-ai-wrap{max-width:82%;min-width:0}
 .bubble-ai{
-  background:var(--card-s);
-  border:1px solid var(--border);
-  padding:14px 16px;
-  border-radius:4px 18px 18px 18px;
-  font-size:13.5px;line-height:1.72;
+  font-size:13.5px;line-height:1.78;
   color:var(--text);word-break:break-word;white-space:pre-wrap;
+  padding-top:2px;
 }
-.bubble-ai-label{
-  display:flex;align-items:center;gap:6px;
-  font-size:10px;font-weight:700;color:#a78bfa;
-  text-transform:uppercase;letter-spacing:.07em;
-  margin-bottom:9px;
+.bubble-ai-actions{
+  display:flex;gap:2px;margin-top:10px;
+  opacity:0;transition:opacity .18s;
 }
-.bubble-ai-label-dot{width:4px;height:4px;border-radius:50%;background:#a78bfa}
-.bubble-ai-actions{display:flex;gap:4px;margin-top:10px}
+.msg-row-ai:hover .bubble-ai-actions{opacity:1}
 .baa{
-  display:flex;align-items:center;gap:4px;
-  padding:4px 9px;border-radius:6px;
-  border:1px solid var(--border);background:none;
-  color:var(--text-3);font-size:11px;cursor:pointer;
-  transition:color .12s,background .12s,border-color .12s;
+  display:flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:7px;
+  border:none;background:none;
+  color:var(--text-3);font-size:14px;cursor:pointer;
+  transition:color .12s,background .12s;
 }
-.baa:hover{color:var(--text);background:rgba(255,255,255,.06);border-color:var(--border-l)}
-.baa.liked{color:var(--green);border-color:rgba(34,197,94,.3)}
-.baa.disliked{color:var(--red);border-color:rgba(244,63,94,.3)}
+.baa:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.baa.liked{color:var(--green)}
+.baa.disliked{color:var(--red)}
 .cursor-blink{
   display:inline-block;width:2px;height:14px;
   background:var(--accent);border-radius:1px;
@@ -221,9 +214,7 @@ button,select,input,textarea{font-family:inherit;font-size:13px}
 /* typing */
 .typing-indicator{
   display:none;
-  padding:14px 16px;
-  background:var(--card-s);border:1px solid var(--border);
-  border-radius:4px 18px 18px 18px;
+  padding:4px 0;
   width:fit-content;
 }
 .typing-dots{display:flex;gap:4px;align-items:center}
@@ -639,11 +630,10 @@ button,select,input,textarea{font-family:inherit;font-size:13px}
         <div class="ai-avatar">✦</div>
         <div class="bubble-ai-wrap">
           <div class="bubble-ai">
-            <div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>
-            Hello! I'm your AI Pen assistant. Ask me any question or give me something to write, edit, translate, or summarize. What can I help with?
+            <span class="msg-content">Hello! I'm your AI Pen assistant. Ask me any question or give me something to write, edit, translate, or summarize. What can I help with?</span>
             <div class="bubble-ai-actions">
-              <button class="baa" onclick="copyBubble(this)">📋 Copy</button>
-              <button class="baa" onclick="speakBubble(this)">🔊 Read</button>
+              <button class="baa" onclick="copyBubble(this)" title="Copy">📋</button>
+              <button class="baa" onclick="speakBubble(this)" title="Read aloud">🔊</button>
             </div>
           </div>
         </div>
@@ -1021,13 +1011,12 @@ async function fetchAIResponse() {
       <div class="ai-avatar">✦</div>
       <div class="bubble-ai-wrap">
         <div class="bubble-ai">
-          <div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>
           <span class="msg-content"></span><span class="cursor-blink"></span>
-          <div class="bubble-ai-actions" style="display:none">
-            <button class="baa" onclick="copyBubble(this)">📋 Copy</button>
-            <button class="baa" onclick="likeMsg(this)">👍 Like</button>
-            <button class="baa" onclick="dislikeMsg(this)">👎 Dislike</button>
-            <button class="baa" onclick="speakBubble(this)">🔊 Read</button>
+          <div class="bubble-ai-actions" style="visibility:hidden">
+            <button class="baa" onclick="copyBubble(this)" title="Copy">📋</button>
+            <button class="baa" onclick="likeMsg(this)" title="Like">👍</button>
+            <button class="baa" onclick="dislikeMsg(this)" title="Dislike">👎</button>
+            <button class="baa" onclick="speakBubble(this)" title="Read aloud">🔊</button>
           </div>
         </div>
       </div>`;
@@ -1055,7 +1044,7 @@ async function fetchAIResponse() {
     }
 
     cursor?.remove();
-    aiRow.querySelector('.bubble-ai-actions').style.display = 'flex';
+    aiRow.querySelector('.bubble-ai-actions').style.visibility = '';
     chatHistory.push({ role: 'assistant', content: fullText });
     totalMessages++; updateStats(); saveSession();
 
@@ -1077,14 +1066,14 @@ function startNewChat() {
   const typingRow = document.getElementById('typing-row');
   while (msgs.firstChild && msgs.firstChild !== typingRow) msgs.removeChild(msgs.firstChild);
   const row = document.createElement('div'); row.className = 'msg-row-ai';
-  row.innerHTML = `<div class="ai-avatar">✦</div><div class="bubble-ai-wrap"><div class="bubble-ai"><div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>New chat started! What would you like to work on?<div class="bubble-ai-actions"><button class="baa" onclick="copyBubble(this)">📋 Copy</button></div></div></div>`;
+  row.innerHTML = `<div class="ai-avatar">✦</div><div class="bubble-ai-wrap"><div class="bubble-ai"><span class="msg-content">New chat started! What would you like to work on?</span><div class="bubble-ai-actions"><button class="baa" onclick="copyBubble(this)" title="Copy">📋</button></div></div></div>`;
   msgs.insertBefore(row, typingRow);
   toast('New chat started');
 }
 
 // ── Message actions ──
 function copyBubble(btn) {
-  const t = btn.closest('.bubble-ai').querySelector('.msg-content')?.textContent || btn.closest('.bubble-ai').innerText.split('\n').slice(1).join('\n').replace(/📋.*|👍.*|👎.*|🔊.*/g,'').trim();
+  const t = btn.closest('.bubble-ai').querySelector('.msg-content')?.textContent || '';
   navigator.clipboard.writeText(t).then(() => toast('Copied!'));
 }
 function likeMsg(btn) { btn.classList.toggle('liked'); toast(btn.classList.contains('liked') ? 'Liked!' : 'Removed.'); }
