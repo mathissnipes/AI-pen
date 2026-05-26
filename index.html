@@ -1,1 +1,1425 @@
-https://claude.ai/api/organizations/dc6c179e-f295-4be9-a78a-7f61918b9d2d/files/1c1d9648-9e85-4cc5-80e0-98f50e708b07/contents
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Pen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Caveat:wght@500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0c12;
+  --panel:#10111a;
+  --card:#16172200;
+  --card-s:#1a1b28;
+  --border:#21233a;
+  --border-l:#2a2d48;
+  --accent:#7c5cfc;
+  --accent-soft:rgba(124,92,252,.14);
+  --accent-glow:rgba(124,92,252,.3);
+  --green:#22c55e;--red:#f43f5e;--yellow:#eab308;
+  --text:#eeeef5;--text-2:#888aaa;--text-3:#454668;
+  --r:10px;--r-lg:16px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;font-size:13px}
+button,select,input,textarea{font-family:inherit;font-size:13px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:4px}
+
+/* ════════════════════════════════
+   SIDEBAR
+════════════════════════════════ */
+.sidebar{
+  width:220px;min-width:220px;height:100vh;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:20px 12px 16px;
+  gap:4px;
+}
+.logo{display:flex;align-items:center;gap:10px;padding:0 6px;margin-bottom:24px}
+.logo-mark{
+  width:30px;height:30px;border-radius:9px;
+  background:linear-gradient(145deg,#7c5cfc,#c084fc);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(124,92,252,.35);
+}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-.4px}
+.logo-text span{color:#c084fc}
+
+.new-chat{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:9px 14px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:var(--r);
+  font-weight:600;font-size:12.5px;
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .15s,transform .1s;
+  margin-bottom:20px;
+  box-shadow:0 3px 16px rgba(124,92,252,.35);
+}
+.new-chat:hover{opacity:.88}.new-chat:active{transform:scale(.97)}
+
+.sb-section{margin-bottom:20px}
+.sb-section-label{
+  font-size:10px;font-weight:600;letter-spacing:.1em;
+  color:var(--text-3);text-transform:uppercase;
+  padding:0 8px 8px;
+}
+.sb-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:8px 10px;
+  border:none;background:none;
+  border-radius:var(--r);
+  color:var(--text-2);font-size:12.5px;font-weight:500;
+  cursor:pointer;text-align:left;
+  transition:background .12s,color .12s;
+}
+.sb-btn:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.sb-btn.active{background:var(--accent-soft);color:#c084fc}
+.sb-btn .icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+.sb-divider{height:1px;background:var(--border);margin:4px 6px 16px}
+
+.sb-shortcut{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:var(--r);
+  color:var(--text-3);font-size:12px;
+  cursor:pointer;transition:color .12s,background .12s;
+}
+.sb-shortcut:hover{color:var(--text-2);background:rgba(255,255,255,.03)}
+.sb-shortcut::before{content:'↳';font-size:11px;color:var(--text-3)}
+
+.sb-spacer{flex:1}
+
+.usage-box{padding:10px 8px;margin-bottom:8px}
+.usage-label{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-3);margin-bottom:6px}
+.usage-bar{height:3px;background:var(--border);border-radius:2px}
+.usage-fill{height:100%;background:linear-gradient(90deg,var(--accent),#c084fc);border-radius:2px;transition:width .3s;width:0%}
+
+.user-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:var(--r);
+  cursor:pointer;transition:background .12s;
+}
+.user-btn:hover{background:rgba(255,255,255,.05)}
+.avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#c084fc);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:10.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+
+/* ════════════════════════════════
+   MAIN CONTENT
+════════════════════════════════ */
+.main{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;
+  height:100vh;
+  border-left:1px solid var(--border);
+  border-right:1px solid var(--border);
+}
+
+/* top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:var(--panel);
+}
+.topbar-left .page-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.topbar-left .page-sub{font-size:11.5px;color:var(--text-2);margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.status-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(34,197,94,.08);
+  border:1px solid rgba(34,197,94,.18);
+  font-size:11px;font-weight:600;color:var(--green);
+}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.icon-btn{
+  width:32px;height:32px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--card-s);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-2);font-size:14px;
+  transition:background .12s,color .12s;
+}
+.icon-btn:hover{background:var(--border);color:var(--text)}
+
+/* views */
+.view{display:none;flex-direction:column;flex:1;overflow:hidden}
+.view.active{display:flex}
+
+/* messages */
+.messages{
+  flex:1;overflow-y:auto;
+  padding:28px 32px;
+  display:flex;flex-direction:column;gap:20px;
+}
+.msg-row-user{display:flex;justify-content:flex-end}
+.msg-row-ai{display:flex;justify-content:flex-start;gap:10px;align-items:flex-start}
+.ai-avatar{
+  width:28px;height:28px;min-width:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#c084fc);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#fff;font-weight:700;
+  margin-top:2px;
+}
+.bubble-user{
+  max-width:65%;
+  background:linear-gradient(135deg,#7c5cfc,#a78bfa);
+  color:#fff;
+  padding:12px 16px;
+  border-radius:18px 18px 4px 18px;
+  font-size:13.5px;line-height:1.65;
+  word-break:break-word;white-space:pre-wrap;
+  box-shadow:0 4px 20px rgba(124,92,252,.25);
+}
+.bubble-user-time{font-size:10px;color:var(--text-3);text-align:right;margin-top:5px}
+.bubble-ai-wrap{max-width:75%}
+.bubble-ai{
+  background:var(--card-s);
+  border:1px solid var(--border);
+  padding:14px 16px;
+  border-radius:4px 18px 18px 18px;
+  font-size:13.5px;line-height:1.72;
+  color:var(--text);word-break:break-word;white-space:pre-wrap;
+}
+.bubble-ai-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:#a78bfa;
+  text-transform:uppercase;letter-spacing:.07em;
+  margin-bottom:9px;
+}
+.bubble-ai-label-dot{width:4px;height:4px;border-radius:50%;background:#a78bfa}
+.bubble-ai-actions{display:flex;gap:4px;margin-top:10px}
+.baa{
+  display:flex;align-items:center;gap:4px;
+  padding:4px 9px;border-radius:6px;
+  border:1px solid var(--border);background:none;
+  color:var(--text-3);font-size:11px;cursor:pointer;
+  transition:color .12s,background .12s,border-color .12s;
+}
+.baa:hover{color:var(--text);background:rgba(255,255,255,.06);border-color:var(--border-l)}
+.baa.liked{color:var(--green);border-color:rgba(34,197,94,.3)}
+.baa.disliked{color:var(--red);border-color:rgba(244,63,94,.3)}
+.cursor-blink{
+  display:inline-block;width:2px;height:14px;
+  background:var(--accent);border-radius:1px;
+  margin-left:1px;vertical-align:text-bottom;
+  animation:blink .7s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* typing */
+.typing-indicator{
+  display:none;
+  padding:14px 16px;
+  background:var(--card-s);border:1px solid var(--border);
+  border-radius:4px 18px 18px 18px;
+  width:fit-content;
+}
+.typing-dots{display:flex;gap:4px;align-items:center}
+.typing-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--text-3);
+  animation:bounce 1.3s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.16s}
+.typing-dot:nth-child(3){animation-delay:.32s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* error */
+.error-bar{
+  display:none;align-items:center;gap:8px;
+  margin:0 32px 4px;padding:10px 14px;
+  background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);
+  border-radius:var(--r);font-size:12px;color:#fca5a5;
+}
+.error-bar.show{display:flex}
+
+/* suggestion chips */
+.chips-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:6px 32px 10px;flex-shrink:0;
+}
+.chip{
+  padding:5px 14px;border-radius:20px;
+  border:1px solid var(--border);background:var(--card-s);
+  font-size:12px;color:var(--text-2);cursor:pointer;
+  transition:border-color .12s,color .12s,background .12s;white-space:nowrap;
+}
+.chip:hover{border-color:var(--accent);color:#c084fc;background:var(--accent-soft)}
+
+/* input area */
+.input-section{padding:10px 24px 20px;flex-shrink:0}
+.template-popup{
+  position:absolute;bottom:calc(100% + 6px);left:24px;
+  width:340px;background:var(--card-s);
+  border:1px solid var(--border-l);border-radius:var(--r-lg);
+  padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.7);
+  z-index:100;
+  opacity:0;pointer-events:none;transform:translateY(10px);
+  transition:opacity .15s,transform .15s;
+}
+.template-popup.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.tpl-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tpl-item{
+  padding:10px 12px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--panel);
+  cursor:pointer;transition:border-color .12s,background .12s;
+}
+.tpl-item:hover{border-color:var(--accent);background:var(--accent-soft)}
+.tpl-item-icon{font-size:16px;margin-bottom:4px}
+.tpl-item-name{font-size:11.5px;font-weight:600}
+.tpl-item-desc{font-size:10.5px;color:var(--text-3);margin-top:2px}
+.input-box{
+  display:flex;align-items:flex-end;gap:8px;
+  background:var(--card-s);border:1px solid var(--border);
+  border-radius:14px;padding:10px 12px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.12)}
+.input-action{
+  width:28px;height:28px;border-radius:7px;
+  border:1px solid var(--border);background:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-3);font-size:12px;
+  flex-shrink:0;transition:color .12s,background .12s;
+}
+.input-action:hover{color:var(--text);background:rgba(255,255,255,.07)}
+.input-action.recording{color:var(--red);border-color:rgba(244,63,94,.35)}
+#msg-input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--text);font-size:13.5px;resize:none;
+  min-height:22px;max-height:120px;line-height:1.55;padding:2px 0;
+}
+#msg-input::placeholder{color:var(--text-3)}
+.send-btn{
+  width:34px;height:34px;border-radius:9px;
+  background:var(--accent);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;color:#fff;
+  box-shadow:0 3px 14px rgba(124,92,252,.4);
+  transition:opacity .12s,transform .1s;
+}
+.send-btn:hover{opacity:.85}.send-btn:active{transform:scale(.93)}
+
+/* ════════════════════════════════
+   NOTES / SESSIONS VIEWS
+════════════════════════════════ */
+.grid-view{flex:1;overflow-y:auto;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-content:start}
+.grid-card{
+  background:var(--card-s);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:14px;
+  cursor:pointer;transition:border-color .15s,transform .12s;
+}
+.grid-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.gc-title{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.gc-body{font-size:12px;color:var(--text-2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gc-date{font-size:10.5px;color:var(--text-3);margin-top:10px}
+.empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:13px}
+.action-btn{
+  padding:8px 16px;border-radius:var(--r);
+  font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:opacity .12s;border:none;
+}
+.action-btn.primary{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(124,92,252,.3)}
+.action-btn.primary:hover{opacity:.87}
+.action-btn.ghost{background:none;border:1px solid var(--border);color:var(--text-2)}
+.action-btn.ghost:hover{border-color:var(--accent);color:#c084fc}
+
+/* ════════════════════════════════
+   RIGHT PANEL
+════════════════════════════════ */
+.right-panel{
+  width:272px;min-width:272px;
+  background:var(--panel);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;padding:16px 12px;gap:10px;
+}
+.rp-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:14px;
+}
+.rp-card-title{
+  font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text-3);margin-bottom:12px;
+}
+
+/* bluetooth */
+.bt-device-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bt-device-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid rgba(124,92,252,.2);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.bt-device-name{font-size:13px;font-weight:600}
+.bt-device-status{font-size:11px;font-weight:500;margin-top:2px}
+.bt-device-status.disconnected{color:var(--text-3)}
+.bt-device-status.connecting{color:var(--yellow)}
+.bt-device-status.connected{color:var(--green)}
+.battery-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.battery-track{flex:1;height:4px;background:var(--border);border-radius:2px}
+.battery-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
+.battery-label{font-size:10.5px;color:var(--text-3);width:28px;text-align:right}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.stat-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:9px 11px}
+.stat-value{font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.stat-label{font-size:10px;color:var(--text-3);margin-top:3px}
+.bt-connect-btn{
+  width:100%;padding:8px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:12px;font-weight:600;color:var(--text-2);
+  cursor:pointer;transition:border-color .12s,color .12s,background .12s;
+}
+.bt-connect-btn:hover{border-color:var(--accent);color:#c084fc;background:var(--accent-soft)}
+.bt-connect-btn.connected{border-color:rgba(244,63,94,.3);color:var(--red);background:rgba(244,63,94,.06)}
+.bt-connect-btn.connected:hover{background:rgba(244,63,94,.12)}
+.bt-connect-btn:disabled{opacity:.4;pointer-events:none}
+.bt-unavailable{font-size:11px;color:var(--text-3);text-align:center;margin-top:8px;font-style:italic}
+
+/* writing panel */
+.writing-pad{
+  min-height:80px;max-height:120px;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r);padding:9px 11px;
+  font-family:'Caveat',cursive;font-size:17px;color:var(--text);
+  outline:none;margin-bottom:8px;line-height:1.5;
+}
+.writing-pad:empty::before{content:attr(data-placeholder);color:var(--text-3);font-size:16px}
+.writing-pad:focus{border-color:var(--border-l)}
+.voice-status{font-size:11px;color:var(--text-3);font-style:italic;margin-bottom:8px;min-height:14px}
+.writing-actions{display:flex;gap:5px}
+.writing-act{
+  flex:1;padding:6px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--panel);
+  font-size:11px;font-weight:600;color:var(--text-3);cursor:pointer;
+  transition:color .12s,border-color .12s;
+}
+.writing-act:hover{color:var(--text);border-color:var(--border-l)}
+
+/* tools */
+.tools-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.tool-item{
+  padding:8px 4px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--panel);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;transition:border-color .12s,background .12s;
+}
+.tool-item:hover{border-color:var(--accent);background:var(--accent-soft)}
+.tool-emoji{font-size:14px}
+.tool-name{font-size:9.5px;color:var(--text-3);text-align:center}
+
+/* recent notes */
+.note-item{
+  padding:9px 11px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--panel);
+  margin-bottom:5px;cursor:pointer;
+  transition:border-color .12s;
+}
+.note-item:hover{border-color:var(--accent)}
+.note-item:last-child{margin-bottom:0}
+.note-item-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-item-preview{font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.note-item-date{font-size:10px;color:var(--text-3);margin-top:4px}
+.no-items{font-size:12px;color:var(--text-3);text-align:center;padding:8px 0}
+
+/* ════════════════════════════════
+   SETTINGS MODAL
+════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:300;
+}
+.modal-overlay.open{display:flex}
+.settings-modal{
+  background:var(--panel);
+  border:1px solid var(--border-l);
+  border-radius:var(--r-lg);
+  width:640px;max-width:94vw;max-height:86vh;
+  display:flex;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.85);
+}
+.settings-nav{
+  width:180px;min-width:180px;
+  background:var(--bg);
+  border-right:1px solid var(--border);
+  padding:20px 10px;display:flex;flex-direction:column;gap:2px;
+}
+.settings-nav-title{font-size:13px;font-weight:700;padding:0 10px 16px}
+.settings-nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r);
+  font-size:12.5px;color:var(--text-2);
+  cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;
+  transition:color .12s,background .12s;
+}
+.settings-nav-item:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.settings-nav-item.active{color:#c084fc;background:var(--accent-soft)}
+.settings-nav-item .icon{font-size:13px;width:16px;text-align:center}
+.settings-content{flex:1;overflow-y:auto;padding:26px}
+.settings-page{display:none}.settings-page.active{display:block}
+.settings-page-title{font-size:16px;font-weight:700;margin-bottom:3px}
+.settings-page-sub{font-size:12px;color:var(--text-2);margin-bottom:22px;line-height:1.5}
+.settings-group{margin-bottom:24px}
+.settings-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:10px}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;border-radius:var(--r);
+  background:var(--bg);border:1px solid var(--border);
+  margin-bottom:5px;gap:14px;
+}
+.settings-row:last-child{margin-bottom:0}
+.sr-label{font-size:12.5px;font-weight:500}
+.sr-desc{font-size:11px;color:var(--text-3);margin-top:2px}
+.toggle{
+  width:36px;height:20px;background:var(--border-l);
+  border-radius:10px;position:relative;cursor:pointer;border:none;
+  transition:background .2s;flex-shrink:0;
+}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{transform:translateX(16px)}
+.settings-select{
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text);border-radius:var(--r);
+  padding:5px 10px;font-size:12px;outline:none;cursor:pointer;
+}
+.settings-select:focus{border-color:var(--accent)}
+.settings-input{
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text);border-radius:var(--r);
+  padding:8px 12px;font-size:13px;outline:none;width:100%;
+}
+.settings-input:focus{border-color:var(--accent)}
+.color-swatches{display:flex;gap:7px;flex-wrap:wrap}
+.swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .12s}
+.swatch.active{border-color:#fff;transform:scale(1.18)}
+.model-list{display:flex;flex-direction:column;gap:5px}
+.model-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 13px;border-radius:var(--r);
+  background:var(--bg);border:2px solid var(--border);
+  cursor:pointer;transition:border-color .15s;
+}
+.model-row.active{border-color:var(--accent);background:var(--accent-soft)}
+.model-icon{font-size:18px;flex-shrink:0}
+.model-info{flex:1}
+.model-name{font-size:12.5px;font-weight:600}
+.model-desc{font-size:11px;color:var(--text-3);margin-top:2px}
+.model-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  flex-shrink:0;
+}
+.model-badge.free{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.model-badge.fast{background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.2)}
+.model-badge.smart{background:var(--accent-soft);color:#c084fc;border:1px solid rgba(124,92,252,.25)}
+.btn-danger{padding:7px 14px;border-radius:var(--r);background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:var(--red);font-size:12px;font-weight:600;cursor:pointer}
+.btn-danger:hover{background:rgba(244,63,94,.18)}
+.btn-primary{padding:7px 14px;border-radius:var(--r);background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.btn-primary:hover{opacity:.87}
+.btn-outline{padding:7px 14px;border-radius:var(--r);background:none;border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;cursor:pointer}
+.btn-outline:hover{border-color:var(--accent);color:#c084fc}
+
+/* ════════════════════════════════
+   TOAST
+════════════════════════════════ */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--card-s);border:1px solid var(--border-l);
+  border-radius:10px;padding:9px 18px;
+  font-size:12.5px;box-shadow:0 10px 34px rgba(0,0,0,.6);
+  opacity:0;transition:opacity .15s,transform .15s;
+  z-index:999;pointer-events:none;will-change:transform,opacity;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    <div class="logo-text">AI<span>Pen</span></div>
+  </div>
+
+  <button class="new-chat" onclick="startNewChat()">✦ &nbsp;New Chat</button>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Menu</div>
+    <button class="sb-btn active" id="nav-chat" onclick="switchView('chat')">
+      <span class="icon">💬</span>Chat
+    </button>
+    <button class="sb-btn" id="nav-notes" onclick="switchView('notes')">
+      <span class="icon">📝</span>Notes
+    </button>
+    <button class="sb-btn" id="nav-sessions" onclick="switchView('sessions')">
+      <span class="icon">🕐</span>History
+    </button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Tools</div>
+    <button class="sb-btn" onclick="prefill('Summarize this text:\n\n')">
+      <span class="icon">📋</span>Summarize
+    </button>
+    <button class="sb-btn" onclick="prefill('Translate to Spanish:\n\n')">
+      <span class="icon">🌐</span>Translate
+    </button>
+    <button class="sb-btn" onclick="openTemplates()">
+      <span class="icon">📄</span>Templates
+    </button>
+  </div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Quick Actions</div>
+    <div class="sb-shortcut" onclick="prefill('Fix the grammar in:\n\n')">Fix Grammar</div>
+    <div class="sb-shortcut" onclick="prefill('Explain this simply:\n\n')">Explain Simply</div>
+    <div class="sb-shortcut" onclick="prefill('Continue writing:\n\n')">Continue Writing</div>
+    <div class="sb-shortcut" onclick="prefill('Brainstorm ideas about:\n\n')">Brainstorm</div>
+    <div class="sb-shortcut" onclick="prefill('Write an email about:\n\n')">Write Email</div>
+  </div>
+
+  <div class="sb-spacer"></div>
+
+  <div class="usage-box">
+    <div class="usage-label">
+      <span>Messages used</span>
+      <span id="usage-label">0 / 100</span>
+    </div>
+    <div class="usage-bar"><div class="usage-fill" id="usage-fill"></div></div>
+  </div>
+
+  <div class="user-btn" onclick="openSettings()">
+    <div class="avatar" id="user-avatar">U</div>
+    <div class="user-info">
+      <div class="user-name" id="user-name">User</div>
+      <div class="user-email" id="user-email">Loading…</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- CHAT VIEW -->
+  <div class="view active" id="view-chat">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="page-title">Good morning</div>
+        <div class="page-sub">Ask me anything — I'm powered by real AI</div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div><span id="model-name-badge">GPT-4o Mini</span></div>
+        <button class="icon-btn" onclick="startNewChat()" title="Clear chat">🗑</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg-row-ai">
+        <div class="ai-avatar">✦</div>
+        <div class="bubble-ai-wrap">
+          <div class="bubble-ai">
+            <div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>
+            Hello! I'm your AI Pen assistant. Ask me any question or give me something to write, edit, translate, or summarize. What can I help with?
+            <div class="bubble-ai-actions">
+              <button class="baa" onclick="copyBubble(this)">📋 Copy</button>
+              <button class="baa" onclick="speakBubble(this)">🔊 Read</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="typing-row" class="msg-row-ai" style="display:none">
+        <div class="ai-avatar">✦</div>
+        <div class="typing-indicator" id="typing-ind">
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-bar" id="error-bar">⚠️ <span id="error-text"></span></div>
+
+    <div class="chips-row">
+      <div class="chip" onclick="sendQuick('What is photosynthesis?')">🌿 Photosynthesis</div>
+      <div class="chip" onclick="sendQuick('Write a short poem about the moon')">✍️ Write a poem</div>
+      <div class="chip" onclick="sendQuick('Translate \"hello, how are you\" to French')">🌐 Translate</div>
+      <div class="chip" onclick="sendQuick('Give me 5 ideas for a school project')">💡 Project ideas</div>
+      <div class="chip" onclick="sendQuick('Explain gravity in simple terms')">🔭 Explain gravity</div>
+    </div>
+
+    <div class="input-section" style="position:relative">
+      <div class="template-popup" id="tpl-popup">
+        <div class="tpl-title">Templates</div>
+        <div class="tpl-grid">
+          <div class="tpl-item" onclick="useTpl('Write a professional email about:\n')"><div class="tpl-item-icon">📧</div><div class="tpl-item-name">Email</div><div class="tpl-item-desc">Professional draft</div></div>
+          <div class="tpl-item" onclick="useTpl('Write a blog post about:\n')"><div class="tpl-item-icon">📰</div><div class="tpl-item-name">Blog Post</div><div class="tpl-item-desc">Full article</div></div>
+          <div class="tpl-item" onclick="useTpl('Write a short story about:\n')"><div class="tpl-item-icon">📖</div><div class="tpl-item-name">Story</div><div class="tpl-item-desc">Creative fiction</div></div>
+          <div class="tpl-item" onclick="useTpl('Summarize these meeting notes:\n')"><div class="tpl-item-icon">📋</div><div class="tpl-item-name">Meeting Notes</div><div class="tpl-item-desc">Clean summary</div></div>
+          <div class="tpl-item" onclick="useTpl('Write a social media post about:\n')"><div class="tpl-item-icon">📱</div><div class="tpl-item-name">Social Post</div><div class="tpl-item-desc">Engaging content</div></div>
+          <div class="tpl-item" onclick="useTpl('Write a cover letter for someone who:\n')"><div class="tpl-item-icon">💼</div><div class="tpl-item-name">Cover Letter</div><div class="tpl-item-desc">Job application</div></div>
+        </div>
+      </div>
+      <div class="input-box">
+        <button class="input-action" onclick="openTemplates()" title="Templates">📄</button>
+        <textarea id="msg-input" placeholder="Ask anything or paste text to edit…" rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="input-action" id="mic-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES VIEW -->
+  <div class="view" id="view-notes">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title">Notes</div>
+        <div class="page-sub">Your saved writing</div>
+      </div>
+      <div class="topbar-right">
+        <button class="action-btn primary" onclick="createNote()">+ New Note</button>
+      </div>
+    </div>
+    <div class="grid-view" id="notes-grid"></div>
+  </div>
+
+  <!-- SESSIONS VIEW -->
+  <div class="view" id="view-sessions">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title">History</div>
+        <div class="page-sub">Past conversations</div>
+      </div>
+      <div class="topbar-right">
+        <button class="action-btn ghost" onclick="clearAllSessions()">Clear All</button>
+      </div>
+    </div>
+    <div class="grid-view" id="sessions-grid"></div>
+  </div>
+</main>
+
+<!-- ══ RIGHT PANEL ══ -->
+<aside class="right-panel">
+
+  <div class="rp-card">
+    <div class="rp-card-title">Pen Status</div>
+    <div class="bt-device-row">
+      <div class="bt-device-icon">🖊️</div>
+      <div>
+        <div class="bt-device-name" id="device-name">AI Pen</div>
+        <div class="bt-device-status disconnected" id="device-status">● Not Connected</div>
+      </div>
+    </div>
+    <div class="battery-row" id="battery-row" style="display:none">
+      <div class="battery-track"><div class="battery-fill" id="battery-fill" style="width:0%"></div></div>
+      <span class="battery-label" id="battery-label">—</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-value" id="stat-words">0</div><div class="stat-label">Words</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-msgs">0</div><div class="stat-label">Messages</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-notes">0</div><div class="stat-label">Notes</div></div>
+      <div class="stat-box"><div class="stat-value">1</div><div class="stat-label">Day Streak</div></div>
+    </div>
+    <button class="bt-connect-btn" id="bt-btn" onclick="toggleBluetooth()">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="6.5 6.5 17.5 17.5"/><polyline points="17.5 6.5 12 12 17.5 17.5"/><polyline points="6.5 17.5 12 12"/></svg>
+      <span id="bt-btn-label">Connect via Bluetooth</span>
+    </button>
+    <div class="bt-unavailable" id="bt-unavailable" style="display:none">Not supported in this browser</div>
+  </div>
+
+  <div class="rp-card">
+    <div class="rp-card-title">Live Writing</div>
+    <div class="writing-pad" id="writing-pad" contenteditable="true"
+      data-placeholder="Start writing here…" oninput="onWritingInput()"></div>
+    <div class="voice-status" id="voice-status">Tap mic to dictate</div>
+    <div class="writing-actions">
+      <button class="writing-act" onclick="copyWriting()">📋 Copy</button>
+      <button class="writing-act" onclick="sendWritingToChat()">→ Send to AI</button>
+      <button class="writing-act" onclick="saveWriting()">💾 Save</button>
+    </div>
+  </div>
+
+  <div class="rp-card">
+    <div class="rp-card-title">AI Tools</div>
+    <div class="tools-grid">
+      <button class="tool-item" onclick="prefill('Summarize:\n\n')"><span class="tool-emoji">📋</span><span class="tool-name">Summarize</span></button>
+      <button class="tool-item" onclick="prefill('Fix grammar:\n\n')"><span class="tool-emoji">✏️</span><span class="tool-name">Grammar</span></button>
+      <button class="tool-item" onclick="prefill('Translate to Spanish:\n\n')"><span class="tool-emoji">🌐</span><span class="tool-name">Translate</span></button>
+      <button class="tool-item" onclick="prefill('Expand this:\n\n')"><span class="tool-emoji">📝</span><span class="tool-name">Expand</span></button>
+      <button class="tool-item" onclick="prefill('Make professional:\n\n')"><span class="tool-emoji">🎨</span><span class="tool-name">Tone</span></button>
+    </div>
+  </div>
+
+  <div class="rp-card">
+    <div class="rp-card-title">Recent Notes</div>
+    <div id="recent-notes-list"><div class="no-items">No notes yet.</div></div>
+  </div>
+
+</aside>
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div class="modal-overlay" id="settings-overlay" onclick="overlayClose(event)">
+  <div class="settings-modal">
+    <div class="settings-nav">
+      <div class="settings-nav-title">Settings</div>
+      <button class="settings-nav-item active" onclick="showSettingsPage('appearance', this)"><span class="icon">🎨</span>Appearance</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('ai', this)"><span class="icon">✦</span>AI &amp; Model</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('writing', this)"><span class="icon">✏️</span>Writing</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('privacy', this)"><span class="icon">🔒</span>Privacy</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('account', this)"><span class="icon">👤</span>Account</button>
+      <button class="settings-nav-item" onclick="showSettingsPage('about', this)"><span class="icon">ℹ️</span>About</button>
+      <div style="flex:1"></div>
+      <button class="settings-nav-item" onclick="closeSettings()" style="color:var(--red)"><span class="icon">✕</span>Close</button>
+    </div>
+    <div class="settings-content">
+
+      <div class="settings-page active" id="page-appearance">
+        <div class="settings-page-title">Appearance</div>
+        <div class="settings-page-sub">Customize how AI Pen looks and feels.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Theme</div>
+          <div class="settings-row"><div><div class="sr-label">Color Theme</div><div class="sr-desc">Overall color scheme</div></div><select class="settings-select" onchange="applyTheme(this.value)"><option value="dark">Dark</option><option value="amoled">AMOLED Black</option><option value="midnight">Midnight Blue</option><option value="forest">Forest Green</option></select></div>
+          <div class="settings-row"><div><div class="sr-label">Accent Color</div><div class="sr-desc">Highlight and button color</div></div><div class="color-swatches"><div class="swatch active" style="background:#7c5cfc" data-color="#7c5cfc" onclick="setAccent(this)"></div><div class="swatch" style="background:#3b82f6" data-color="#3b82f6" onclick="setAccent(this)"></div><div class="swatch" style="background:#06b6d4" data-color="#06b6d4" onclick="setAccent(this)"></div><div class="swatch" style="background:#10b981" data-color="#10b981" onclick="setAccent(this)"></div><div class="swatch" style="background:#f59e0b" data-color="#f59e0b" onclick="setAccent(this)"></div><div class="swatch" style="background:#f43f5e" data-color="#f43f5e" onclick="setAccent(this)"></div></div></div>
+          <div class="settings-row"><div><div class="sr-label">Message Font Size</div></div><select class="settings-select" onchange="setFontSize(this.value)"><option value="12">Small</option><option value="13.5" selected>Medium</option><option value="15">Large</option><option value="17">Extra Large</option></select></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">Layout</div>
+          <div class="settings-row"><div><div class="sr-label">Show Right Panel</div><div class="sr-desc">Bluetooth, tools &amp; notes</div></div><button class="toggle on" id="tog-panel" onclick="toggleSetting('panel')"></button></div>
+        </div>
+      </div>
+
+      <div class="settings-page" id="page-ai">
+        <div class="settings-page-title">AI &amp; Model</div>
+        <div class="settings-page-sub">Choose which AI model powers your responses.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Model</div>
+          <div class="model-list" id="model-list"></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">System Prompt</div>
+          <textarea class="settings-input" id="system-prompt-input" rows="3" style="resize:vertical" placeholder="You are AI Pen, a concise AI assistant…" oninput="savePref('sysprompt', this.value)"></textarea>
+        </div>
+      </div>
+
+      <div class="settings-page" id="page-writing">
+        <div class="settings-page-title">Writing</div>
+        <div class="settings-page-sub">Voice input and note preferences.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Voice</div>
+          <div class="settings-row"><div><div class="sr-label">Language</div><div class="sr-desc">Speech recognition language</div></div><select class="settings-select" id="voice-lang" onchange="savePref('vlang', this.value)"><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="es-ES">Spanish</option><option value="fr-FR">French</option><option value="de-DE">German</option><option value="ja-JP">Japanese</option><option value="zh-CN">Chinese</option></select></div>
+          <div class="settings-row"><div><div class="sr-label">Read Aloud Speed</div></div><select class="settings-select" id="speak-rate" onchange="savePref('srate', this.value)"><option value="0.75">Slow</option><option value="1" selected>Normal</option><option value="1.25">Fast</option><option value="1.5">Very Fast</option></select></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">Notes</div>
+          <div class="settings-row"><div><div class="sr-label">Auto-save Writing Panel</div><div class="sr-desc">Save automatically every 3s</div></div><button class="toggle" id="tog-autosave" onclick="toggleSetting('autosave')"></button></div>
+          <div class="settings-row"><div><div class="sr-label">Clear All Notes</div><div class="sr-desc">Permanently delete all notes</div></div><button class="btn-danger" onclick="clearAllNotes()">Delete Notes</button></div>
+        </div>
+      </div>
+
+      <div class="settings-page" id="page-privacy">
+        <div class="settings-page-title">Privacy &amp; Data</div>
+        <div class="settings-page-sub">Control how your data is stored.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Storage</div>
+          <div class="settings-row"><div><div class="sr-label">Save Chat History</div><div class="sr-desc">Store sessions in your browser</div></div><button class="toggle on" id="tog-history" onclick="toggleSetting('history')"></button></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">Export &amp; Delete</div>
+          <div class="settings-row"><div><div class="sr-label">Export My Data</div><div class="sr-desc">Download notes &amp; sessions as JSON</div></div><button class="btn-outline" onclick="exportAllData()">Export</button></div>
+          <div class="settings-row"><div><div class="sr-label">Clear History</div><div class="sr-desc">Remove all saved sessions</div></div><button class="btn-danger" onclick="clearAllSessions()">Clear</button></div>
+        </div>
+      </div>
+
+      <div class="settings-page" id="page-account">
+        <div class="settings-page-title">Account</div>
+        <div class="settings-page-sub">Manage your profile and session.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Profile</div>
+          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+            <div class="sr-label">Display Name</div>
+            <div style="display:flex;gap:8px;width:100%">
+              <input class="settings-input" id="display-name-input" type="text" placeholder="Your name" style="flex:1"/>
+              <button class="btn-primary" onclick="updateDisplayName()">Save</button>
+            </div>
+          </div>
+          <div class="settings-row"><div><div class="sr-label">Signed in as</div><div class="sr-desc" id="signed-in-as">—</div></div></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">Session</div>
+          <div class="settings-row"><div><div class="sr-label">Sign Out</div><div class="sr-desc">Sign out of AI Pen</div></div><button class="btn-danger" onclick="signOutUser()">Sign Out</button></div>
+        </div>
+      </div>
+
+      <div class="settings-page" id="page-about">
+        <div class="settings-page-title">About AI Pen</div>
+        <div class="settings-page-sub">Version and support information.</div>
+        <div class="settings-group">
+          <div class="settings-group-label">Info</div>
+          <div class="settings-row"><div class="sr-label">Version</div><span style="font-size:12px;color:var(--text-3)">v3.2.0</span></div>
+          <div class="settings-row"><div class="sr-label">AI Provider</div><span style="font-size:12px;color:var(--text-3)">OpenRouter</span></div>
+          <div class="settings-row"><div class="sr-label">Auth</div><span style="font-size:12px;color:var(--text-3)">Firebase</span></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-label">Feedback</div>
+          <div class="settings-row"><div><div class="sr-label">Send Feedback</div></div><button class="btn-outline" onclick="toast('Feedback form coming soon!')">Send Feedback</button></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+// ── Firebase ──
+firebase.initializeApp({
+  apiKey:"AIzaSyAb9ORZa7EQyKhLf8hL46Qh3FXZmNGzIjg",
+  authDomain:"ai-pen-c85a0.firebaseapp.com",
+  projectId:"ai-pen-c85a0",
+  storageBucket:"ai-pen-c85a0.firebasestorage.app",
+  messagingSenderId:"997852271146",
+  appId:"1:997852271146:web:f9b42d91dce0ead0d86953"
+});
+const auth = firebase.auth();
+
+// ── Models ──
+const MODELS = [
+  {id:'openai/gpt-4o-mini',                    name:'GPT-4o Mini',       desc:'Fast & capable, great all-rounder',    icon:'🟢', tag:'fast'},
+  {id:'openai/gpt-4o',                          name:'GPT-4o',            desc:'Most capable OpenAI model',            icon:'🔵', tag:'smart'},
+  {id:'anthropic/claude-3-5-haiku',             name:'Claude 3.5 Haiku',  desc:'Anthropic — fast & smart',             icon:'🟣', tag:'fast'},
+  {id:'anthropic/claude-3-5-sonnet',            name:'Claude 3.5 Sonnet', desc:'Anthropic — most capable',             icon:'🟣', tag:'smart'},
+  {id:'google/gemini-flash-1.5',                name:'Gemini Flash 1.5',  desc:'Google — ultra fast responses',        icon:'🔴', tag:'fast'},
+  {id:'meta-llama/llama-3.3-70b-instruct',      name:'Llama 3.3 70B',     desc:'Meta open source — very capable',      icon:'🟡', tag:'smart'},
+  {id:'meta-llama/llama-3.1-8b-instruct:free',  name:'Llama 3.1 8B',      desc:'Free tier — good for testing',         icon:'⚪', tag:'free'},
+  {id:'deepseek/deepseek-chat',                 name:'DeepSeek V3',       desc:'Great at coding & analysis',           icon:'🔷', tag:'smart'},
+  {id:'mistralai/mistral-7b-instruct:free',     name:'Mistral 7B',        desc:'Free tier — lightweight',              icon:'⚪', tag:'free'},
+];
+
+// ── State ──
+let activeModel = localStorage.getItem('pref_model') || 'openai/gpt-4o-mini';
+let chatHistory = [];
+let totalMessages = 0, totalWords = 0;
+
+// ── Auth ──
+auth.onAuthStateChanged(user => {
+  if (!user) { window.location.href = '/login.html'; return; }
+  const name = user.displayName || user.email?.split('@')[0] || 'User';
+  document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-email').textContent = user.email || user.phoneNumber || '';
+  document.getElementById('display-name-input').value = name;
+  document.getElementById('signed-in-as').textContent = user.email || user.phoneNumber || 'Signed in';
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night';
+  document.getElementById('page-title').textContent = `${greet}, ${name}`;
+  loadPreferences();
+  buildModelList();
+  refreshRightPanel();
+  initBluetooth();
+  updateStats();
+});
+
+// ── Send message ──
+function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim(); if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  totalWords += text.split(/\s+/).filter(Boolean).length;
+  addUserMessage(text);
+  chatHistory.push({ role: 'user', content: text });
+  updateStats(); fetchAIResponse();
+}
+
+function sendQuick(text) {
+  addUserMessage(text);
+  chatHistory.push({ role: 'user', content: text });
+  totalWords += text.split(/\s+/).length;
+  updateStats(); fetchAIResponse();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('messages');
+  const typingRow = document.getElementById('typing-row');
+  const div = document.createElement('div'); div.className = 'msg-row-user';
+  div.innerHTML = `<div><div class="bubble-user">${esc(text)}</div><div class="bubble-user-time">✓✓ ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div></div>`;
+  msgs.insertBefore(div, typingRow);
+  msgs.scrollTop = msgs.scrollHeight;
+  saveSession();
+}
+
+async function fetchAIResponse() {
+  const msgs = document.getElementById('messages');
+  const typingRow = document.getElementById('typing-row');
+  const errBar = document.getElementById('error-bar');
+  const typingInd = document.getElementById('typing-ind');
+
+  errBar.classList.remove('show');
+  typingRow.style.display = 'flex';
+  typingInd.style.display = 'block';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const sysPrompt = localStorage.getItem('pref_sysprompt') ||
+    'You are AI Pen, a concise AI assistant. Keep answers short and to the point — 1 to 3 sentences unless the user asks for more. Deliver writing tasks directly without preamble.';
+
+  let fullText = '', aiRow = null, bubbleBody = null, cursor = null;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: activeModel, messages: [{ role: 'system', content: sysPrompt }, ...chatHistory] })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    typingRow.style.display = 'none';
+
+    aiRow = document.createElement('div'); aiRow.className = 'msg-row-ai';
+    aiRow.innerHTML = `
+      <div class="ai-avatar">✦</div>
+      <div class="bubble-ai-wrap">
+        <div class="bubble-ai">
+          <div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>
+          <span class="msg-content"></span><span class="cursor-blink"></span>
+          <div class="bubble-ai-actions" style="display:none">
+            <button class="baa" onclick="copyBubble(this)">📋 Copy</button>
+            <button class="baa" onclick="likeMsg(this)">👍 Like</button>
+            <button class="baa" onclick="dislikeMsg(this)">👎 Dislike</button>
+            <button class="baa" onclick="speakBubble(this)">🔊 Read</button>
+          </div>
+        </div>
+      </div>`;
+    msgs.insertBefore(aiRow, typingRow);
+    bubbleBody = aiRow.querySelector('.msg-content');
+    cursor = aiRow.querySelector('.cursor-blink');
+    msgs.scrollTop = msgs.scrollHeight;
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n'); buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim(); if (data === '[DONE]') break;
+        try {
+          const delta = JSON.parse(data).choices?.[0]?.delta?.content || '';
+          if (delta) { fullText += delta; bubbleBody.textContent = fullText; msgs.scrollTop = msgs.scrollHeight; }
+        } catch {}
+      }
+    }
+
+    cursor?.remove();
+    aiRow.querySelector('.bubble-ai-actions').style.display = 'flex';
+    chatHistory.push({ role: 'assistant', content: fullText });
+    totalMessages++; updateStats(); saveSession();
+
+  } catch (err) {
+    typingRow.style.display = 'none';
+    cursor?.remove(); aiRow?.remove();
+    document.getElementById('error-text').textContent = err.message;
+    errBar.classList.add('show');
+    if (chatHistory[chatHistory.length - 1]?.role === 'user') chatHistory.pop();
+    setTimeout(() => errBar.classList.remove('show'), 8000);
+  }
+}
+
+function startNewChat() {
+  if (chatHistory.length && !confirm('Start a new chat? Current chat will be saved.')) return;
+  if (chatHistory.length) saveSession();
+  chatHistory = []; window._sessionId = null;
+  const msgs = document.getElementById('messages');
+  const typingRow = document.getElementById('typing-row');
+  while (msgs.firstChild && msgs.firstChild !== typingRow) msgs.removeChild(msgs.firstChild);
+  const row = document.createElement('div'); row.className = 'msg-row-ai';
+  row.innerHTML = `<div class="ai-avatar">✦</div><div class="bubble-ai-wrap"><div class="bubble-ai"><div class="bubble-ai-label"><div class="bubble-ai-label-dot"></div>AI Pen</div>New chat started! What would you like to work on?<div class="bubble-ai-actions"><button class="baa" onclick="copyBubble(this)">📋 Copy</button></div></div></div>`;
+  msgs.insertBefore(row, typingRow);
+  toast('New chat started');
+}
+
+// ── Message actions ──
+function copyBubble(btn) {
+  const t = btn.closest('.bubble-ai').querySelector('.msg-content')?.textContent || btn.closest('.bubble-ai').innerText.split('\n').slice(1).join('\n').replace(/📋.*|👍.*|👎.*|🔊.*/g,'').trim();
+  navigator.clipboard.writeText(t).then(() => toast('Copied!'));
+}
+function likeMsg(btn) { btn.classList.toggle('liked'); toast(btn.classList.contains('liked') ? 'Liked!' : 'Removed.'); }
+function dislikeMsg(btn) { btn.classList.toggle('disliked'); toast(btn.classList.contains('disliked') ? 'Feedback noted.' : 'Removed.'); }
+function speakBubble(btn) {
+  const t = btn.closest('.bubble-ai').querySelector('.msg-content')?.textContent || '';
+  if (!t) { toast('Nothing to read'); return; }
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); toast('Stopped.'); return; }
+  const u = new SpeechSynthesisUtterance(t);
+  u.rate = parseFloat(localStorage.getItem('pref_srate') || '1');
+  speechSynthesis.speak(u); toast('Reading aloud…');
+}
+
+// ── Templates ──
+let tplOpen = false;
+function openTemplates() {
+  tplOpen = !tplOpen;
+  document.getElementById('tpl-popup').classList.toggle('open', tplOpen);
+}
+function useTpl(text) {
+  document.getElementById('msg-input').value = text;
+  autoResize(document.getElementById('msg-input'));
+  document.getElementById('msg-input').focus();
+  document.getElementById('tpl-popup').classList.remove('open'); tplOpen = false;
+}
+function prefill(text) {
+  const writing = document.getElementById('writing-pad').textContent.trim();
+  document.getElementById('msg-input').value = text + writing;
+  autoResize(document.getElementById('msg-input'));
+  document.getElementById('msg-input').focus();
+  switchView('chat');
+}
+document.addEventListener('click', e => {
+  if (tplOpen && !e.target.closest('#tpl-popup') && !e.target.closest('.input-action'))
+    { document.getElementById('tpl-popup').classList.remove('open'); tplOpen = false; }
+});
+
+// ── Voice ──
+let recognizer = null, isListening = false;
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { toast('Voice not supported in this browser'); return; }
+  if (isListening) { recognizer.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognizer = new SR();
+  recognizer.lang = localStorage.getItem('pref_vlang') || 'en-US';
+  recognizer.continuous = true; recognizer.interimResults = true;
+  recognizer.onstart = () => { isListening = true; document.getElementById('mic-btn').classList.add('recording'); document.getElementById('voice-status').textContent = 'Listening…'; };
+  recognizer.onresult = e => {
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) final += e.results[i][0].transcript;
+    if (final) { const inp = document.getElementById('msg-input'); inp.value += (inp.value ? ' ' : '') + final; autoResize(inp); }
+    document.getElementById('voice-status').textContent = 'Recognized ✓';
+  };
+  recognizer.onerror = () => { toast('Voice error'); stopListening(); };
+  recognizer.onend = stopListening;
+  recognizer.start();
+}
+function stopListening() { isListening = false; document.getElementById('mic-btn').classList.remove('recording'); document.getElementById('voice-status').textContent = 'Tap mic to dictate'; }
+
+// ── Writing Panel ──
+let autosaveTimer;
+function onWritingInput() {
+  if (localStorage.getItem('pref_autosave') === 'true') {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(() => {
+      const t = document.getElementById('writing-pad').textContent.trim();
+      if (t) { saveNote('Auto-save', t); toast('Auto-saved'); }
+    }, 3000);
+  }
+}
+function copyWriting() {
+  const t = document.getElementById('writing-pad').textContent;
+  if (!t.trim()) { toast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(t).then(() => toast('Copied!'));
+}
+function sendWritingToChat() {
+  const t = document.getElementById('writing-pad').textContent.trim();
+  if (!t) { toast('Write something first'); return; }
+  document.getElementById('msg-input').value = 'Work with this text:\n\n' + t;
+  autoResize(document.getElementById('msg-input'));
+  document.getElementById('msg-input').focus();
+  switchView('chat');
+}
+function saveWriting() {
+  const t = document.getElementById('writing-pad').textContent.trim();
+  if (!t) { toast('Nothing to save'); return; }
+  saveNote('Note ' + new Date().toLocaleDateString(), t);
+  refreshRightPanel(); toast('Saved!');
+}
+
+// ── Notes ──
+function getNotes() { try { return JSON.parse(localStorage.getItem('ap_notes') || '[]'); } catch { return []; } }
+function saveNote(title, content) {
+  const notes = getNotes();
+  notes.unshift({ id: Date.now(), title, content, date: new Date().toLocaleDateString() });
+  localStorage.setItem('ap_notes', JSON.stringify(notes.slice(0, 100)));
+  updateStats();
+}
+function loadNote(id) {
+  const note = getNotes().find(n => n.id === id);
+  if (note) { document.getElementById('writing-pad').textContent = note.content; toast('Note loaded!'); }
+}
+function createNote() {
+  const title = prompt('Note title:'); if (!title) return;
+  const content = prompt('Content:'); if (!content) return;
+  saveNote(title, content); renderNotesGrid(); refreshRightPanel(); toast('Note created!');
+}
+function clearAllNotes() {
+  if (!confirm('Delete all notes permanently?')) return;
+  localStorage.removeItem('ap_notes');
+  renderNotesGrid(); refreshRightPanel(); updateStats(); toast('Notes deleted.');
+}
+function renderNotesGrid() {
+  const notes = getNotes();
+  const grid = document.getElementById('notes-grid');
+  if (!notes.length) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-text">No notes yet. Save something from the writing panel.</div></div>'; return; }
+  grid.innerHTML = notes.map(n => `<div class="grid-card" onclick="loadNote(${n.id}); switchView('chat')"><div class="gc-title">${esc(n.title)}</div><div class="gc-body">${esc(n.content)}</div><div class="gc-date">${n.date}</div></div>`).join('');
+}
+function refreshRightPanel() {
+  const notes = getNotes().slice(0, 4);
+  const el = document.getElementById('recent-notes-list');
+  el.innerHTML = notes.length
+    ? notes.map(n => `<div class="note-item" onclick="loadNote(${n.id})"><div class="note-item-title">${esc(n.title)}</div><div class="note-item-preview">${esc(n.content.substring(0, 50))}</div><div class="note-item-date">${n.date}</div></div>`).join('')
+    : '<div class="no-items">No notes yet.</div>';
+}
+
+// ── Sessions ──
+function saveSession() {
+  if (localStorage.getItem('pref_history') === 'false' || !chatHistory.length) return;
+  const sessions = JSON.parse(localStorage.getItem('ap_sessions') || '[]');
+  const preview = chatHistory[0]?.content?.substring(0, 70) || 'Conversation';
+  if (!window._sessionId) window._sessionId = Date.now();
+  const existing = sessions.find(s => s.id === window._sessionId);
+  if (existing) { existing.preview = preview; existing.count = chatHistory.length; }
+  else sessions.unshift({ id: window._sessionId, preview, count: chatHistory.length, date: new Date().toLocaleDateString() });
+  localStorage.setItem('ap_sessions', JSON.stringify(sessions.slice(0, 50)));
+}
+function renderSessionsGrid() {
+  const sessions = JSON.parse(localStorage.getItem('ap_sessions') || '[]');
+  const grid = document.getElementById('sessions-grid');
+  if (!sessions.length) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-text">No sessions yet.</div></div>'; return; }
+  grid.innerHTML = sessions.map(s => `<div class="grid-card"><div class="gc-title">${esc(s.preview)}…</div><div class="gc-body">${s.count} messages</div><div class="gc-date">${s.date}</div></div>`).join('');
+}
+function clearAllSessions() {
+  if (!confirm('Clear all history?')) return;
+  localStorage.removeItem('ap_sessions'); renderSessionsGrid(); toast('History cleared.');
+}
+
+// ── Views ──
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-btn[id^=nav]').forEach(b => b.classList.remove('active'));
+  document.getElementById(`view-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  if (name === 'notes') renderNotesGrid();
+  if (name === 'sessions') renderSessionsGrid();
+}
+
+// ── Stats ──
+function updateStats() {
+  document.getElementById('stat-words').textContent = totalWords;
+  document.getElementById('stat-msgs').textContent = totalMessages;
+  document.getElementById('stat-notes').textContent = getNotes().length;
+  const pct = Math.min(totalMessages, 100);
+  document.getElementById('usage-fill').style.width = pct + '%';
+  document.getElementById('usage-label').textContent = totalMessages + ' / 100';
+}
+
+// ── Bluetooth ──
+let btDevice = null, btServer = null;
+function initBluetooth() {
+  if (!navigator.bluetooth) {
+    document.getElementById('bt-btn').style.display = 'none';
+    document.getElementById('bt-unavailable').style.display = 'block';
+  }
+}
+async function toggleBluetooth() {
+  if (btDevice?.gatt.connected) { disconnectBluetooth(); return; }
+  if (!navigator.bluetooth) { toast('Bluetooth not supported'); return; }
+  setDeviceStatus('connecting');
+  try {
+    btDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['battery_service', 'device_information'] });
+    btDevice.addEventListener('gattserverdisconnected', onDeviceDrop);
+    btServer = await btDevice.gatt.connect();
+    const name = btDevice.name || 'AI Pen';
+    document.getElementById('device-name').textContent = name;
+    setDeviceStatus('connected'); toast(`Connected to ${name}`);
+    try {
+      const svc = await btServer.getPrimaryService('battery_service');
+      const ch = await svc.getCharacteristic('battery_level');
+      setBattery((await ch.readValue()).getUint8(0));
+      ch.addEventListener('characteristicvaluechanged', e => setBattery(e.target.value.getUint8(0)));
+      await ch.startNotifications().catch(() => {});
+    } catch {}
+  } catch (err) {
+    if (err.name !== 'NotFoundError' && err.name !== 'AbortError') toast('Could not connect.');
+    setDeviceStatus('disconnected'); btDevice = null; btServer = null;
+  }
+}
+function disconnectBluetooth() {
+  btDevice?.gatt?.disconnect();
+  setDeviceStatus('disconnected'); setBattery(null);
+  document.getElementById('device-name').textContent = 'AI Pen';
+  btDevice = null; btServer = null; toast('Disconnected');
+}
+function onDeviceDrop() {
+  setDeviceStatus('disconnected'); setBattery(null);
+  document.getElementById('device-name').textContent = 'AI Pen';
+  btDevice = null; btServer = null; toast('Pen disconnected');
+}
+function setDeviceStatus(state) {
+  const el = document.getElementById('device-status');
+  const btn = document.getElementById('bt-btn');
+  const lbl = document.getElementById('bt-btn-label');
+  el.className = 'bt-device-status ' + state;
+  if (state === 'connected') { el.textContent = '● Connected'; btn.classList.add('connected'); btn.disabled = false; lbl.textContent = 'Disconnect'; }
+  else if (state === 'connecting') { el.textContent = '● Connecting…'; btn.classList.remove('connected'); btn.disabled = true; lbl.textContent = 'Connecting…'; }
+  else { el.textContent = '● Not Connected'; btn.classList.remove('connected'); btn.disabled = false; lbl.textContent = 'Connect via Bluetooth'; }
+}
+function setBattery(pct) {
+  const row = document.getElementById('battery-row');
+  if (pct === null) { row.style.display = 'none'; return; }
+  row.style.display = 'flex';
+  const fill = document.getElementById('battery-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = pct > 30 ? 'var(--green)' : pct > 15 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('battery-label').textContent = pct + '%';
+}
+
+// ── Settings ──
+function openSettings() { buildModelList(); document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+function overlayClose(e) { if (e.target === document.getElementById('settings-overlay')) closeSettings(); }
+function showSettingsPage(page, btn) {
+  document.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${page}`)?.classList.add('active'); btn?.classList.add('active');
+}
+function buildModelList() {
+  document.getElementById('model-list').innerHTML = MODELS.map(m =>
+    `<div class="model-row ${m.id === activeModel ? 'active' : ''}" onclick="selectModel('${m.id}', this)">
+      <span class="model-icon">${m.icon}</span>
+      <div class="model-info"><div class="model-name">${m.name}</div><div class="model-desc">${m.desc}</div></div>
+      <span class="model-badge ${m.tag}">${m.tag}</span>
+    </div>`
+  ).join('');
+}
+function selectModel(id, el) {
+  activeModel = id; savePref('model', id);
+  document.querySelectorAll('.model-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  const m = MODELS.find(x => x.id === id);
+  document.getElementById('model-name-badge').textContent = m?.name || 'AI Pen';
+  toast('Model: ' + (m?.name || id));
+}
+function toggleSetting(key) {
+  const el = document.getElementById(`tog-${key}`); el.classList.toggle('on');
+  savePref(key, el.classList.contains('on'));
+  if (key === 'panel') document.querySelector('.right-panel').style.display = el.classList.contains('on') ? '' : 'none';
+}
+function savePref(key, value) { localStorage.setItem('pref_' + key, value); }
+
+// ── Appearance ──
+function applyTheme(t) {
+  const themes = {
+    dark:    { bg:'#0b0c12', panel:'#10111a', card:'#16172200', cards:'#1a1b28', border:'#21233a' },
+    amoled:  { bg:'#000000', panel:'#090909', card:'#00000000', cards:'#111111', border:'#1c1c1c' },
+    midnight:{ bg:'#060814', panel:'#0a0d1e', card:'#0d102200', cards:'#12152a', border:'#1a2040' },
+    forest:  { bg:'#070d09', panel:'#0c1410', card:'#0f191300', cards:'#131e15', border:'#1e2e22' },
+  };
+  const c = themes[t] || themes.dark;
+  const r = document.documentElement.style;
+  r.setProperty('--bg', c.bg); r.setProperty('--panel', c.panel);
+  r.setProperty('--card', c.card); r.setProperty('--card-s', c.cards);
+  r.setProperty('--border', c.border);
+  savePref('theme', t); toast('Theme applied!');
+}
+function setAccent(el) {
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active')); el.classList.add('active');
+  document.documentElement.style.setProperty('--accent', el.dataset.color);
+  savePref('accent', el.dataset.color); toast('Accent updated!');
+}
+function setFontSize(size) {
+  document.querySelectorAll('.bubble-user, .bubble-ai').forEach(el => el.style.fontSize = size + 'px');
+  savePref('fontsize', size);
+}
+
+// ── Account ──
+function updateDisplayName() {
+  const name = document.getElementById('display-name-input').value.trim();
+  if (name.length < 2) { toast('Name too short'); return; }
+  auth.currentUser?.updateProfile({ displayName: name }).then(() => {
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+    toast('Name saved!');
+  }).catch(() => toast('Could not update name'));
+}
+function signOutUser() {
+  if (!confirm('Sign out of AI Pen?')) return;
+  auth.signOut().then(() => window.location.href = '/login.html');
+}
+function exportAllData() {
+  const data = { notes: getNotes(), sessions: JSON.parse(localStorage.getItem('ap_sessions') || '[]') };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.download = 'aipen-export.json'; a.click(); toast('Exported!');
+}
+
+// ── Preferences ──
+function loadPreferences() {
+  const accent = localStorage.getItem('pref_accent'); if (accent) { document.documentElement.style.setProperty('--accent', accent); document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.color === accent)); }
+  const theme = localStorage.getItem('pref_theme'); if (theme) applyTheme(theme);
+  if (localStorage.getItem('pref_panel') === 'false') { document.querySelector('.right-panel').style.display = 'none'; document.getElementById('tog-panel').classList.remove('on'); }
+  const fs = localStorage.getItem('pref_fontsize'); if (fs) document.querySelectorAll('.bubble-user,.bubble-ai').forEach(el => el.style.fontSize = fs + 'px');
+  activeModel = localStorage.getItem('pref_model') || 'openai/gpt-4o-mini';
+  const m = MODELS.find(x => x.id === activeModel); if (m) document.getElementById('model-name-badge').textContent = m.name;
+  const sys = localStorage.getItem('pref_sysprompt'); if (sys) document.getElementById('system-prompt-input').value = sys;
+  const vl = localStorage.getItem('pref_vlang'); if (vl) { const el = document.getElementById('voice-lang'); if (el) el.value = vl; }
+  const sr = localStorage.getItem('pref_srate'); if (sr) { const el = document.getElementById('speak-rate'); if (el) el.value = sr; }
+  ['autosave', 'history'].forEach(key => {
+    const el = document.getElementById(`tog-${key}`); if (!el) return;
+    const val = localStorage.getItem(`pref_${key}`);
+    el.classList.toggle('on', val === null ? key === 'history' : val === 'true');
+  });
+}
+
+// ── Toast ──
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
