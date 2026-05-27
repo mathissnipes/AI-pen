@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>AI Pen — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -13,7 +14,6 @@
   --green:#22c55e;--red:#f43f5e;
 }
 html,body{height:100%;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center}
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* card */
 .card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:36px 32px 30px;margin:20px;box-shadow:0 32px 80px rgba(0,0,0,.6)}
@@ -47,7 +47,7 @@ input::placeholder{color:var(--text-3)}
 
 /* messages */
 .err{font-size:13px;color:var(--red);margin-bottom:12px;min-height:18px}
-.ok{font-size:13px;color:var(--green);margin-bottom:12px;display:none}
+.ok{font-size:13px;color:var(--green);margin-bottom:12px;padding:10px 12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.18);border-radius:8px;display:none}
 
 /* toggle row */
 .toggle-row{text-align:center;margin-top:16px;font-size:13px;color:var(--text-2)}
@@ -71,10 +71,6 @@ input::placeholder{color:var(--text-3)}
 .otp-row{display:flex;gap:8px;margin-bottom:16px;justify-content:center}
 .otp-box{width:46px;height:52px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:22px;font-weight:700;text-align:center;color:var(--text);font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;caret-color:transparent;margin-bottom:0}
 .otp-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-
-/* divider */
-.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-3);font-size:12px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* loading overlay */
 #auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
@@ -138,9 +134,9 @@ input::placeholder{color:var(--text-3)}
         Back to Sign In
       </div>
       <div class="step-title">Reset Password</div>
-      <div class="step-sub">Enter your email and we'll send you a reset link.</div>
+      <div class="step-sub">Enter your email and we'll send you a reset link right away.</div>
       <div class="err" id="forgot-error"></div>
-      <div class="ok" id="forgot-ok">✓ Reset email sent! Check your inbox.</div>
+      <div class="ok" id="forgot-ok">✓ Reset email sent! Check your inbox (and spam folder).</div>
       <label class="field-label">Email</label>
       <input type="email" id="forgot-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')sendReset()"/>
       <button class="btn" id="reset-btn" onclick="sendReset()">Send Reset Email</button>
@@ -229,16 +225,16 @@ function switchTab(tab) {
 // ── Sign-up / Sign-in toggle ──
 function toggleMode() {
   signUpMode = !signUpMode;
-  document.getElementById('email-btn').textContent   = signUpMode ? 'Create Account' : 'Sign In';
-  document.getElementById('toggle-hint').textContent = signUpMode ? 'Already have an account?' : "Don't have an account?";
-  document.getElementById('toggle-link').textContent = signUpMode ? ' Sign In' : ' Sign Up';
+  document.getElementById('email-btn').textContent    = signUpMode ? 'Create Account' : 'Sign In';
+  document.getElementById('toggle-hint').textContent  = signUpMode ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('toggle-link').textContent  = signUpMode ? ' Sign In' : ' Sign Up';
   document.getElementById('username-field').className = signUpMode ? '' : 'hidden-field';
   document.getElementById('forgot-row').style.display = signUpMode ? 'none' : '';
   if (!signUpMode) document.getElementById('username-input').value = '';
   clearErrors();
 }
 
-// ── Errors ──
+// ── Error helpers ──
 function clearErrors() {
   ['email-error','phone-error','otp-error','name-error','forgot-error'].forEach(id => {
     const el = document.getElementById(id); if (el) el.textContent = '';
@@ -298,8 +294,8 @@ function showForgot() {
   document.getElementById('forgot-panel').style.display = 'block';
   document.getElementById('forgot-error').textContent   = '';
   document.getElementById('forgot-ok').style.display    = 'none';
-  document.getElementById('reset-btn').disabled  = false;
-  document.getElementById('reset-btn').textContent = 'Send Reset Email';
+  document.getElementById('reset-btn').disabled         = false;
+  document.getElementById('reset-btn').textContent      = 'Send Reset Email';
   document.getElementById('forgot-email').focus();
 }
 function hideForgot() {
@@ -419,12 +415,12 @@ function backToStep1() {
   confirmResult = null; initRecaptcha();
 }
 
-// ── OTP box UX ──
+// ── OTP box UX: auto-advance, backspace, paste ──
 document.querySelectorAll('.otp-box').forEach((box, i, boxes) => {
   box.addEventListener('input', () => {
     const v = box.value.replace(/\D/g,''); box.value = v.slice(-1);
     if (v && i < boxes.length-1) boxes[i+1].focus();
-    if (Array.from(boxes).every(b=>b.value)) verifyCode();
+    if (Array.from(boxes).every(b => b.value)) verifyCode();
   });
   box.addEventListener('keydown', e => {
     if (e.key==='Backspace' && !box.value && i>0) { boxes[i-1].focus(); boxes[i-1].value=''; }
@@ -440,5 +436,3 @@ document.querySelectorAll('.otp-box').forEach((box, i, boxes) => {
 </script>
 </body>
 </html>
-
-File has not been read yet. Read it first before writing to it.
